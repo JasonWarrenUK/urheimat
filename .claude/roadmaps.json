@@ -1,0 +1,219 @@
+[
+	{
+		"name": "PHASE_1",
+		"path": "docs/roadmaps/PHASE_1.md",
+		"project": "Urheimat",
+		"archived": false,
+		"externalGates": [],
+		"milestones": [
+			{
+				"id": "M1",
+				"name": "Foundations and launch",
+				"goal": "Get the game as it stands onto a public URL, so every later change ships somewhere real.",
+				"tasks": [
+					{
+						"id": "1FN.1",
+						"description": "Create the public GitHub repository and push the existing history",
+						"status": "todo",
+						"dependsOn": [],
+						"assignee": "Jason"
+					},
+					{
+						"id": "1FN.2",
+						"description": "Deploy the current client-side game to Vercel from the repository",
+						"status": "blocked",
+						"dependsOn": ["1FN.1"],
+						"notes": "The game runs entirely client-side today, so this needs nothing from the persistence milestone. The adapter is already configured.",
+						"assignee": "Jason"
+					}
+				]
+			},
+			{
+				"id": "M2",
+				"name": "Design spikes",
+				"goal": "Answer the open design questions before building on assumptions that may not survive them.",
+				"tasks": [
+					{
+						"id": "2DS.1",
+						"description": "Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived",
+						"status": "todo",
+						"dependsOn": [],
+						"notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "2DS.2",
+						"description": "UI spike: information architecture first, then visual design; defines how the derived states are displayed, and produces concrete mobile and accessibility tasks rather than principles",
+						"status": "blocked",
+						"dependsOn": ["2DS.1", "4SD.1", "4SD.2", "4SD.3"],
+						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks.",
+						"assignee": "Jason"
+					}
+				]
+			},
+			{
+				"id": "M3",
+				"name": "Persistence",
+				"goal": "Runs survive the session and finished runs are comparable, attributed to a signed-in player.",
+				"tasks": [
+					{
+						"id": "3PL.1",
+						"description": "Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers",
+						"status": "todo",
+						"dependsOn": [],
+						"notes": "Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "3PL.2",
+						"description": "Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes",
+						"status": "blocked",
+						"dependsOn": ["1FN.2", "3PL.1"],
+						"notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "3PL.3",
+						"description": "Save and resume a run across sessions and devices",
+						"status": "blocked",
+						"dependsOn": ["3PL.2"],
+						"notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "3PL.4",
+						"description": "Leaderboard of finished runs",
+						"status": "blocked",
+						"dependsOn": ["3PL.2"],
+						"notes": "Deliberately not a first-class feature; a small indexed collection is enough.",
+						"assignee": "Jason"
+					}
+				]
+			},
+			{
+				"id": "M4",
+				"name": "Simulation depth",
+				"goal": "Deepen the drift model and inter-culture dynamics so reconstruction has something harder to work on.",
+				"tasks": [
+					{
+						"id": "4SD.1",
+						"description": "Derive a narrative condition state, replacing numeric prosperity entirely",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"notes": "No float, no bar. Prosperity currently drives death at zero and the daughter-band threshold, so the derivation must preserve those mechanics while the player only ever sees prose.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.2",
+						"description": "Derive a narrative strain state, replacing the count of straining parts",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.3",
+						"description": "Derive a narrative action-budget state, replacing the actions-left counter",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.4",
+						"description": "Semantic drift: place feature values on a similarity graph so drift favours near neighbours",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"notes": "Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.5",
+						"description": "Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight",
+						"status": "blocked",
+						"dependsOn": ["2DS.1", "4SD.1"],
+						"notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Depends on condition state because prestige is derived from it.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.6",
+						"description": "Second founding stock: seed two unrelated ancestral cultures at game start",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"notes": "The player still leads a band from one stock and is still scored on recovering that stock's truth; the second exists to contaminate the record.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.7",
+						"description": "Substrate inheritance: dying and displaced cultures leave traces in whoever succeeds them",
+						"status": "blocked",
+						"dependsOn": ["4SD.6"],
+						"notes": "Needs a second lineage to inherit from, so it follows the second founding stock. Traces may be unrelated traditions or mutated sibling ones.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.8",
+						"description": "Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"notes": "A second lever beyond Hold, and a systematic bias for the scholars to fall for.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.9",
+						"description": "Richer inter-culture relations: trade, conquest and hostility beyond distance-and-terrain contact",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.10",
+						"description": "Expand the corpus: more customs, more parts per custom, more values per part",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"softDependsOn": ["4SD.4"],
+						"notes": "Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.",
+						"assignee": "Jason"
+					}
+				]
+			},
+			{
+				"id": "M5",
+				"name": "Reconstruction",
+				"goal": "Make the scholars fallible in ways that reward how the player played, not just what survived.",
+				"tasks": [
+					{
+						"id": "5RC.1",
+						"description": "Chronicle carries the evidence the scholars later consume",
+						"status": "blocked",
+						"dependsOn": ["2DS.1"],
+						"notes": "Attestation has to be sourced from something recorded. The chronicle is what the player actually saw happen, which keeps the scoring legible in hindsight.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "5RC.2",
+						"description": "Uneven attestation derived from in-game events, never from a random roll",
+						"status": "blocked",
+						"dependsOn": ["5RC.1"],
+						"notes": "A culture that kept Carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Makes being legible to the future a goal in itself.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "5RC.3",
+						"description": "Deeper scholar model: weighted evidence, competing hypotheses and sub-grouping rather than flat comparison",
+						"status": "blocked",
+						"dependsOn": ["5RC.2"],
+						"assignee": "Jason"
+					},
+					{
+						"id": "5RC.4",
+						"description": "Scoring accounts for the second stock: contamination misleads, but the player's own ancestral truth stays the target",
+						"status": "blocked",
+						"dependsOn": ["4SD.6"],
+						"softDependsOn": ["5RC.3"],
+						"notes": "False unity across the two stocks becomes a scoreable error. Soft-linked to the scholar model, which it should reflect but need not wait for.",
+						"assignee": "Jason"
+					}
+				]
+			}
+		]
+	}
+]
