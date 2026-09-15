@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Urheimat</title>
+<style>
+  :root{
+    --bg:#2a2118; --bg2:#33291e; --bg3:#3e3226; --line:#5a4a38;
+    --ink:#e6dcc6; --ink2:#b9ad95; --ink3:#87795f;
+    --bronze:#c99a47; --verd:#6fae95; --ochre:#c8603f; --pale:#f3ead7;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.5}
+  #app{background:var(--bg);color:var(--ink);min-height:100vh;max-width:560px;margin:0 auto;padding:14px 14px 40px}
+  h1{font-size:40px;font-weight:normal;letter-spacing:.02em;margin:6px 0 2px;line-height:1.05}
+  h2{font-size:22px;font-weight:normal;margin:18px 0 6px}
+  h3{font-size:15px;font-weight:normal;color:var(--bronze);margin:16px 0 4px;font-style:italic}
+  p{margin:6px 0}
+  .muted{color:var(--ink2)} .faint{color:var(--ink3)}
+  .small{font-size:13px}
+  button{font-family:var(--serif);font-size:15px;background:var(--bg3);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:8px 12px;cursor:pointer}
+  button:hover{border-color:var(--bronze)}
+  button:focus-visible{outline:2px solid var(--bronze);outline-offset:2px}
+  button.primary{background:var(--bronze);color:#2a2118;border-color:var(--bronze)}
+  button.on{background:#4b3d2b;border-color:var(--bronze);color:var(--pale)}
+  button:disabled{opacity:.4;cursor:default}
+  button.tiny{font-size:12px;padding:3px 8px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .between{justify-content:space-between}
+  .hidden{display:none !important}
+  canvas{display:block;width:100%;height:auto;border:1px solid var(--line);background:#1f2a33;border-radius:3px;touch-action:manipulation}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--ink2);margin-top:6px}
+  .legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:4px;vertical-align:-1px;border-radius:2px;background:var(--c)}
+  .status{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:12px 0}
+  .status > div{background:var(--bg2);border:1px solid var(--line);border-radius:3px;padding:6px 8px}
+  .status b{display:block;font-size:20px;font-weight:normal;color:var(--pale)}
+  .status span{font-size:12px;color:var(--ink2)}
+  .bar{height:6px;background:var(--bg3);border-radius:3px;margin-top:4px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--verd)}
+  .bar i.low{background:var(--ochre)}
+  .tabs{display:flex;border-bottom:1px solid var(--line);margin:10px 0 0}
+  .tabs button{background:none;border:none;border-bottom:2px solid transparent;border-radius:0;padding:8px 12px;color:var(--ink2)}
+  .tabs button.on{color:var(--pale);border-bottom-color:var(--bronze)}
+  .trait{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:7px 0;border-bottom:1px solid #3a2f24;align-items:center}
+  .trait .name{font-size:13px;color:var(--ink2)}
+  .trait .val{color:var(--pale)}
+  .trait .val.changed{color:var(--bronze)}
+  .trait .fit{font-size:12px;color:var(--ink3)}
+  .trait .fit.strain{color:var(--ochre)}
+  .trait .fit.ok{color:var(--verd)}
+  .trait .ctl{display:flex;gap:4px}
+  .trait.held{background:linear-gradient(90deg,#3d3222,transparent);padding-left:6px;margin-left:-6px}
+  .kin{padding:10px 0;border-bottom:1px solid #3a2f24}
+  .kin .head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .kin .head b{font-weight:normal;font-size:18px;color:var(--pale)}
+  .kin .diff{font-size:13px;color:var(--ink2);margin-top:4px}
+  .kin .diff span{color:var(--bronze)}
+  .kin.dead{opacity:.5}
+  .log p{font-size:14px;padding:4px 0;border-bottom:1px solid #3a2f24;margin:0}
+  .log p em{color:var(--bronze);font-style:normal}
+  .picker{background:var(--bg2);border:1px solid var(--bronze);border-radius:3px;padding:10px;margin:8px 0}
+  .picker button{display:block;width:100%;text-align:left;margin:4px 0}
+  .actions{position:sticky;bottom:0;background:var(--bg);padding:8px 0 4px;border-top:1px solid var(--line);margin-top:14px}
+  .actions button{font-size:14px;padding:6px 10px}
+  .orders{font-size:13px;color:var(--ink2);margin-bottom:6px;min-height:1.3em}
+  .notebook .entry{padding:10px 0;border-bottom:1px solid #3a2f24}
+  .notebook .slot{font-size:13px;color:var(--ink2)}
+  .notebook .rec{font-size:19px;color:var(--pale)}
+  .notebook .rec .star{color:var(--bronze)}
+  .notebook .verdict{display:inline-block;font-size:12px;padding:1px 7px;border-radius:2px;margin-left:6px;vertical-align:middle}
+  .v-correct{background:#2f4a3e;color:#a7d9c4}
+  .v-wrong{background:#4f2a20;color:#f0b09a}
+  .v-lost{background:#3e3226;color:var(--ink2)}
+  .notebook .note{font-size:13px;color:var(--ink2);margin-top:4px}
+  .notebook .note .verdict{margin:0 4px 0 0}
+  .score{font-size:44px;line-height:1;color:var(--pale);margin:8px 0 0}
+  .score small{font-size:16px;color:var(--ink2)}
+  .domain{font-size:13px;font-style:italic;color:var(--bronze);margin:14px 0 2px}
+  .goal{border-left:2px solid var(--bronze);padding:2px 0 2px 12px;margin:14px 0}
+  .ancestral .trait{grid-template-columns:1fr}
+  @media (prefers-reduced-motion:no-preference){ .picker{animation:in .15s ease-out} }
+  @keyframes in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script id="sim">
+/* ===================== SIMULATION (pure, no DOM) ===================== */
+const SIM = (() => {
+  function rngFrom(seed){ let a = seed|0; return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  const pick = (r, arr) => arr[Math.floor(r()*arr.length)];
+  function weighted(r, items, w){ let tot = w.reduce((a,b)=>a+b,0), x = r()*tot; for (let i=0;i<items.length;i++){ x-=w[i]; if (x<=0) return items[i]; } return items[items.length-1]; }
+
+  const LAND = ['coast','marsh','river','forest','steppe','desert','mountain'];
+  const RICHNESS = {coast:0.3, marsh:-0.2, river:0.5, forest:0.2, steppe:0, desert:-0.5, mountain:-0.3};
+
+  // A custom is a small structure: each slot has features, each feature a set of values.
+  // A value's affinity: 3 = the terrain strongly favours it, 1.5 = favours, 0 = strains.
+  // A value with no affinity table is neutral: no terrain pulls on it and none strains against it.
+  const V = (name, aff) => ({name, aff});
+  const ST={steppe:3}, ST_={steppe:1.5};
+  const SLOTS = [
+    {id:'highGod', domain:'Cosmology', name:'The greatest power',
+      features:[
+        {id:'domain', label:'domain', values:[V('Sky',{steppe:3,mountain:1.5,desert:1.5}), V('Storm',{mountain:3,forest:1.5}), V('Sun',{desert:3,steppe:1.5}), V('Earth',{river:3,forest:1.5}), V('Sea',{coast:3,marsh:1.5}), V('Fire',{mountain:1.5,forest:3})]},
+        {id:'role', label:'person', values:[V('Father'), V('Mother'), V('Elder'), V('Lord')]},
+        {id:'consort', label:'consort', values:[V('wedded to the Earth',{river:1.5,forest:1.5,steppe:1.5}), V('wedded to the Sea',{coast:3,marsh:1.5}), V('unwed',{desert:3,mountain:1.5}), V('wedded to the Dawn',{steppe:3,desert:1.5})]}],
+      render:n=>`The ${n[0]} ${n[1]}, ${n[2]}`},
+    {id:'hero', domain:'Cosmology', name:'The founding tale',
+      features:[
+        {id:'kind', label:'the hero', values:[V('A twin pair'), V('An orphan'), V("A king's youngest son"), V('A woman')]},
+        {id:'deed', label:'deed', values:[V('slew the serpent that held the waters',{river:3,mountain:1.5}), V('raided the cattle of the gods',{steppe:3,desert:1.5}), V('built the first house',{river:1.5,forest:1.5,coast:1.5}), V('returned from the drowned lands',{coast:3,marsh:1.5}), V('cut the first furrow',{river:3,forest:1.5}), V('stole fire from the heights',{mountain:3,forest:1.5})]},
+        {id:'companion', label:'helper', values:[V('nursed by wolves',{forest:3,mountain:1.5}), V('guided by a horse',{steppe:3}), V('carried by a boat',{coast:3,river:1.5}), V('helped by a bee',{forest:1.5,river:1.5,marsh:1.5}), V('alone',{desert:3,mountain:1.5})]}],
+      render:n=>`${n[0]} who ${n[1]}, ${n[2]}`},
+    {id:'afterlife', domain:'Cosmology', name:'Where the dead go',
+      features:[
+        {id:'dest', label:'destination', values:[V('the pasture of the ancestors',{steppe:3,desert:1.5}), V('beneath the mountain',{mountain:3,desert:1.5}), V('down into the sea',{coast:3}), V('across the river',{river:3,coast:1.5}), V('the winds',{desert:3,steppe:1.5}), V('the grandchildren, to be born again',{forest:1.5,river:1.5,marsh:1.5})]},
+        {id:'passage', label:'passage', values:[V('ferried',{river:1.5,coast:1.5,marsh:1.5}), V('on horseback',{steppe:3,desert:1.5}), V('led by a hound',{forest:3,mountain:1.5}), V('on their own feet',{mountain:1.5,desert:1.5})]},
+        {id:'judge', label:'judgement', values:[V('judged at a gate'), V('unjudged'), V('sorted by manner of death')]}],
+      render:n=>`To ${n[0]}, ${n[1]}, ${n[2]}`},
+    {id:'cult', domain:'Cosmology', name:'The daily cult',
+      features:[
+        {id:'figure', label:'figure', values:[V('The Dawn',{steppe:3,desert:1.5}), V('The Moon',{desert:3,steppe:1.5}), V('The Hearth-fire',{forest:3,mountain:1.5}), V('The River',{river:3,marsh:1.5}), V('The Tide',{coast:3,marsh:1.5})]},
+        {id:'when', label:'timing', values:[V('at dawn'), V('at dusk'), V('at each new moon'), V('before every meal')]},
+        {id:'who', label:'officiant', values:[V('the eldest woman'), V('the household head'), V('a priest'), V('the children')]}],
+      render:n=>`${n[0]}, honoured ${n[1]} by ${n[2]}`},
+    {id:'sacrifice', domain:'Rite', name:'What is offered',
+      features:[
+        {id:'victim', label:'offering', values:[V('A horse',ST), V('Cattle',{steppe:1.5,river:1.5,forest:1.5}), V('First fruits',{river:3,forest:1.5}), V('Fish and fowl',{coast:3,marsh:3}), V('The hunted deer',{forest:3,mountain:1.5}), V('Drink poured out',{desert:1.5,mountain:1.5})]},
+        {id:'manner', label:'manner', values:[V('burnt',{forest:1.5,steppe:1.5,mountain:1.5}), V('drowned',{coast:1.5,river:1.5,marsh:1.5}), V('buried',{river:1.5,steppe:1.5,desert:1.5}), V('shared in a feast')]},
+        {id:'occasion', label:'occasion', values:[V('midwinter'), V('midsummer'), V('the first grass',{steppe:1.5,river:1.5,forest:1.5}), V('the first catch',{coast:1.5,marsh:1.5,river:1.5})]}],
+      render:n=>`${n[0]}, ${n[1]}, at ${n[2]}`},
+    {id:'funeral', domain:'Rite', name:'Treatment of the dead',
+      features:[
+        {id:'disposal', label:'disposal', values:[V('Mound burial',{steppe:3,river:1.5}), V('Cremation',{forest:3,river:1.5}), V('Sky exposure',{mountain:3,desert:1.5}), V('Boat burial',{coast:3}), V('Bog offering',{marsh:3}), V('Cave interment',{mountain:1.5,desert:3})]},
+        {id:'goods', label:'grave goods', values:[V('weapons',{steppe:1.5,forest:1.5,mountain:1.5}), V('food and drink'), V('nothing',{desert:1.5,marsh:1.5}), V('the tools of their trade',{river:1.5,coast:1.5})]},
+        {id:'facing', label:'orientation', values:[V('facing the dawn'), V('facing the water',{coast:1.5,river:1.5,marsh:1.5}), V('facing the homeland'), V('face down')]}],
+      render:n=>`${n[0]}, with ${n[1]}, ${n[2]}`},
+    {id:'drink', domain:'Rite', name:'The sacred drink',
+      features:[
+        {id:'base', label:'drink', values:[V('Mead',{forest:3,steppe:1.5}), V("Fermented mare's milk",ST), V('Barley beer',{river:3,coast:1.5}), V('Wine',{coast:1.5,desert:1.5,mountain:1.5}), V('No drink, but smoke',{mountain:1.5,marsh:3})]},
+        {id:'sharing', label:'sharing', values:[V('passed in one cup'), V('poured to the gods first'), V('taken by the chief alone'), V('taken by all together')]}],
+      render:n=>`${n[0]}, ${n[1]}`},
+    {id:'place', domain:'Rite', name:'The holy place',
+      features:[
+        {id:'site', label:'site', values:[V('An open-air fire altar',{steppe:3,desert:1.5}), V('A grove',{forest:3}), V('A hilltop',{mountain:3}), V('A spring',{river:1.5,marsh:1.5,forest:1.5}), V('A headland',{coast:3})]},
+        {id:'image', label:'image', values:[V('an unshaped stone',{mountain:1.5,desert:1.5,steppe:1.5}), V('a carved post',{forest:1.5,river:1.5,coast:1.5}), V('no image',{desert:1.5,steppe:1.5,marsh:1.5}), V('a painted hide',{steppe:1.5,forest:1.5})]},
+        {id:'access', label:'access', values:[V('open to all'), V('men only'), V('priests only'), V('women only')]}],
+      render:n=>`${n[0]} with ${n[1]}, ${n[2]}`},
+    {id:'descent', domain:'Kinship', name:'Descent and the household',
+      features:[
+        {id:'line', label:'line', values:[V('the father',{steppe:3,desert:1.5,mountain:1.5}), V('the mother',{forest:1.5,marsh:1.5,coast:1.5}), V('the house',{river:1.5,coast:1.5})]},
+        {id:'residence', label:'residence', values:[V("with the husband's kin",{steppe:1.5,desert:1.5,mountain:1.5}), V("with the wife's kin",{forest:1.5,marsh:1.5}), V('at a new hearth',{river:1.5,coast:1.5})]},
+        {id:'inherit', label:'inheritance', values:[V('to the eldest'), V('divided equally'), V('to the youngest'), V("to the sister's son")]}],
+      render:n=>`Through ${n[0]}; couples live ${n[1]}; the estate passes ${n[2]}`},
+    {id:'rule', domain:'Kinship', name:'Who rules',
+      features:[
+        {id:'ruler', label:'ruler', values:[V('A sacral king',{river:3,desert:1.5}), V('An elected war-chief',ST), V('A council of elders',{forest:3,marsh:1.5}), V('The ship-lords',{coast:3}), V('A priest-judge',{mountain:1.5,desert:1.5})]},
+        {id:'tenure', label:'tenure', values:[V('for life'), V('until defeated'), V('chosen each year'), V('chosen by lot')]},
+        {id:'duty', label:'sacred duty', values:[V('keeps the fire'), V('speaks with the ancestors'), V('wards the herds',{steppe:1.5,desert:1.5}), V('reads the waters',{coast:1.5,river:1.5,marsh:1.5})]}],
+      render:n=>`${n[0]}, ${n[1]}, who ${n[2]}`},
+    {id:'youth', domain:'Kinship', name:'How the young are made adult',
+      features:[
+        {id:'rite', label:'rite', values:[V('Wolf-bands raiding abroad',{steppe:3,forest:1.5}), V('Apprenticed to a craft',{river:3,coast:1.5}), V('A vision-fast',{mountain:3,desert:1.5}), V('Early marriage',{marsh:1.5,river:1.5})]},
+        {id:'age', label:'age', values:[V('at twelve'), V('at first beard or blood'), V('at sixteen')]},
+        {id:'mark', label:'mark', values:[V('then scarred'), V('then tattooed'), V('then given a new name'), V('then shorn')]}],
+      render:n=>`${n[0]}, ${n[1]}, ${n[2]}`},
+    {id:'guest', domain:'Kinship', name:'The stranger at the door',
+      features:[
+        {id:'rule', label:'rule', values:[V('Sacred guest-right',{steppe:3,desert:3}), V('Feast-gift rivalry',{coast:3,forest:1.5,river:1.5}), V('Exchange of hostages',{mountain:1.5}), V('Strangers barred',{marsh:3,mountain:1.5})]},
+        {id:'token', label:'token', values:[V('salt'), V('bread'), V('a ring'), V('water',{desert:3,steppe:1.5})]},
+        {id:'span', label:'duration', values:[V('three nights'), V('as long as the guest chooses'), V('one meal')]}],
+      render:n=> n[0]==='Strangers barred' ? `Strangers barred unless they bring ${n[1]}; then shelter for ${n[2]}` : `${n[0]}: ${n[1]} shared, shelter for ${n[2]}`},
+    {id:'marriage', domain:'Kinship', name:'Marriage',
+      features:[
+        {id:'payment', label:'payment', values:[V('Bride-price in cattle',ST), V('Dowry in land',{river:3}), V('Exchange of sisters',{forest:1.5,marsh:1.5}), V('Bride-service',{coast:1.5,mountain:1.5,desert:1.5})]},
+        {id:'partner', label:'partner', values:[V('from another clan'), V('within the clan'), V('from another people'), V('a cousin')]},
+        {id:'form', label:'form', values:[V('one spouse'), V('many wives'), V('brothers sharing a wife',{mountain:1.5,desert:1.5})]}],
+      render:n=>`${n[0]}, ${n[1]}, ${n[2]}`},
+    {id:'justice', domain:'Law', name:'Justice for a killing',
+      features:[
+        {id:'remedy', label:'remedy', values:[V('Blood-price',{steppe:3,forest:1.5}), V('Ordeal by water',{river:1.5,marsh:3,coast:1.5}), V('Exile',{mountain:3,desert:1.5}), V("The assembly's judgement",{forest:1.5,coast:1.5})]},
+        {id:'payer', label:'who answers', values:[V('the killer alone'), V("the killer's kin"), V("the killer's chief")]},
+        {id:'cleansing', label:'cleansing', values:[V('purified by fire',{mountain:1.5,desert:1.5,steppe:1.5}), V('purified by water',{river:1.5,coast:1.5,marsh:1.5}), V("purified by a year's silence"), V('never clean again')]}],
+      render:n=>`${n[0]}, answered by ${n[1]}, ${n[2]}`},
+    {id:'oath', domain:'Law', name:'The oath',
+      features:[
+        {id:'on', label:'sworn on', values:[V('Fire',{mountain:1.5,desert:1.5,steppe:1.5}), V('Water',{river:3,coast:1.5,marsh:1.5}), V("The ancestors' bones",{forest:1.5,mountain:1.5}), V('Weapons',ST)]},
+        {id:'witness', label:'witness', values:[V('before the assembly'), V('before the chief'), V('before the god alone')]},
+        {id:'breach', label:'breach', values:[V('the breaker outlawed'), V('the breaker struck by the god'), V('the breaker fined'), V('the breaker cursed by the poets')]}],
+      render:n=>`${n[0]}, ${n[1]}; ${n[2]}`},
+    {id:'memory', domain:'Law', name:'How the past is kept',
+      features:[
+        {id:'keeper', label:'keepers', values:[V('Poets of praise and blame',{steppe:1.5,forest:1.5}), V('Carved stones',{mountain:3,desert:1.5}), V('Sung genealogies',{coast:1.5,river:1.5}), V('Masked dancers',{marsh:3,forest:1.5})]},
+        {id:'what', label:'matter', values:[V('the lineages of chiefs'), V('the deeds of heroes'), V('the boundaries of the land',{river:1.5,coast:1.5}), V('the names of the dead')]},
+        {id:'when', label:'occasion', values:[V('at funerals'), V('at midwinter'), V('at the assembly')]}],
+      render:n=>`${n[0]}, keeping ${n[1]}, ${n[2]}`},
+  ];
+  const FEATURE_COUNT = SLOTS.reduce((a,s)=>a+s.features.length,0);
+  const aff = (slot, f, v, terrain) => { const a = SLOTS[slot].features[f].values[v].aff; return a ? (a[terrain]||0) : 1; };
+  const isNeutral = (slot,f,v) => !SLOTS[slot].features[f].values[v].aff;
+  const render = (slot, fv) => SLOTS[slot].render(fv.map((v,f)=> v===null?'…':SLOTS[slot].features[f].values[v].name));
+  const vname = (slot,f,v) => SLOTS[slot].features[f].values[v].name;
+  const clone = traits => traits.map(fv=>fv.slice());
+  const sameCustom = (a,b) => a.every((v,i)=>v===b[i]);
+
+  // ---------- names ----------
+  const CONS = ['k','t','r','s','m','n','w','d','g','th','l','v','b','h'], VOW = ['a','e','i','o','u','ai','au','ei'];
+  function genName(r, syl){ let s=''; for (let i=0;i<syl;i++){ s += pick(r,CONS)+pick(r,VOW); } if (r()<0.5) s += pick(r,['r','n','s','th','l']); return s[0].toUpperCase()+s.slice(1); }
+
+  // ---------- map ----------
+  const W=9, H=7;
+  function genMap(r){
+    const noise = () => { let g=[]; for (let y=0;y<H;y++){ g.push([]); for (let x=0;x<W;x++) g[y].push(r()); } return g; };
+    const smooth = g => { let o=[]; for (let y=0;y<H;y++){ o.push([]); for (let x=0;x<W;x++){ let s=0,n=0; for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ let yy=y+dy,xx=x+dx; if (yy>=0&&yy<H&&xx>=0&&xx<W){ s+=g[yy][xx]; n++; } } o[y].push(s/n); } } return o; };
+    const norm = g => { let mn=Infinity,mx=-Infinity; g.forEach(row=>row.forEach(v=>{mn=Math.min(mn,v);mx=Math.max(mx,v);})); return g.map(row=>row.map(v=>(v-mn)/(mx-mn||1))); };
+    let h = norm(smooth(smooth(noise()))), m = norm(smooth(noise()));
+    const cx=4, cy=3, tiles=[];
+    for (let y=0;y<H;y++){ tiles.push([]); for (let x=0;x<W;x++){
+      let e = Math.min(x, W-1-x, y, H-1-y);
+      let hv = h[y][x] - (e===0?0.16:0);
+      if (Math.abs(x-cx)<=1 && Math.abs(y-cy)<=1) hv = Math.max(hv, 0.45);
+      let t;
+      if (hv < 0.19) t='water';
+      else if (hv > 0.74) t='mountain';
+      else { let mv=m[y][x]; t = mv<0.25?'desert': mv<0.48?'steppe': mv<0.68?'forest': mv<0.84?'river':'marsh'; }
+      tiles[y].push(t);
+    } }
+    for (let y=0;y<H;y++) for (let x=0;x<W;x++){
+      if (tiles[y][x]==='water'||tiles[y][x]==='mountain') continue;
+      let sea=false; [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dx,dy])=>{ let yy=y+dy,xx=x+dx; if (yy>=0&&yy<H&&xx>=0&&xx<W&&tiles[yy][xx]==='water') sea=true; });
+      if (sea) tiles[y][x]='coast';
+    }
+    return {tiles, cx, cy};
+  }
+  const inb = (x,y) => x>=0&&x<W&&y>=0&&y<H;
+  const dist = (a,b) => Math.max(Math.abs(a.x-b.x), Math.abs(a.y-b.y));
+
+  function contact(st, a, b){
+    if (!a.alive || !b.alive) return 0;
+    const d = dist(a,b);
+    let base = d===1?1: d===2?0.5: d===3?0.2: 0;
+    const ta = st.map.tiles[a.y][a.x], tb = st.map.tiles[b.y][b.x];
+    if (ta==='mountain' || tb==='mountain') base *= 0.5;
+    if (d===2){ const mx=(a.x+b.x)/2, my=(a.y+b.y)/2; if (Number.isInteger(mx)&&Number.isInteger(my)&&st.map.tiles[my][mx]==='mountain') base*=0.4; }
+    if (ta==='coast' && tb==='coast' && d<=4) base = Math.max(base, 0.35);
+    return base;
+  }
+
+  // ---------- setup ----------
+  function genAncestral(r, terrain){
+    // A homeland culture carries nothing that strains against its own land: strained values are excluded,
+    // strongly favoured ones are four times as likely as mildly favoured ones, neutral parts are uniform.
+    return SLOTS.map((s,si)=> s.features.map((f,fi)=>{
+      let w = f.values.map((_,vi)=>{ const a=aff(si,fi,vi,terrain); return a>0 ? a*a : 0; });
+      if (!w.some(x=>x>0)) w = w.map(()=>1);
+      return weighted(r, f.values.map((_,vi)=>vi), w);
+    }));
+  }
+  function makeCulture(st, name, x, y, traits, isPlayer){
+    const r = st.rng;
+    return { id: st.cultures.length, name, x, y, traits: clone(traits), alive:true, isPlayer,
+      prosperity: 6, conserv: 0.7+r()*0.7, drive:{dx:pick(r,[-1,0,1]), dy:pick(r,[-1,0,1]), pref:pick(r,LAND)},
+      known: clone(st.ancestral), knownEra: 0, migrated:false, held:new Set(), bornEra: st.era, diedEra:null, parent:null };
+  }
+  function freeLand(st, x, y){ return inb(x,y) && st.map.tiles[y][x]!=='water' && !st.cultures.some(c=>c.alive&&c.x===x&&c.y===y); }
+
+  function newGame(seed){
+    const r = rngFrom(seed);
+    const st = { seed, rng:r, era:0, maxEra:8, cultures:[], log:[], playerId:null, over:false, playerDead:false };
+    st.map = genMap(r);
+    st.peopleName = genName(r, 2);
+    st.homeTerrain = st.map.tiles[st.map.cy][st.map.cx];
+    st.ancestral = genAncestral(r, st.homeTerrain);
+    return st;
+  }
+  function startTiles(st){ const out=[]; for (let y=0;y<H;y++) for (let x=0;x<W;x++){ const d=Math.max(Math.abs(x-st.map.cx),Math.abs(y-st.map.cy)); if (d>=1&&d<=2&&st.map.tiles[y][x]!=='water') out.push({x,y}); } return out; }
+  function begin(st, px, py){
+    const r = st.rng;
+    const p = makeCulture(st, genName(r,2), px, py, st.ancestral, true); st.cultures.push(p); st.playerId = p.id;
+    let cands = startTiles(st).filter(t=>!(t.x===px&&t.y===py));
+    for (let i=0;i<5 && cands.length;i++){ const t = cands.splice(Math.floor(r()*cands.length),1)[0]; st.cultures.push(makeCulture(st, genName(r,2), t.x, t.y, st.ancestral, false)); }
+    st.era = 1;
+    st.log.push({era:0, text:`The ${st.peopleName} of the ${st.homeTerrain} scatter. Six bands set out; yours, the ${p.name}, go to the ${st.map.tiles[py][px]}.`});
+    return st;
+  }
+
+  // ---------- the era ----------
+  function retention(st, c){
+    let rt = 5*c.conserv;
+    const ruler = vname(9,0,c.traits[9][0]), keeper = vname(15,0,c.traits[15][0]);
+    if (ruler==='A priest-judge') rt += 1.5; if (ruler==='A sacral king') rt += 1;
+    if (keeper==='Carved stones') rt += 1; if (keeper==='Poets of praise and blame'||keeper==='Sung genealogies') rt += 0.5;
+    if (c.migrated) rt -= 2;
+    return Math.max(2, rt);
+  }
+  function strainedFeatures(st, c){ const t = st.map.tiles[c.y][c.x]; const out=[]; c.traits.forEach((fv,si)=>fv.forEach((v,fi)=>{ if (aff(si,fi,v,t)===0) out.push([si,fi]); })); return out; }
+  const strainCount = (st,c) => strainedFeatures(st,c).length;
+
+  function tryMove(st, c, x, y){ if (!freeLand(st,x,y) || dist(c,{x,y})!==1) return false; c.x=x; c.y=y; c.migrated=true; return true; }
+  function aiMove(st, c){
+    const r = st.rng, p = st.era<=4?0.5:0.2;
+    if (r()>p) return;
+    let best=null, bs=0.5;
+    for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ if (!dx&&!dy) continue; const x=c.x+dx,y=c.y+dy; if (!freeLand(st,x,y)) continue;
+      let s = (st.map.tiles[y][x]===c.drive.pref?2:0) + (dx*c.drive.dx+dy*c.drive.dy)*0.8 + r()*0.5;
+      if (st.map.tiles[c.y][c.x]===c.drive.pref) s -= 1.5;
+      if (s>bs){ bs=s; best={x,y}; } }
+    if (best && tryMove(st,c,best.x,best.y)) st.log.push({era:st.era, text:`The ${c.name} move to the ${st.map.tiles[best.y][best.x]}.`});
+  }
+  function trySplit(st, c, forced){
+    const r = st.rng;
+    if (!forced && !(c.prosperity>=7 && st.era<=6 && r()<0.25)) return null;
+    if (st.cultures.filter(k=>k.alive).length>=10) return null;
+    const opts=[]; for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ if (!dx&&!dy) continue; if (freeLand(st,c.x+dx,c.y+dy)) opts.push({x:c.x+dx,y:c.y+dy}); }
+    if (!opts.length) return null;
+    const t = pick(r,opts);
+    const d = makeCulture(st, genName(r,2), t.x, t.y, c.traits, false);
+    d.parent = c.id; d.prosperity = 4; d.migrated = true; if (c.isPlayer) d.conserv = 1.2 + r()*0.3; d.known = clone(c.traits); d.knownEra = st.era;
+    c.prosperity -= 2;
+    st.cultures.push(d);
+    st.log.push({era:st.era, text:`A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}.`});
+    return d;
+  }
+  // Drift acts on one feature at a time. Neighbour states are the pre-era snapshot passed in.
+  function drift(st, c, snapshot){
+    const r = st.rng, t = st.map.tiles[c.y][c.x], rt = retention(st,c), changes=[];
+    const nbs = st.cultures.filter(k=>k.alive&&k.id!==c.id).map(k=>({k, w:contact(st,c,k)})).filter(n=>n.w>0);
+    SLOTS.forEach((slot,si)=>{
+      if (c.held.has(si)) return;
+      slot.features.forEach((f,fi)=>{
+        if (r()>0.35) return;
+        const cur = c.traits[si][fi], neutral = isNeutral(si,fi,cur);
+        const scores = f.values.map((v,vi)=>{ let s=aff(si,fi,vi,t)+(neutral?0.3:0.05); nbs.forEach(n=>{ if (snapshot[n.k.id][si][fi]===vi) s+=0.9*n.w; }); if (vi===cur) s+=rt*(neutral?0.6:1); return s; });
+        const nxt = weighted(r, f.values.map((_,vi)=>vi), scores);
+        if (nxt!==cur){ c.traits[si][fi]=nxt; changes.push({slot:si, f:fi, from:cur, to:nxt, borrowed: nbs.some(n=>snapshot[n.k.id][si][fi]===nxt)}); }
+      });
+    });
+    return changes;
+  }
+  function prosperityStep(st, c, consolidations){
+    const t = st.map.tiles[c.y][c.x];
+    let d = 1.1 - 5.0*(strainCount(st,c)/FEATURE_COUNT) + RICHNESS[t] + 1.5*(consolidations||0);
+    if (c.migrated) d -= 1;
+    d = Math.max(-2, Math.min(2.5, d));
+    c.prosperity = Math.max(0, Math.min(10, c.prosperity + d));
+    return d;
+  }
+
+  // orders: {held:Set<slot>, reforms:{"slot:f":v}, move:{x,y}|null, split:bool, consolidate:number, teach:{kin,slot}|null}
+  function endEra(st, orders){
+    orders = orders || {held:new Set(), reforms:{}, move:null, split:false, consolidate:0, teach:null};
+    const p = st.cultures[st.playerId];
+    st.cultures.forEach(c=>{ c.migrated=false; c.held=new Set(); });
+    if (p.alive){
+      p.held = new Set(orders.held);
+      Object.entries(orders.reforms).forEach(([key,v])=>{ const [si,fi]=key.split(':').map(Number); if (p.traits[si][fi]!==v){ st.log.push({era:st.era, text:`You reform ${SLOTS[si].name.toLowerCase()} (${SLOTS[si].features[fi].label}): <em>${vname(si,fi,p.traits[si][fi])}</em> gives way to <em>${vname(si,fi,v)}</em>.`}); p.traits[si][fi]=v; p.held.add(si); } });
+      if (orders.move && tryMove(st,p,orders.move.x,orders.move.y)) st.log.push({era:st.era, text:`You lead the ${p.name} to the ${st.map.tiles[p.y][p.x]}.`});
+      if (orders.split) trySplit(st, p, true);
+      if (orders.teach){ const k=st.cultures[orders.teach.kin], si=orders.teach.slot;
+        if (k&&k.alive&&contact(st,p,k)>=0.5){ let restored=[]; SLOTS[si].features.forEach((f,fi)=>{ if (p.traits[si][fi]===st.ancestral[si][fi] && k.traits[si][fi]!==st.ancestral[si][fi]){ k.traits[si][fi]=st.ancestral[si][fi]; restored.push(f.label); } });
+          if (restored.length){ k.held.add(si); k.known=clone(k.traits); k.knownEra=st.era; st.log.push({era:st.era, text:`Your elders go among the ${k.name} and restore ${SLOTS[si].name.toLowerCase()} (${restored.join(', ')}): <em>${render(si,k.traits[si])}</em> once more.`}); } } }
+    }
+    st.cultures.filter(c=>c.alive&&!c.isPlayer&&c.bornEra<st.era).forEach(c=>{ aiMove(st,c); });
+    st.cultures.filter(c=>c.alive&&!c.isPlayer&&c.bornEra<st.era).forEach(c=>{ trySplit(st,c,false); });
+    const snapshot = st.cultures.map(c=>clone(c.traits));
+    st.cultures.filter(c=>c.alive).forEach(c=>{
+      const ch = drift(st,c,snapshot);
+      if (c.isPlayer) ch.forEach(x=> st.log.push({era:st.era, text:`Among your people, ${SLOTS[x.slot].name.toLowerCase()} shifts (${SLOTS[x.slot].features[x.f].label}): <em>${vname(x.slot,x.f,x.from)}</em> becomes <em>${vname(x.slot,x.f,x.to)}</em>${x.borrowed?' — learned from neighbours':''}.`}));
+    });
+    st.cultures.filter(c=>c.alive).forEach(c=>{
+      prosperityStep(st, c, c.isPlayer?orders.consolidate:0);
+      if (c.prosperity<=0){ c.alive=false; c.diedEra=st.era; st.log.push({era:st.era, text:`The ${c.name} are no more; what they kept is lost.${c.isPlayer?' Your testimony ends here.':''}`}); if (c.isPlayer) st.playerDead=true; }
+    });
+    if (p.alive) st.cultures.forEach(c=>{ if (c.alive&&!c.isPlayer&&contact(st,p,c)>=0.5){ c.known=clone(c.traits); c.knownEra=st.era; } });
+    st.era++;
+    if (st.era>st.maxEra) st.over=true;
+    return st;
+  }
+
+  // ---------- the comparative method, feature by feature ----------
+  function reconstruct(st){
+    const alive = st.cultures.filter(c=>c.alive);
+    const terrainOf = c => st.map.tiles[c.y][c.x];
+    const names = cs => cs.map(c=>'the '+c.name).join(', ');
+    const entries = SLOTS.map((slot,si)=>{
+      const feats = slot.features.map((f,fi)=>{
+        const byVal = new Map();
+        alive.forEach(c=>{ const v=c.traits[si][fi]; if (!byVal.has(v)) byVal.set(v,[]); byVal.get(v).push(c); });
+        const cands = [...byVal.entries()].map(([v,cs])=>{
+          const seen=new Set(); let comps=0;
+          cs.forEach(c=>{ if (seen.has(c.id)) return; comps++; const stack=[c]; seen.add(c.id); while(stack.length){ const a=stack.pop(); cs.forEach(b=>{ if (!seen.has(b.id)&&contact(st,a,b)>=0.75){ seen.add(b.id); stack.push(b); } }); } });
+          return {v, cs, witnesses:comps, terrains:new Set(cs.map(terrainOf)).size};
+        }).sort((a,b)=> b.witnesses-a.witnesses || b.terrains-a.terrains || b.cs.length-a.cs.length);
+        const best = cands[0], truth = st.ancestral[si][fi];
+        let rec=null, conf=null;
+        if (best && best.witnesses>=2 && best.terrains>=2){ rec=best.v; conf='secure'; }
+        else if (best && best.witnesses>=3){ rec=best.v; conf='suspect'; }
+        const verdict = rec===null?'lost': rec===truth?'correct':'wrong';
+        const pts = verdict==='correct'?(conf==='secure'?2:1): verdict==='wrong'?-1:0;
+        const survivors = byVal.get(truth);
+        let note;
+        if (rec===null){
+          note = !alive.length ? 'no descendant survived to be asked' :
+            (best && best.witnesses===2) ? `${names(best.cs)} agree on <em>${f.values[best.v].name}</em>, but on the same kind of land; left blank as possible convergence${best.v===truth?', though it was right':''}` :
+            survivors ? `only ${names(survivors)} kept it; one witness proves nothing` : `no agreement, and nobody kept the old way`;
+        } else if (verdict==='correct'){
+          note = conf==='secure' ? `${names(best.cs)}: different land, never met` : `${names(best.cs)}: same land, so marked doubtful`;
+        } else {
+          note = `${names(best.cs)} all hold it${best.terrains<2?', all on the same land':''}; the truth ${survivors?'survived only among '+names(survivors):'died out'}`;
+        }
+        return {f:fi, label:f.label, rec, conf, truth, verdict, pts, note};
+      });
+      return {slot:si, feats, pts:feats.reduce((a,x)=>a+x.pts,0), recFv: feats.map(x=>x.rec)};
+    });
+    const all = entries.flatMap(e=>e.feats);
+    const total = all.reduce((a,e)=>a+e.pts,0);
+    const counts = {correct:all.filter(e=>e.verdict==='correct').length, wrong:all.filter(e=>e.verdict==='wrong').length, lost:all.filter(e=>e.verdict==='lost').length};
+    return {entries, total, max:FEATURE_COUNT*2, counts, survivors:alive.length};
+  }
+
+  // per slot, per feature: the values a player may reform to (terrain-favoured, or practised by a neighbour in contact)
+  function allowedReforms(st, c){
+    const t = st.map.tiles[c.y][c.x];
+    const nbs = st.cultures.filter(k=>k.alive&&k.id!==c.id&&contact(st,c,k)>=0.5);
+    return SLOTS.map((slot,si)=> slot.features.map((f,fi)=> f.values.map((_,vi)=>vi).filter(vi=> vi!==c.traits[si][fi] && !isNeutral(si,fi,vi) && (aff(si,fi,vi,t)>0 || nbs.some(k=>k.traits[si][fi]===vi)))));
+  }
+
+  return { SLOTS, FEATURE_COUNT, LAND, W, H, aff, isNeutral, render, vname, sameCustom, contact, dist, newGame, startTiles, begin, endEra, reconstruct, strainCount, strainedFeatures, retention, allowedReforms, freeLand };
+})();
+if (typeof module!=='undefined') module.exports = SIM;
+</script>
+
+<script>
+/* ===================== UI ===================== */
+(() => {
+  const {SLOTS} = SIM;
+  const TC = {water:'#2b4a6b', coast:'#7d9c86', marsh:'#4f6a4a', river:'#6f8f5a', forest:'#3f5a36', steppe:'#a08d52', desert:'#c2a069', mountain:'#6e6459'};
+  const TL = {water:'Sea', coast:'Coast', marsh:'Marsh', river:'River valley', forest:'Forest', steppe:'Steppe', desert:'Desert', mountain:'Mountains'};
+  const KC = ['#e6dcc6','#c99a47','#6fae95','#c8603f','#9fb3d8','#d69bc4','#8fd0d8','#e0c48a','#b0b0b0','#8fbf6f'];
+  const app = document.getElementById('app');
+  let st, orders, tab='ours', mode=null, picker=null, seed = (Date.now()%100000);
+
+  const esc = x => String(x).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const R = (si,fv) => esc(SIM.render(si,fv));
+  const player = () => st.cultures[st.playerId];
+  const terr = c => st.map.tiles[c.y][c.x];
+  const ap = () => 3 - (orders.held.size + Object.keys(orders.reforms).length + (orders.move?1:0) + (orders.split?1:0) + (orders.teach?1:0) + orders.consolidate);
+  function resetOrders(){ orders = {held:new Set(), reforms:{}, move:null, split:false, consolidate:0, teach:null}; mode=null; picker=null; }
+
+  function intro(){
+    st = SIM.newGame(seed); resetOrders();
+    const byDomain = {}; SLOTS.forEach((sl,i)=>{ (byDomain[sl.domain]=byDomain[sl.domain]||[]).push(`<div class="trait"><span class="name">${sl.name}</span><span class="val">${R(i,st.ancestral[i])}</span></div>`); });
+    app.innerHTML = `
+      <h1>Urheimat</h1>
+      <p class="muted">The ${esc(st.peopleName)}, a people of the ${st.homeTerrain}. Nobody will ever write down what they believed.</p>
+      <div class="goal">
+        <p>Three thousand years from now, scholars will gather the customs of every people descended from the ${esc(st.peopleName)} and try to reconstruct the original by comparison.</p>
+        <p>Each custom is made of parts, and the parts drift separately: a people may keep the Sky and lose the Father. The scholars work part by part. They trust a part only when it is kept by two peoples who never met and live on different kinds of land, or by three who never met on the same kind. Neighbours who agree may have borrowed. Peoples on the same land may have converged. Both fool them, and a false reconstruction counts against you.</p>
+        <p>You lead one band through eight eras with three actions each. Hold what your kin will lose, adapt what you must to survive, teach neighbours what they have forgotten, send out daughters to be witnesses, and stay alive: a dead people testifies to nothing.</p>
+      </div>
+      <h2>What the ${esc(st.peopleName)} know to be true</h2>
+      <div class="ancestral">${Object.entries(byDomain).map(([d,r])=>`<div class="domain">${d}</div>${r.join('')}`).join('')}</div>
+      <div class="row" style="margin-top:16px"><button class="primary" id="go">Scatter</button><button id="reroll">Another people</button><span class="faint small">world ${seed}</span></div>`;
+    document.getElementById('go').onclick = chooseStart;
+    document.getElementById('reroll').onclick = ()=>{ seed=(seed*7919+13)%100000; intro(); };
+  }
+
+  function chooseStart(){
+    app.innerHTML = `<h1>Urheimat</h1><p>Where does your band go? Tap a tile within two days' walk of the homeland. The land you choose will pull your customs after it.</p>
+      <canvas id="map"></canvas><div class="legend" id="legend"></div><p class="faint small">Terrain decides which customs come easily and which you must strain to keep.</p>`;
+    legend(); drawMap({selecting: SIM.startTiles(st), onPick:(x,y)=>{ SIM.begin(st,x,y); resetOrders(); tab='ours'; main(); }});
+  }
+  function legend(){ document.getElementById('legend').innerHTML = Object.keys(TC).map(t=>`<span style="--c:${TC[t]}">${TL[t]}</span>`).join(''); }
+
+  function drawMap(opts){
+    opts = opts||{};
+    const cv = document.getElementById('map'); if (!cv) return;
+    const Wpx = cv.parentElement.clientWidth || 360, ts = Math.floor(Wpx/SIM.W);
+    cv.width = ts*SIM.W; cv.height = ts*SIM.H;
+    const g = cv.getContext('2d');
+    const sel = opts.selecting || [];
+    for (let y=0;y<SIM.H;y++) for (let x=0;x<SIM.W;x++){
+      const t = st.map.tiles[y][x];
+      g.fillStyle = TC[t]; g.fillRect(x*ts,y*ts,ts,ts);
+      g.strokeStyle='rgba(0,0,0,.25)'; g.strokeRect(x*ts+.5,y*ts+.5,ts-1,ts-1);
+      if (t==='mountain'){ g.fillStyle='rgba(255,255,255,.35)'; g.beginPath(); g.moveTo(x*ts+ts*.2,y*ts+ts*.8); g.lineTo(x*ts+ts*.5,y*ts+ts*.25); g.lineTo(x*ts+ts*.8,y*ts+ts*.8); g.fill(); }
+      if (t==='forest'){ g.fillStyle='rgba(0,0,0,.25)'; for (let k=0;k<3;k++){ g.beginPath(); g.arc(x*ts+ts*(.3+.2*k), y*ts+ts*(.4+.15*(k%2)), ts*.09, 0, 7); g.fill(); } }
+      if (t==='river'){ g.strokeStyle='rgba(120,180,255,.6)'; g.lineWidth=2; g.beginPath(); g.moveTo(x*ts+ts*.2,y*ts+ts*.2); g.quadraticCurveTo(x*ts+ts*.7,y*ts+ts*.4,x*ts+ts*.3,y*ts+ts*.8); g.stroke(); g.lineWidth=1; }
+      if (sel.some(q=>q.x===x&&q.y===y)){ g.strokeStyle='#f3ead7'; g.lineWidth=2; g.strokeRect(x*ts+3,y*ts+3,ts-6,ts-6); g.lineWidth=1; }
+    }
+    g.fillStyle='#f3ead7'; g.font=`${Math.round(ts*.5)}px serif`; g.textAlign='center'; g.textBaseline='middle';
+    g.fillText('✦', st.map.cx*ts+ts/2, st.map.cy*ts+ts/2);
+    st.cultures.forEach(c=>{
+      if (!c.alive) return;
+      const px=c.x*ts+ts/2, py=c.y*ts+ts/2, rr=ts*.3;
+      g.beginPath(); g.arc(px,py,rr,0,7); g.fillStyle=KC[c.id%KC.length]; g.fill();
+      g.strokeStyle= c.isPlayer?'#fff':'rgba(0,0,0,.6)'; g.lineWidth=c.isPlayer?3:1; g.stroke(); g.lineWidth=1;
+      g.fillStyle='#1a140e'; g.font=`bold ${Math.round(ts*.34)}px serif`; g.fillText(c.name[0], px, py+1);
+    });
+    if (orders && orders.move){ const {x,y}=orders.move; g.strokeStyle='#c99a47'; g.setLineDash([4,3]); g.strokeRect(x*ts+3,y*ts+3,ts-6,ts-6); g.setLineDash([]); }
+    cv.onclick = e => {
+      const r = cv.getBoundingClientRect(); const x=Math.floor((e.clientX-r.left)/r.width*SIM.W), y=Math.floor((e.clientY-r.top)/r.height*SIM.H);
+      if (opts.onPick && sel.some(q=>q.x===x&&q.y===y)) opts.onPick(x,y);
+    };
+  }
+
+  function main(){
+    if (st.over){ ending(); return; }
+    const p = player();
+    app.innerHTML = `
+      <div class="row between"><h1 style="font-size:28px;margin:0">Urheimat</h1><span class="muted">Era ${st.era} of ${st.maxEra}</span></div>
+      <canvas id="map"></canvas><div class="legend" id="legend"></div>
+      <div class="status">
+        <div><b>${p.alive?p.prosperity.toFixed(1):'—'}</b><span>prosperity</span><div class="bar"><i class="${p.prosperity<3?'low':''}" style="width:${p.prosperity*10}%"></i></div></div>
+        <div><b>${p.alive?SIM.strainCount(st,p):'—'}</b><span>of ${SIM.FEATURE_COUNT} parts straining against the ${terr(p)}</span></div>
+        <div><b>${st.cultures.filter(c=>c.alive).length}</b><span>peoples alive</span></div>
+      </div>
+      <div class="tabs">${['ours','kin','chronicle'].map(t=>`<button data-t="${t}" class="${tab===t?'on':''}">${t==='ours'?'Our customs':t==='kin'?'Our kin':'Chronicle'}</button>`).join('')}</div>
+      <div id="panel"></div>
+      <div class="actions">
+        <div class="orders" id="orders"></div><div id="teachpick"></div>
+        <div class="row">
+          <button class="primary" id="end">${st.playerDead?'Let the ages pass':'End the era'}</button>
+          ${p.alive?`<button id="move" class="${mode==='move'?'on':''}">Migrate</button><button id="split" class="${orders.split?'on':''}">Daughter band</button><button id="teach" class="${orders.teach||mode==='teach'?'on':''}">Teach</button><button id="cons">Consolidate</button>`:''}
+          <span class="faint small">${p.alive?`${ap()} action${ap()===1?'':'s'} left`:''}</span>
+        </div>
+      </div>`;
+    legend();
+    document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ tab=b.dataset.t; mode=null; main(); });
+    document.getElementById('end').onclick = ()=>{ SIM.endEra(st, orders); resetOrders(); main(); };
+    if (p.alive){
+      document.getElementById('move').onclick = ()=>{ if (orders.move){ orders.move=null; main(); return; } if (ap()<=0) return; mode = mode==='move'?null:'move'; main(); };
+      document.getElementById('split').onclick = ()=>{ if (orders.split){ orders.split=false; } else { if (ap()<=0||p.prosperity<4) return; orders.split=true; } main(); };
+      document.getElementById('cons').onclick = ()=>{ if (ap()<=0) return; orders.consolidate++; main(); };
+      document.getElementById('teach').onclick = ()=>{ if (orders.teach){ orders.teach=null; main(); return; } if (ap()<=0) return; mode = mode==='teach'?null:'teach'; main(); };
+      if (mode==='teach'){
+        const nb = st.cultures.filter(c=>c.alive&&!c.isPlayer&&SIM.contact(st,p,c)>=0.5);
+        const opts=[]; nb.forEach(k=>SLOTS.forEach((sl,si)=>{ const parts=sl.features.filter((f,fi)=>p.traits[si][fi]===st.ancestral[si][fi] && k.traits[si][fi]!==st.ancestral[si][fi]).map(f=>f.label); if (parts.length) opts.push({k,si,parts}); }));
+        document.getElementById('teachpick').innerHTML = `<div class="picker"><div class="small muted">${opts.length?'Send your elders to a people in contact and restore the parts of a custom they have lost and you still keep:':'Nobody in contact has lost a part you still keep.'}</div>${opts.map(o=>`<button data-teach="${o.k.id}:${o.si}">the ${esc(o.k.name)}: ${SLOTS[o.si].name.toLowerCase()} <span class="faint small">(${o.parts.join(', ')})</span></button>`).join('')}</div>`;
+        document.querySelectorAll('[data-teach]').forEach(b=>b.onclick=()=>{ const [kin,slot]=b.dataset.teach.split(':').map(Number); orders.teach={kin,slot}; mode=null; main(); });
+      }
+    }
+    const moveTiles=[]; if (mode==='move'){ for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){ if ((dx||dy)&&SIM.freeLand(st,p.x+dx,p.y+dy)) moveTiles.push({x:p.x+dx,y:p.y+dy}); } }
+    drawMap({selecting:moveTiles, onPick:(x,y)=>{ orders.move={x,y}; mode=null; main(); }});
+    renderOrders(); renderPanel();
+  }
+
+  function renderOrders(){
+    const o=[]; const p=player();
+    orders.held.forEach(si=>o.push(`hold ${SLOTS[si].name.toLowerCase()}`));
+    Object.entries(orders.reforms).forEach(([key,v])=>{ const [si,fi]=key.split(':').map(Number); o.push(`reform ${SLOTS[si].name.toLowerCase()} (${SLOTS[si].features[fi].label}) to ${esc(SIM.vname(si,fi,v))}`); });
+    if (orders.move) o.push(`migrate to the ${st.map.tiles[orders.move.y][orders.move.x]}`);
+    if (orders.split) o.push('send out a daughter band (−2 prosperity)');
+    if (orders.teach) o.push(`teach the ${esc(st.cultures[orders.teach.kin].name)} ${SLOTS[orders.teach.slot].name.toLowerCase()}`);
+    if (orders.consolidate) o.push(`consolidate ×${orders.consolidate} (+1.5 prosperity each)`);
+    document.getElementById('orders').innerHTML = !p.alive ? 'Your people are gone. The kin go on without you.' : o.length ? 'This era: '+o.join('; ')+'.' : (mode==='move'?'Tap a neighbouring tile on the map. Moving costs a point of prosperity and loosens every custom for an era.': mode==='teach'?'Choose below.':'No orders yet. A held custom keeps all its parts this era; everything else may drift.');
+  }
+
+  function renderPanel(){
+    const el=document.getElementById('panel'); const p=player();
+    if (tab==='ours'){
+      const t=terr(p), allowed=SIM.allowedReforms(st,p);
+      const kin = st.cultures.filter(c=>c.alive&&!c.isPlayer);
+      let html='', lastDomain='';
+      SLOTS.forEach((sl,si)=>{
+        if (sl.domain!==lastDomain){ html+=`<div class="domain">${sl.domain}</div>`; lastDomain=sl.domain; }
+        const fv=p.traits[si], held=orders.held.has(si);
+        const reformed = sl.features.map((f,fi)=> orders.reforms[si+':'+fi]);
+        const shown = fv.map((v,fi)=> reformed[fi]!==undefined?reformed[fi]:v);
+        const changed = !SIM.sameCustom(fv, st.ancestral[si]);
+        const strained = sl.features.filter((f,fi)=>SIM.aff(si,fi,fv[fi],t)===0).map(f=>f.label);
+        const whole = kin.filter(k=>SIM.sameCustom(k.known[si], st.ancestral[si])).length;
+        const part = kin.filter(k=>!SIM.sameCustom(k.known[si], st.ancestral[si]) && k.known[si].some((v,fi)=>v===st.ancestral[si][fi])).length;
+        const hasReform = allowed[si].some(a=>a.length);
+        html+=`<div class="trait ${held||reformed.some(x=>x!==undefined)?'held':''}">
+          <div><div class="name">${sl.name}${changed?` <span class="faint">(was: ${R(si,st.ancestral[si])})</span>`:''}</div>
+          <div class="val ${changed?'changed':''}">${R(si,shown)}${reformed.some(x=>x!==undefined)?' <span class="faint small">(reforming)</span>':''}</div>
+          <div class="fit ${strained.length?'strain':'ok'}">${strained.length?'strains against the '+t+': '+strained.join(', '):'fits the '+t}<span class="faint"> · ${whole} kin keep it whole, ${part} in part, as far as you know</span></div></div>
+          ${p.alive?`<div class="ctl"><button class="tiny ${held?'on':''}" data-hold="${si}">${held?'Holding':'Hold'}</button>${hasReform?`<button class="tiny ${reformed.some(x=>x!==undefined)?'on':''}" data-ref="${si}">${reformed.some(x=>x!==undefined)?'Undo':'Reform'}</button>`:''}</div>`:''}
+        </div>`;
+        if (picker===si){
+          html+=`<div class="picker"><div class="small muted">Reform one part of ${sl.name.toLowerCase()} to something the ${t} favours or a neighbour practises:</div>${sl.features.map((f,fi)=>allowed[si][fi].map(vi=>`<button data-pick="${si}:${fi}:${vi}">${f.label}: ${esc(SIM.vname(si,fi,vi))} <span class="faint small">${SIM.aff(si,fi,vi,t)>0?'fits the '+t:'from neighbours'}</span></button>`).join('')).join('')}</div>`;
+        }
+      });
+      el.innerHTML=html;
+      el.querySelectorAll('[data-hold]').forEach(b=>b.onclick=()=>{ const si=+b.dataset.hold; if (orders.held.has(si)) orders.held.delete(si); else { if (ap()<=0) return; orders.held.add(si); } main(); });
+      el.querySelectorAll('[data-ref]').forEach(b=>b.onclick=()=>{ const si=+b.dataset.ref; const keys=Object.keys(orders.reforms).filter(k=>k.startsWith(si+':')); if (keys.length){ keys.forEach(k=>delete orders.reforms[k]); picker=null; } else { if (ap()<=0) return; picker = picker===si?null:si; } main(); });
+      el.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{ const [si,fi,vi]=b.dataset.pick.split(':').map(Number); orders.reforms[si+':'+fi]=vi; picker=null; main(); });
+    } else if (tab==='kin'){
+      const kin = st.cultures.filter(c=>!c.isPlayer);
+      el.innerHTML = `<p class="small muted">You know what a people keeps only while you are in contact with them. Out of touch, your knowledge goes stale.</p>` + kin.map(c=>{
+        const w = SIM.contact(st,p,c);
+        const rel = !c.alive?`gone in era ${c.diedEra}`: w>=1?'close neighbours': w>=0.5?'in touch': w>0?'distant': 'out of touch';
+        const diffs = SLOTS.map((sl,si)=> SIM.sameCustom(c.known[si],st.ancestral[si])?null:`${sl.name.toLowerCase()}: <span>${sl.features.map((f,fi)=>c.known[si][fi]===st.ancestral[si][fi]?null:esc(SIM.vname(si,fi,c.known[si][fi]))).filter(Boolean).join(', ')}</span>`).filter(Boolean);
+        const keptParts = c.known.reduce((a,fv,si)=>a+fv.filter((v,fi)=>v===st.ancestral[si][fi]).length,0);
+        return `<div class="kin ${c.alive?'':'dead'}"><div class="head"><b><span style="color:${KC[c.id%KC.length]}">●</span> the ${esc(c.name)}</b><span class="small muted">${c.alive?TL[terr(c)]+', ':''}${rel}</span></div>
+          <div class="small faint">${c.parent!==null?`daughter of the ${esc(st.cultures[c.parent].name)}; `:''}as last known (era ${c.knownEra}), keeps ${keptParts} of ${SIM.FEATURE_COUNT} ancestral parts${c.alive?`; prosperity ${w>=0.5?c.prosperity.toFixed(0):'unknown'}`:''}</div>
+          <div class="diff">${diffs.length?diffs.join(' · '):'Nothing known to have changed.'}</div></div>`;
+      }).join('');
+    } else {
+      el.innerHTML = `<div class="log">${st.log.slice().reverse().map(l=>`<p><span class="faint">${l.era===0?'':'Era '+l.era+'. '}</span>${l.text}</p>`).join('')}</div>`;
+    }
+  }
+
+  function ending(){
+    const Rz = SIM.reconstruct(st), p=player();
+    let lastDomain='';
+    app.innerHTML = `
+      <h1 style="font-size:30px">The Reconstructor's notebook</h1>
+      <p class="muted">Three thousand years on. ${Rz.survivors} peoples descend from the ${esc(st.peopleName)}${p.alive?', among them the '+esc(p.name):'; the '+esc(p.name)+' are not among them'}. Reconstructed forms are marked with an asterisk, as is the custom; an ellipsis is a part the scholars could not recover.</p>
+      <div class="score">${Rz.total} <small>of ${Rz.max}</small></div>
+      <p class="small muted">Of ${SIM.FEATURE_COUNT} parts: ${Rz.counts.correct} recovered, ${Rz.counts.wrong} reconstructed wrongly, ${Rz.counts.lost} unrecoverable. Secure recoveries score 2, doubtful ones 1, false ones −1.</p>
+      <div class="notebook">${Rz.entries.map(e=>{
+        const sl=SLOTS[e.slot]; let head=''; if (sl.domain!==lastDomain){ head=`<div class="domain">${sl.domain}</div>`; lastDomain=sl.domain; }
+        return head+`<div class="entry"><div class="slot">${sl.name} <span class="faint">· ${e.pts>=0?'+':''}${e.pts}</span></div>
+          <div class="rec"><span class="star">*</span>${R(e.slot,e.recFv)}</div>
+          <div class="small muted">In truth: ${R(e.slot,st.ancestral[e.slot])}</div>
+          ${e.feats.map(f=>`<div class="note"><span class="verdict v-${f.verdict}">${f.verdict==='correct'?(f.conf==='secure'?'secure':'doubtful'):f.verdict}</span> ${f.label}${f.verdict==='wrong'?`: <em>${esc(SIM.vname(e.slot,f.f,f.rec))}</em> for <em>${esc(SIM.vname(e.slot,f.f,f.truth))}</em>`:''} — ${f.note}</div>`).join('')}</div>`; }).join('')}</div>
+      <div class="row" style="margin-top:18px"><button class="primary" id="again">A new people</button><button id="same">The same people again</button></div>`;
+    document.getElementById('again').onclick=()=>{ seed=(seed*7919+13)%100000; intro(); };
+    document.getElementById('same').onclick=()=>{ intro(); };
+  }
+
+  window.addEventListener('resize', ()=>{ if (document.getElementById('map')) { if (st.playerId===null) chooseStart(); else if (!st.over) main(); } });
+  intro();
+})();
+</script>
+</body>
+</html>
