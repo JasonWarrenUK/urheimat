@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { GameState, Point } from '$lib/types';
 	import { W, H } from '$lib/sim/engine';
-	import { TERRAIN_COLOUR, CULTURE_COLOUR } from '$lib/sim/display';
+	import { TERRAIN_COLOUR, CULTURE_COLOUR, themeCanvasColours } from '$lib/sim/display';
 
 	interface Props {
 		gameState: GameState;
@@ -22,6 +22,7 @@
 		canvas.height = ts * H;
 		const g = canvas.getContext('2d');
 		if (!g) return;
+		const theme = themeCanvasColours();
 
 		for (let y = 0; y < H; y++)
 			for (let x = 0; x < W; x++) {
@@ -56,14 +57,14 @@
 					g.lineWidth = 1;
 				}
 				if (selecting.some((q) => q.x === x && q.y === y)) {
-					g.strokeStyle = '#f3ead7';
+					g.strokeStyle = theme.ink;
 					g.lineWidth = 2;
 					g.strokeRect(x * ts + 3, y * ts + 3, ts - 6, ts - 6);
 					g.lineWidth = 1;
 				}
 			}
 
-		g.fillStyle = '#f3ead7';
+		g.fillStyle = theme.ink;
 		g.font = `${Math.round(ts * 0.5)}px serif`;
 		g.textAlign = 'center';
 		g.textBaseline = 'middle';
@@ -89,7 +90,7 @@
 
 		if (moveTarget) {
 			const { x, y } = moveTarget;
-			g.strokeStyle = '#c99a47';
+			g.strokeStyle = theme.accent;
 			g.setLineDash([4, 3]);
 			g.strokeRect(x * ts + 3, y * ts + 3, ts - 6, ts - 6);
 			g.setLineDash([]);
@@ -117,6 +118,24 @@
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	});
+
+	// The canvas reads theme colours via getComputedStyle at draw time, which does not
+	// re-run on its own: matchMedia only fires for the OS preference, never for an
+	// explicit data-theme write, so both signals are needed to keep the map in sync
+	// with the toggle (see artefact-conventions.md, "Diagrams under a runtime toggle").
+	$effect(() => {
+		const media = matchMedia('(prefers-color-scheme: dark)');
+		const handleSchemeChange = () => draw();
+		media.addEventListener('change', handleSchemeChange);
+
+		const observer = new MutationObserver(() => draw());
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+		return () => {
+			media.removeEventListener('change', handleSchemeChange);
+			observer.disconnect();
+		};
+	});
 </script>
 
 <canvas bind:this={canvas} onclick={handleClick} aria-label="World map"></canvas>
@@ -126,9 +145,9 @@
 		display: block;
 		width: 100%;
 		height: auto;
-		border: 1px solid var(--line);
-		background: #1f2a33;
-		border-radius: 3px;
+		border: 1px solid var(--color-line);
+		background: var(--color-surface-raised);
+		border-radius: var(--radius-sm);
 		touch-action: manipulation;
 	}
 </style>

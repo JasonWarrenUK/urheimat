@@ -34,3 +34,14 @@ export const CULTURE_COLOUR = [
 	'#b0b0b0',
 	'#8fbf6f'
 ];
+
+// Canvas fill/stroke colours that can't read CSS custom properties directly.
+// Resolved from the live theme tokens at draw time so both variants track the toggle.
+export function themeCanvasColours(): { ink: string; accent: string } {
+	if (typeof window === 'undefined') return { ink: '#e0ede7', accent: '#62c2a0' };
+	const styles = getComputedStyle(document.documentElement);
+	return {
+		ink: styles.getPropertyValue('--ink').trim() || '#e0ede7',
+		accent: styles.getPropertyValue('--accent').trim() || '#62c2a0'
+	};
+}

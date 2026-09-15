@@ -4,6 +4,7 @@
 	import StartPicker from '$lib/components/StartPicker.svelte';
 	import GameScreen from '$lib/components/GameScreen.svelte';
 	import ReconstructorNotebook from '$lib/components/ReconstructorNotebook.svelte';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	if (!game.state) game.newGame();
 </script>
@@ -13,6 +14,9 @@
 </svelte:head>
 
 <div id="app">
+	<div class="row" style="justify-content:flex-end;padding-top:2px">
+		<ThemeToggle />
+	</div>
 	{#if game.state}
 		{#if game.phase === 'intro'}
 			<IntroScreen gameState={game.state} onScatter={() => game.scatter()} />

@@ -1,0 +1,74 @@
+:root {
+	--ink: #15231d;
+	--ink-muted: #596761;
+	--surface: #ecf6f2;
+	--surface-raised: #f9fefc;
+	--line: #c8d5cf;
+	--accent: #016b50;
+	--accent-ink: #f5fcf9;
+	--accent-2: #8c403c;
+	--ok: #4f7629;
+	--warn: #966c1e;
+	--danger: #a83a38;
+	--info: #3c688b;
+	--gradient: linear-gradient(135deg, #006348 0%, #736424 50%, #ab5e59 100%);
+	--font-display: Grenze, 'Palatino Linotype', Palatino, Georgia, serif;
+	--font-body: 'Crimson Pro', 'Iowan Old Style', Palatino, Georgia, serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+	--text-base: 16px;
+	--text-ratio: 1.25;
+	--leading: 1.5;
+	--radius-sm: 3px;
+	--radius-md: 6px;
+	--radius-lg: 10px;
+	--shadow: 0 2px 18px rgba(0, 0, 0, 0.22);
+	--space: 8px;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--ink: #e0ede7;
+		--ink-muted: #9daca5;
+		--surface: #0f1a16;
+		--surface-raised: #1a2822;
+		--line: #36453f;
+		--accent: #62c2a0;
+		--accent-ink: #07130f;
+		--accent-2: #df827b;
+		--ok: #93c26c;
+		--warn: #e3b160;
+		--danger: #eb7770;
+		--info: #83b4de;
+		--gradient: linear-gradient(135deg, #52b392 0%, #c1b067 50%, #fea69f 100%);
+	}
+}
+:root[data-theme='dark'] {
+	--ink: #e0ede7;
+	--ink-muted: #9daca5;
+	--surface: #0f1a16;
+	--surface-raised: #1a2822;
+	--line: #36453f;
+	--accent: #62c2a0;
+	--accent-ink: #07130f;
+	--accent-2: #df827b;
+	--ok: #93c26c;
+	--warn: #e3b160;
+	--danger: #eb7770;
+	--info: #83b4de;
+	--gradient: linear-gradient(135deg, #52b392 0%, #c1b067 50%, #fea69f 100%);
+}
+
+/* Role aliases: components reference these, never the tokens above directly. */
+:root {
+	--color-primary: var(--accent);
+	--color-on-primary: var(--accent-ink);
+	--color-surface: var(--surface);
+	--color-surface-raised: var(--surface-raised);
+	--color-text: var(--ink);
+	--color-text-muted: var(--ink-muted);
+	--color-line: var(--line);
+	--color-danger: var(--danger);
+	--color-warn: var(--warn);
+	--color-ok: var(--ok);
+	--color-info: var(--info);
+	--color-secondary: var(--accent-2);
+}

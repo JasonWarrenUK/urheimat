@@ -1,0 +1,60 @@
+{
+	"$schema": "clod-theme/target@1",
+	"family": "tumulus",
+	"target": "html",
+	"extends": "tumulus.json",
+	"rationale": {
+		"mapping_notes": "Tokens are the core palette copied verbatim per variant, with --gradient built from the core's three monotonic stops as a 135-degree linear-gradient. Type tokens carry the core's three voices: Grenze for display (angular roman-blackletter hybrid, suits a game about inscription and inheritance without tipping into costume), Crimson Pro for body (a plain book serif that holds a long paragraph, replacing the source artefact's Iowan Old Style default) and JetBrains Mono for labels and tabular figures. Shape tokens come from the core unchanged; the 3px small radius matches the source artefact's own restrained corner treatment. Google Fonts lists only the two webfonts: the mono fallback stack is adequate on its own and is left unloaded to keep the payload down."
+	},
+	"html": {
+		"tokens": {
+			"light": {
+				"--ink": "#15231d",
+				"--ink-muted": "#596761",
+				"--surface": "#ecf6f2",
+				"--surface-raised": "#f9fefc",
+				"--line": "#c8d5cf",
+				"--accent": "#016b50",
+				"--accent-ink": "#f5fcf9",
+				"--accent-2": "#8c403c",
+				"--ok": "#4f7629",
+				"--warn": "#966c1e",
+				"--danger": "#a83a38",
+				"--info": "#3c688b",
+				"--gradient": "linear-gradient(135deg, #006348 0%, #736424 50%, #ab5e59 100%)"
+			},
+			"dark": {
+				"--ink": "#e0ede7",
+				"--ink-muted": "#9daca5",
+				"--surface": "#0f1a16",
+				"--surface-raised": "#1a2822",
+				"--line": "#36453f",
+				"--accent": "#62c2a0",
+				"--accent-ink": "#07130f",
+				"--accent-2": "#df827b",
+				"--ok": "#93c26c",
+				"--warn": "#e3b160",
+				"--danger": "#eb7770",
+				"--info": "#83b4de",
+				"--gradient": "linear-gradient(135deg, #52b392 0%, #c1b067 50%, #fea69f 100%)"
+			}
+		},
+		"type": {
+			"--font-display": "Grenze, 'Palatino Linotype', Palatino, Georgia, serif",
+			"--font-body": "'Crimson Pro', 'Iowan Old Style', Palatino, Georgia, serif",
+			"--font-mono": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+			"--text-base": "16px",
+			"--text-ratio": "1.25",
+			"--leading": "1.5"
+		},
+		"shape": {
+			"--radius-sm": "3px",
+			"--radius-md": "6px",
+			"--radius-lg": "10px",
+			"--shadow": "0 2px 18px rgba(0, 0, 0, 0.22)",
+			"--space": "8px"
+		},
+		"google_fonts": ["Grenze:wght@400;600;700", "Crimson+Pro:wght@400;600"],
+		"theme_switch": "data-theme attribute on :root plus prefers-color-scheme fallback (see artefact-conventions)"
+	}
+}

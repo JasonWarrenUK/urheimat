@@ -1,0 +1,266 @@
+{
+	"$schema": "clod-theme/core@1",
+	"family": "tumulus",
+	"version": 1,
+	"rationale": {
+		"mood": "Verdigris on wet slate: bronze that has been in the ground three thousand years and come up green, for a game about what survives burial and what the surface can honestly tell you about it.",
+		"inspiration": "The game's own subject rather than its original stylesheet: cultural drift, deep time and the comparative method reconstructing an original nobody wrote down. Grave goods oxidising in a mound, turned earth, and the green bloom on excavated metal.",
+		"anchor_reason": "Oxidised copper at OKLCH hue 168 survives both surfaces at a single recognisable hue: 5.91:1 on the pale ground at lightness 0.47, 8.26:1 on the dark ground at 0.745. It was also chosen against the originality register, where the existing clod and brass families both anchor in the gold region at hue 75 to 83, which is exactly where the source artefact's bronze sat.",
+		"rule_bent": "accent-2 and danger share hue 25. The convention prefers status colours held clear of the gradient partner, but the red-earth complement is what makes the verdigris read as metal in soil rather than mint, so the two are separated by chroma and lightness (accent-2 at chroma 0.105 light and 0.115 dark, danger at 0.145) instead of by hue, and never sit adjacent within one component.",
+		"rejected": [
+			{
+				"palette": "The source artefact's own browns and bronze (#2a2118 ground, #c99a47 bronze, #f3ead7 parchment)",
+				"why": "Its anchor lands in the same gold region as both registered families, clod and brass, so it would have failed the originality gate on arrival. Keeping the artefact's spirit while moving the hue is the better trade."
+			},
+			{
+				"palette": "Ochre and umber earth tones, anchored around hue 60",
+				"why": "The obvious 'archaeology' register, and dull for it. It also reads as sepia nostalgia, which works against a game whose whole argument is that reconstruction of the past is unreliable rather than warm."
+			},
+			{
+				"palette": "Slate blue and bone, anchored near hue 250",
+				"why": "Clean and legible, but it reads as a data dashboard. The subject is soil and decay, and a cool neutral palette gives the page no sense of ground."
+			}
+		]
+	},
+	"anchor": {
+		"name": "verdigris",
+		"hex": "#43987b",
+		"oklch": [
+			0.62,
+			0.095,
+			168
+		]
+	},
+	"palette": {
+		"ink": {
+			"light": "#15231d",
+			"dark": "#e0ede7",
+			"role": "primary text"
+		},
+		"ink-muted": {
+			"light": "#596761",
+			"dark": "#9daca5",
+			"role": "secondary text, captions, meta"
+		},
+		"surface": {
+			"light": "#ecf6f2",
+			"dark": "#0f1a16",
+			"role": "page background"
+		},
+		"surface-raised": {
+			"light": "#f9fefc",
+			"dark": "#1a2822",
+			"role": "cards, panels, code blocks"
+		},
+		"line": {
+			"light": "#c8d5cf",
+			"dark": "#36453f",
+			"role": "borders, rules, dividers"
+		},
+		"accent": {
+			"light": "#016b50",
+			"dark": "#62c2a0",
+			"role": "links, primary actions, highlights"
+		},
+		"accent-ink": {
+			"light": "#f5fcf9",
+			"dark": "#07130f",
+			"role": "text placed on accent"
+		},
+		"accent-2": {
+			"light": "#8c403c",
+			"dark": "#df827b",
+			"role": "secondary emphasis, gradient partner"
+		},
+		"ok": {
+			"light": "#4f7629",
+			"dark": "#93c26c",
+			"role": "success, done, passing"
+		},
+		"warn": {
+			"light": "#966c1e",
+			"dark": "#e3b160",
+			"role": "caution, pending, stale"
+		},
+		"danger": {
+			"light": "#a83a38",
+			"dark": "#eb7770",
+			"role": "error, blocked, destructive"
+		},
+		"info": {
+			"light": "#3c688b",
+			"dark": "#83b4de",
+			"role": "neutral notice, in progress"
+		}
+	},
+	"gradient": {
+		"light": [
+			"#006348",
+			"#736424",
+			"#ab5e59"
+		],
+		"dark": [
+			"#52b392",
+			"#c1b067",
+			"#fea69f"
+		]
+	},
+	"typography": {
+		"display": {
+			"family": "Grenze",
+			"fallback": "'Palatino Linotype', Palatino, Georgia, serif",
+			"weight": 600
+		},
+		"body": {
+			"family": "Crimson Pro",
+			"fallback": "'Iowan Old Style', Palatino, Georgia, serif",
+			"weight": 400
+		},
+		"mono": {
+			"family": "JetBrains Mono",
+			"fallback": "ui-monospace, SFMono-Regular, Menlo, monospace",
+			"weight": 400
+		},
+		"scale": {
+			"base_px": 16,
+			"ratio": 1.25,
+			"line_height": 1.5
+		}
+	},
+	"shape": {
+		"radius_px": {
+			"sm": 3,
+			"md": 6,
+			"lg": 10
+		},
+		"shadow": {
+			"blur_px": 18,
+			"offset_y_px": 2,
+			"opacity": 0.22
+		},
+		"space_px": {
+			"unit": 8
+		}
+	},
+	"contrast": {
+		"light": [
+			{
+				"fg": "ink",
+				"bg": "surface",
+				"level": "AA",
+				"ratio": 14.75
+			},
+			{
+				"fg": "ink",
+				"bg": "surface-raised",
+				"level": "AA",
+				"ratio": 15.98
+			},
+			{
+				"fg": "ink-muted",
+				"bg": "surface",
+				"level": "AA",
+				"ratio": 5.38
+			},
+			{
+				"fg": "accent",
+				"bg": "surface",
+				"level": "AA",
+				"ratio": 5.91
+			},
+			{
+				"fg": "accent-ink",
+				"bg": "accent",
+				"level": "AA",
+				"ratio": 6.26
+			},
+			{
+				"fg": "ok",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 4.81
+			},
+			{
+				"fg": "warn",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 4.27
+			},
+			{
+				"fg": "danger",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 5.72
+			},
+			{
+				"fg": "info",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 5.37
+			}
+		],
+		"dark": [
+			{
+				"fg": "ink",
+				"bg": "surface",
+				"level": "AA",
+				"ratio": 14.78
+			},
+			{
+				"fg": "ink",
+				"bg": "surface-raised",
+				"level": "AA",
+				"ratio": 12.72
+			},
+			{
+				"fg": "ink-muted",
+				"bg": "surface",
+				"level": "AA",
+				"ratio": 7.53
+			},
+			{
+				"fg": "accent",
+				"bg": "surface",
+				"level": "AA",
+				"ratio": 8.26
+			},
+			{
+				"fg": "accent-ink",
+				"bg": "accent",
+				"level": "AA",
+				"ratio": 8.79
+			},
+			{
+				"fg": "ok",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 8.62
+			},
+			{
+				"fg": "warn",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 9.09
+			},
+			{
+				"fg": "danger",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 6.28
+			},
+			{
+				"fg": "info",
+				"bg": "surface",
+				"level": "AA-large",
+				"ratio": 8.09
+			}
+		]
+	},
+	"provenance": {
+		"seed": "Mood words from the game's subject matter: cultural drift, deep time, the comparative method, reconstruction from fragments. The project's own src/app.css was offered as a seed and deliberately turned down; see rationale.rejected.",
+		"derived_from": null,
+		"created": "2026-09-15",
+		"updated": "2026-09-15",
+		"tool": "theme-factory@1"
+	}
+}

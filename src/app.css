@@ -1,17 +1,3 @@
-:root {
-	--bg: #2a2118;
-	--bg2: #33291e;
-	--bg3: #3e3226;
-	--line: #5a4a38;
-	--ink: #e6dcc6;
-	--ink2: #b9ad95;
-	--ink3: #87795f;
-	--bronze: #c99a47;
-	--verd: #6fae95;
-	--ochre: #c8603f;
-	--pale: #f3ead7;
-	--serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
-}
 * {
 	box-sizing: border-box;
 }
@@ -21,36 +7,38 @@ body {
 	padding: 0;
 }
 body {
-	background: var(--bg);
-	color: var(--ink);
-	font-family: var(--serif);
+	background: var(--color-surface);
+	color: var(--color-text);
+	font-family: var(--font-body);
 	font-size: 16px;
 	line-height: 1.5;
 }
 #app {
-	background: var(--bg);
-	color: var(--ink);
+	background: var(--color-surface);
+	color: var(--color-text);
 	min-height: 100vh;
 	max-width: 560px;
 	margin: 0 auto;
 	padding: 14px 14px 40px;
 }
 h1 {
+	font-family: var(--font-display);
 	font-size: 40px;
-	font-weight: normal;
+	font-weight: 600;
 	letter-spacing: 0.02em;
 	margin: 6px 0 2px;
 	line-height: 1.05;
 }
 h2 {
+	font-family: var(--font-display);
 	font-size: 22px;
-	font-weight: normal;
+	font-weight: 600;
 	margin: 18px 0 6px;
 }
 h3 {
 	font-size: 15px;
 	font-weight: normal;
-	color: var(--bronze);
+	color: var(--color-primary);
 	margin: 16px 0 4px;
 	font-style: italic;
 }
@@ -58,40 +46,41 @@ p {
 	margin: 6px 0;
 }
 .muted {
-	color: var(--ink2);
+	color: var(--color-text-muted);
 }
 .faint {
-	color: var(--ink3);
+	color: var(--color-text-muted);
+	opacity: 0.75;
 }
 .small {
 	font-size: 13px;
 }
 button {
-	font-family: var(--serif);
+	font-family: var(--font-body);
 	font-size: 15px;
-	background: var(--bg3);
-	color: var(--ink);
-	border: 1px solid var(--line);
-	border-radius: 3px;
+	background: var(--color-surface-raised);
+	color: var(--color-text);
+	border: 1px solid var(--color-line);
+	border-radius: var(--radius-sm);
 	padding: 8px 12px;
 	cursor: pointer;
 }
 button:hover {
-	border-color: var(--bronze);
+	border-color: var(--color-primary);
 }
 button:focus-visible {
-	outline: 2px solid var(--bronze);
+	outline: 2px solid var(--color-primary);
 	outline-offset: 2px;
 }
 button.primary {
-	background: var(--bronze);
-	color: #2a2118;
-	border-color: var(--bronze);
+	background: var(--color-primary);
+	color: var(--color-on-primary);
+	border-color: var(--color-primary);
 }
 button.on {
-	background: #4b3d2b;
-	border-color: var(--bronze);
-	color: var(--pale);
+	background: var(--color-surface-raised);
+	border-color: var(--color-primary);
+	color: var(--color-primary);
 }
 button:disabled {
 	opacity: 0.4;
@@ -118,7 +107,7 @@ button.tiny {
 	flex-wrap: wrap;
 	gap: 4px 12px;
 	font-size: 12px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 	margin-top: 6px;
 }
 .legend span::before {
@@ -138,39 +127,41 @@ button.tiny {
 	margin: 12px 0;
 }
 .status > div {
-	background: var(--bg2);
-	border: 1px solid var(--line);
-	border-radius: 3px;
+	background: var(--color-surface-raised);
+	border: 1px solid var(--color-line);
+	border-radius: var(--radius-sm);
 	padding: 6px 8px;
 }
 .status b {
 	display: block;
 	font-size: 20px;
 	font-weight: normal;
-	color: var(--pale);
+	color: var(--color-text);
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
 }
 .status span {
 	font-size: 12px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 }
 .bar {
 	height: 6px;
-	background: var(--bg3);
-	border-radius: 3px;
+	background: var(--color-line);
+	border-radius: var(--radius-sm);
 	margin-top: 4px;
 	overflow: hidden;
 }
 .bar i {
 	display: block;
 	height: 100%;
-	background: var(--verd);
+	background: var(--color-ok);
 }
 .bar i.low {
-	background: var(--ochre);
+	background: var(--color-danger);
 }
 .tabs {
 	display: flex;
-	border-bottom: 1px solid var(--line);
+	border-bottom: 1px solid var(--color-line);
 	margin: 10px 0 0;
 }
 .tabs button {
@@ -179,52 +170,52 @@ button.tiny {
 	border-bottom: 2px solid transparent;
 	border-radius: 0;
 	padding: 8px 12px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 }
 .tabs button.on {
-	color: var(--pale);
-	border-bottom-color: var(--bronze);
+	color: var(--color-text);
+	border-bottom-color: var(--color-primary);
 }
 .trait {
 	display: grid;
 	grid-template-columns: 1fr auto;
 	gap: 2px 8px;
 	padding: 7px 0;
-	border-bottom: 1px solid #3a2f24;
+	border-bottom: 1px solid var(--color-line);
 	align-items: center;
 }
 .trait .name {
 	font-size: 13px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 }
 .trait .val {
-	color: var(--pale);
+	color: var(--color-text);
 }
 .trait .val.changed {
-	color: var(--bronze);
+	color: var(--color-primary);
 }
 .trait .fit {
 	font-size: 12px;
-	color: var(--ink3);
+	color: var(--color-text-muted);
 }
 .trait .fit.strain {
-	color: var(--ochre);
+	color: var(--color-danger);
 }
 .trait .fit.ok {
-	color: var(--verd);
+	color: var(--color-ok);
 }
 .trait .ctl {
 	display: flex;
 	gap: 4px;
 }
 .trait.held {
-	background: linear-gradient(90deg, #3d3222, transparent);
+	background: linear-gradient(90deg, var(--color-surface-raised), transparent);
 	padding-left: 6px;
 	margin-left: -6px;
 }
 .kin {
 	padding: 10px 0;
-	border-bottom: 1px solid #3a2f24;
+	border-bottom: 1px solid var(--color-line);
 }
 .kin .head {
 	display: flex;
@@ -235,15 +226,15 @@ button.tiny {
 .kin .head b {
 	font-weight: normal;
 	font-size: 18px;
-	color: var(--pale);
+	color: var(--color-text);
 }
 .kin .diff {
 	font-size: 13px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 	margin-top: 4px;
 }
 .kin .diff span {
-	color: var(--bronze);
+	color: var(--color-primary);
 }
 .kin.dead {
 	opacity: 0.5;
@@ -251,17 +242,17 @@ button.tiny {
 .log p {
 	font-size: 14px;
 	padding: 4px 0;
-	border-bottom: 1px solid #3a2f24;
+	border-bottom: 1px solid var(--color-line);
 	margin: 0;
 }
 .log p em {
-	color: var(--bronze);
+	color: var(--color-primary);
 	font-style: normal;
 }
 .picker {
-	background: var(--bg2);
-	border: 1px solid var(--bronze);
-	border-radius: 3px;
+	background: var(--color-surface-raised);
+	border: 1px solid var(--color-primary);
+	border-radius: var(--radius-sm);
 	padding: 10px;
 	margin: 8px 0;
 }
@@ -274,9 +265,9 @@ button.tiny {
 .actions {
 	position: sticky;
 	bottom: 0;
-	background: var(--bg);
+	background: var(--color-surface);
 	padding: 8px 0 4px;
-	border-top: 1px solid var(--line);
+	border-top: 1px solid var(--color-line);
 	margin-top: 14px;
 }
 .actions button {
@@ -285,24 +276,24 @@ button.tiny {
 }
 .orders {
 	font-size: 13px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 	margin-bottom: 6px;
 	min-height: 1.3em;
 }
 .notebook .entry {
 	padding: 10px 0;
-	border-bottom: 1px solid #3a2f24;
+	border-bottom: 1px solid var(--color-line);
 }
 .notebook .slot {
 	font-size: 13px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 }
 .notebook .rec {
 	font-size: 19px;
-	color: var(--pale);
+	color: var(--color-text);
 }
 .notebook .rec .star {
-	color: var(--bronze);
+	color: var(--color-primary);
 }
 .notebook .verdict {
 	display: inline-block;
@@ -313,43 +304,45 @@ button.tiny {
 	vertical-align: middle;
 }
 .v-correct {
-	background: #2f4a3e;
-	color: #a7d9c4;
+	background: color-mix(in srgb, var(--color-ok) 30%, var(--color-surface));
+	color: var(--color-ok);
 }
 .v-wrong {
-	background: #4f2a20;
-	color: #f0b09a;
+	background: color-mix(in srgb, var(--color-danger) 30%, var(--color-surface));
+	color: var(--color-danger);
 }
 .v-lost {
-	background: #3e3226;
-	color: var(--ink2);
+	background: var(--color-surface-raised);
+	color: var(--color-text-muted);
 }
 .notebook .note {
 	font-size: 13px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 	margin-top: 4px;
 }
 .notebook .note .verdict {
 	margin: 0 4px 0 0;
 }
 .score {
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
 	font-size: 44px;
 	line-height: 1;
-	color: var(--pale);
+	color: var(--color-text);
 	margin: 8px 0 0;
 }
 .score small {
 	font-size: 16px;
-	color: var(--ink2);
+	color: var(--color-text-muted);
 }
 .domain {
 	font-size: 13px;
 	font-style: italic;
-	color: var(--bronze);
+	color: var(--color-primary);
 	margin: 14px 0 2px;
 }
 .goal {
-	border-left: 2px solid var(--bronze);
+	border-left: 2px solid var(--color-primary);
 	padding: 2px 0 2px 12px;
 	margin: 14px 0;
 }
