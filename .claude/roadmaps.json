@@ -22,11 +22,11 @@
 					{
 						"id": "1FN.2",
 						"description": "Deploy the current client-side game to Vercel from the repository",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"1FN.1"
 						],
-						"notes": "The game runs entirely client-side today, so this needs nothing from the persistence milestone. The adapter is already configured.",
+						"notes": "https://urheimat.vercel.app/",
 						"assignee": "Jason"
 					}
 				]
