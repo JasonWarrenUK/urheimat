@@ -10,9 +10,10 @@ Urheimat is playable but private, shallow in places, and built on a loop nobody 
 
 **Goal:** Get the game as it stands onto a public URL, so every later change ships somewhere real.
 
-- [ ] **1FN.1**: Create the public GitHub repository and push the existing history
-- [ ] **1FN.2**: Deploy the current client-side game to Vercel from the repository _(blocked: depends on 1FN.1)_
-  - Note: The game runs entirely client-side today, so this needs nothing from the persistence milestone. The adapter is already configured.
+- [x] **1FN.1**: Create the public GitHub repository and push the existing history
+  - Note: https://github.com/JasonWarrenUK/urheimat
+- [x] **1FN.2**: Deploy the current client-side game to Vercel from the repository
+  - Note: https://urheimat.vercel.app/
 
 ---
 
@@ -159,6 +160,7 @@ graph LR
 	5RC.3 -.-> 5RC.4
 	5RC.3 --> M5
 	5RC.4 --> M5
-	class 1FN.1,2DS.1,3PL.1 todo
-	class 1FN.2,2DS.2,3PL.2,3PL.3,3PL.4,4SD.1,4SD.10,4SD.2,4SD.3,4SD.4,4SD.5,4SD.6,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4 blocked
+	class 2DS.1,3PL.1 todo
+	class 2DS.2,3PL.2,3PL.3,3PL.4,4SD.1,4SD.10,4SD.2,4SD.3,4SD.4,4SD.5,4SD.6,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4 blocked
+	class 1FN.1,1FN.2 done
 ```
