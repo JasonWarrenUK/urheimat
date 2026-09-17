@@ -52,7 +52,7 @@ interface RunSummaryDoc {
 	seed: number;
 	era: number;
 	over: boolean;
-	state: { peopleName: string };
+	state?: { peopleName: string };
 	updatedAt: Date;
 }
 
@@ -66,7 +66,7 @@ export async function listRuns(playerId: string): Promise<RunSummary[]> {
 		seed: d.seed,
 		era: d.era,
 		over: d.over,
-		peopleName: d.state.peopleName,
+		peopleName: d.state?.peopleName ?? '',
 		updatedAt: d.updatedAt
 	}));
 }
