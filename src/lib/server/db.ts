@@ -28,7 +28,12 @@ function ensureIndexes(): Promise<void> {
 				.collection<RunDoc>('runs')
 				.createIndex({ playerId: 1, seed: 1 }, { unique: true }),
 			db().collection<RunDoc>('runs').createIndex({ playerId: 1, updatedAt: -1 })
-		]).then(() => undefined);
+		])
+			.then(() => undefined)
+			.catch((err) => {
+				indexesEnsured = undefined;
+				throw err;
+			});
 	}
 	return indexesEnsured;
 }
