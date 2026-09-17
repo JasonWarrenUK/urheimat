@@ -18,7 +18,7 @@ The game began as a single self-contained HTML artefact and was ported into a fu
 ## Prerequisites
 
 - [bun](https://bun.sh) 1.x
-- [Docker](https://www.docker.com/) (for a local MongoDB via `bun run db:up`), or a MongoDB Atlas connection string
+- A container runtime for the local MongoDB via `bun run db:up`: [Colima](https://github.com/abiosoft/colima) or Docker Desktop, either of which provides the `docker compose` CLI. Alternatively, skip it and point `MONGODB_URI` at a MongoDB Atlas cluster.
 - GitHub OAuth credentials, to sign in and keep runs (optional; without them the game plays anonymously). See `docs/setup/github-oauth.md`.
 
 ## Installation
@@ -30,7 +30,8 @@ bun install
 ## Usage
 
 ```bash
-bun run db:up   # start a local MongoDB (requires Docker running)
+colima start    # if using Colima and the VM isn't already running
+bun run db:up   # start a local MongoDB
 bun run dev
 ```
 

@@ -32,8 +32,8 @@ leaked local secret cannot be used against production.
 
 ## 3. Atlas cluster
 
-The local Docker instance is not reachable from Vercel, so the deploy needs a
-hosted database.
+The local containerised instance is not reachable from Vercel, so the deploy
+needs a hosted database.
 
 1. Create a free M0 cluster at <https://cloud.mongodb.com>.
 2. Database Access: add a user with **Read and write to any database**.
@@ -77,7 +77,7 @@ Then repeat 1 to 3 against the deployed URL.
 
 ## What was verified without these credentials
 
-Against the local Docker MongoDB with a seeded user and session:
+Against the local containerised MongoDB with a seeded user and session:
 
 - Anonymous request to `/api/runs` → 401.
 - Signed-in request → only that player's own runs; another player's run and a
