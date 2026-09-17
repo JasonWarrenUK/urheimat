@@ -9,9 +9,13 @@ control stays hidden and `/api/runs` answers 401.
 1. Go to <https://github.com/settings/developers> → **New OAuth App**.
 2. Application name: `Urheimat (local)`.
 3. Homepage URL: `http://localhost:5173`.
-4. Authorization callback URL: `http://localhost:5173/auth/callback/github`.
-5. Register, then **Generate a new client secret**.
-6. Copy both values into `.env`:
+4. Under **Redirect URIs**, put `http://localhost:5173/auth/callback/github` in
+   the **Redirect URI** box. Leave **Allow wildcard matching** unticked.
+5. Leave **Enable Device Flow** off; it is for input-constrained devices, not
+   web apps. Leave **Expire user access tokens** ticked: the adapter stores the
+   refresh token, so nothing here needs doing by hand.
+6. **Register application**, then **Generate a new client secret**.
+7. Copy both values into `.env`:
 
 ```bash
 AUTH_SECRET=$(openssl rand -hex 32)
@@ -19,16 +23,23 @@ AUTH_GITHUB_ID=<client id>
 AUTH_GITHUB_SECRET=<client secret>
 ```
 
-The callback path is `/auth/callback/github`, not `/api/auth/...`; `@auth/sveltekit`
+GitHub's newer registration form calls this field **Redirect URI**, under a
+**Redirect URIs** heading. Older documentation, this file included until now,
+calls it the **Authorization callback URL**. Same field, and it accepts up to
+ten entries now rather than one.
+
+The path is `/auth/callback/github`, not `/api/auth/...`; `@auth/sveltekit`
 mounts at `/auth` unless `basePath` is overridden.
 
 ## 2. GitHub OAuth app (production)
 
-Register a second app rather than adding a second callback to the first, so a
-leaked local secret cannot be used against production.
+The form now accepts up to ten redirect URIs, so adding the production one to
+the local app is possible. Register a second app anyway: one app means one
+client secret, and a leaked local secret would then be usable against
+production.
 
 - Homepage URL: `https://urheimat.vercel.app`
-- Callback URL: `https://urheimat.vercel.app/auth/callback/github`
+- Redirect URI: `https://urheimat.vercel.app/auth/callback/github`
 
 ## 3. Atlas cluster
 
@@ -56,7 +67,7 @@ Set these for Production (and Preview, if you want sign-in on preview deploys):
 `AUTH_TRUST_HOST` is not needed on Vercel; the config sets `trustHost` already.
 
 Preview deploys get a different URL each time, so OAuth will fail there unless
-you add that exact callback URL to an OAuth app. Verifying on production is the
+you add that exact redirect URI to an OAuth app. Verifying on production is the
 simpler path.
 
 ## 5. Verify
@@ -66,6 +77,11 @@ Locally, with `bun run db:up` running and `.env` filled in:
 ```bash
 bun run dev
 ```
+
+Check the printed URL is actually `http://localhost:5173`. If port 5173 is
+taken, Vite moves to 5174 without complaint, and GitHub then rejects the
+sign-in with a redirect URI mismatch. Free the port, or run
+`bun run dev --port 5173 --strictPort` so it fails loudly instead.
 
 1. The sign-in control appears top-right (it is hidden when credentials are unset).
 2. Sign in with GitHub; your GitHub name replaces the button.

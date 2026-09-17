@@ -47,7 +47,7 @@ Copy `.env.example` to `.env`:
 Sign-in is via GitHub, through Auth.js. These three are optional: leave them unset and the game plays anonymously with the sign-in control hidden.
 
 - `AUTH_SECRET`: session encryption key. Generate with `openssl rand -hex 32`.
-- `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET`: from a GitHub OAuth app whose callback URL is `http://localhost:5173/auth/callback/github`.
+- `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET`: from a GitHub OAuth app whose redirect URI is `http://localhost:5173/auth/callback/github`.
 
 `docs/setup/github-oauth.md` walks through creating the OAuth apps, the Atlas cluster and the Vercel variables.
 
