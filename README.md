@@ -18,7 +18,8 @@ The game began as a single self-contained HTML artefact and was ported into a fu
 ## Prerequisites
 
 - [bun](https://bun.sh) 1.x
-- A MongoDB Atlas connection string and GitHub OAuth credentials, once the save/leaderboard backend is implemented (not yet wired up — see Configuration)
+- [Docker](https://www.docker.com/) (for a local MongoDB via `bun run db:up`), or a MongoDB Atlas connection string
+- GitHub OAuth credentials, once auth is wired up (not yet — see Configuration)
 
 ## Installation
 
@@ -29,17 +30,20 @@ bun install
 ## Usage
 
 ```bash
+bun run db:up   # start a local MongoDB (requires Docker running)
 bun run dev
 ```
 
-Then open the printed local URL. The game runs entirely client-side; there is no build step required to play it locally.
+Then open the printed local URL. The game runs entirely client-side; there is no build step required to play it locally. Run `bun run db:down` when you're done with the local database.
 
 ## Configuration
 
-No environment variables are required yet. The project is scaffolded for a MongoDB + Auth.js backend (save/resume runs, a leaderboard) per `docs/adrs/001-initial-tech-stack.md`, but that data layer has not been implemented. When it is, expect:
+Copy `.env.example` to `.env`:
 
-- `MONGODB_URI` — Atlas connection string
-- `AUTH_SECRET`, plus the chosen OAuth provider's client ID/secret — Auth.js configuration
+- `MONGODB_URI` — MongoDB connection string. `mongodb://localhost:27017` for the local Docker instance, or an Atlas connection string.
+- `MONGODB_DB` — database name (defaults to `urheimat` if unset).
+
+`bun run test` and `bun run check` both pass with no live database required. Auth.js configuration (`AUTH_SECRET`, plus the chosen OAuth provider's client ID/secret) is not yet wired up.
 
 ## Project Structure
 
