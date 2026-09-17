@@ -60,9 +60,14 @@ export interface LogEntry {
 	text: string;
 }
 
+export interface Rng {
+	(): number;
+	state: number;
+}
+
 export interface GameState {
 	seed: number;
-	rng: () => number;
+	rng: Rng;
 	era: number;
 	maxEra: number;
 	cultures: Culture[];
@@ -144,6 +149,7 @@ export interface RunDocument {
 
 /** GameState with Set/function fields replaced by plain JSON-safe shapes for storage. */
 export interface SerializedGameState extends Omit<GameState, 'rng' | 'cultures'> {
+	rngState: number;
 	cultures: SerializedCulture[];
 }
 

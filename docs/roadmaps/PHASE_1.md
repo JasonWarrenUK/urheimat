@@ -35,11 +35,13 @@ Urheimat is playable but private, shallow in places, and built on a loop nobody 
 - [ ] **3PL.1**: Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers
   - Note: Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.
 - [ ] **3PL.2**: Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes _(blocked: depends on 1FN.2, 3PL.1)_
-  - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database.
-- [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2)_
+  - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL.
+- [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2, 3PL.5)_
   - Note: The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load.
 - [ ] **3PL.4**: Leaderboard of finished runs _(blocked: depends on 3PL.2)_
   - Note: Deliberately not a first-class feature; a small indexed collection is enough.
+- [ ] **3PL.5**: Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI) _(blocked: depends on 3PL.1)_
+  - Note: The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.
 
 ---
 
@@ -99,8 +101,9 @@ graph LR
 	2DS.1["2DS.1: Gameplay-loop spike: interrogate the cor…"]
 	3PL.1["3PL.1: Build the MongoDB data layer: runs and s…"]
 	3PL.2["3PL.2: Wire Auth.js with a GitHub OAuth app and…"]
-	3PL.3["3PL.3: Save and resume a run across sessions an…"]
 	3PL.4["3PL.4: Leaderboard of finished runs"]
+	3PL.5["3PL.5: Wire integration tests for the runs and…"]
+	3PL.3["3PL.3: Save and resume a run across sessions an…"]
 	M3["M3: Persistence"]:::mile
 	4SD.1["4SD.1: Derive a narrative condition state, repl…"]
 	4SD.2["4SD.2: Derive a narrative strain state, replaci…"]
@@ -135,10 +138,12 @@ graph LR
 	2DS.1 --> 4SD.10
 	2DS.1 --> 5RC.1
 	3PL.1 --> 3PL.2
-	3PL.2 --> 3PL.3
+	3PL.1 --> 3PL.5
 	3PL.2 --> 3PL.4
-	3PL.3 --> M3
+	3PL.2 --> 3PL.3
 	3PL.4 --> M3
+	3PL.5 --> 3PL.3
+	3PL.3 --> M3
 	4SD.1 --> 2DS.2
 	4SD.1 --> 4SD.5
 	4SD.2 --> 2DS.2
@@ -161,6 +166,6 @@ graph LR
 	5RC.3 --> M5
 	5RC.4 --> M5
 	class 2DS.1,3PL.1 todo
-	class 2DS.2,3PL.2,3PL.3,3PL.4,4SD.1,4SD.10,4SD.2,4SD.3,4SD.4,4SD.5,4SD.6,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4 blocked
+	class 2DS.2,3PL.2,3PL.3,3PL.4,3PL.5,4SD.1,4SD.10,4SD.2,4SD.3,4SD.4,4SD.5,4SD.6,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4 blocked
 	class 1FN.1,1FN.2 done
 ```

@@ -1,6 +1,6 @@
 # Urheimat PHASE_1: Roadmap Overview
 
-**22 tasks across 5 milestones.** Files: `.claude/roadmaps.json` (machine-readable), `docs/roadmaps/PHASE_1.md` (full task list with Mermaid dependency diagram).
+**23 tasks across 5 milestones.** Files: `.claude/roadmaps.json` (machine-readable), `docs/roadmaps/PHASE_1.md` (full task list with Mermaid dependency diagram).
 
 > The phase opens with 19 of 22 tasks blocked. That is deliberate rather than pessimistic: the gameplay-loop spike holds the premise itself open, so the simulation and reconstruction work genuinely cannot be specified until it reports. Three tasks are actionable on day one, in three independent tracks.
 

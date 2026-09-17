@@ -8,19 +8,23 @@ import type {
 	Orders,
 	Point,
 	ReconstructionResult,
+	Rng,
 	Terrain
 } from '$lib/types';
 import { FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
-export function rngFrom(seed: number): () => number {
-	let a = seed | 0;
-	return function () {
+export function rngFrom(seed: number, state?: number): Rng {
+	let a = (state ?? seed) | 0;
+	const r = (() => {
 		a |= 0;
 		a = (a + 0x6d2b79f5) | 0;
 		let t = Math.imul(a ^ (a >>> 15), 1 | a);
 		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		r.state = a;
 		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-	};
+	}) as Rng;
+	r.state = a;
+	return r;
 }
 
 const pick = <T>(r: () => number, arr: T[]): T => arr[Math.floor(r() * arr.length)];
