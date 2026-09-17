@@ -67,7 +67,7 @@
 					{
 						"id": "3PL.1",
 						"description": "Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [],
 						"notes": "Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.",
 						"assignee": "Jason"
@@ -75,7 +75,7 @@
 					{
 						"id": "3PL.2",
 						"description": "Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"1FN.2",
 							"3PL.1"
@@ -107,7 +107,7 @@
 					{
 						"id": "3PL.5",
 						"description": "Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"3PL.1"
 						],
