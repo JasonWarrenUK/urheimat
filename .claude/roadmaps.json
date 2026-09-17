@@ -91,7 +91,7 @@
 							"3PL.2",
 							"3PL.5"
 						],
-						"notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load.",
+						"notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.",
 						"assignee": "Jason"
 					},
 					{
