@@ -75,12 +75,12 @@
 					{
 						"id": "3PL.2",
 						"description": "Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"1FN.2",
 							"3PL.1"
 						],
-						"notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL.",
+						"notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.",
 						"assignee": "Jason"
 					},
 					{
@@ -91,13 +91,13 @@
 							"3PL.2",
 							"3PL.5"
 						],
-						"notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load.",
+						"notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.",
 						"assignee": "Jason"
 					},
 					{
 						"id": "3PL.4",
 						"description": "Leaderboard of finished runs",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"3PL.2"
 						],
