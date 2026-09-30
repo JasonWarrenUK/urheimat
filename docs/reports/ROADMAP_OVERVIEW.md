@@ -1,8 +1,8 @@
 # Urheimat PHASE_1: Roadmap Overview
 
-**23 tasks across 5 milestones.** Files: `.claude/roadmaps.json` (machine-readable), `docs/roadmaps/PHASE_1.md` (full task list with Mermaid dependency diagram).
+**43 tasks across 6 milestones.** Files: `.claude/roadmaps.json` (machine-readable), `docs/roadmaps/PHASE_1.md` (full task list with Mermaid dependency diagram).
 
-> The phase opens with 19 of 22 tasks blocked. That is deliberate rather than pessimistic: the gameplay-loop spike holds the premise itself open, so the simulation and reconstruction work genuinely cannot be specified until it reports. Three tasks are actionable on day one, in three independent tracks.
+> The gameplay-loop spike (2DS.1) reported on 2026-09-30; its decisions are in `docs/spikes/2DS.1-gameplay-loop.md`. It replaced the premise (the player is a spirit bound to one lineage, the reconstruction is a verdict rather than a target), removed the order menu and action budget in favour of situations and answers, and added Milestone 6 to build that loop. Most of the phase now sits behind M6.
 
 ---
 

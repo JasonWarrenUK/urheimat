@@ -4,9 +4,13 @@
 	Two placeholders, each substituted exactly once below: the phase-name
 	title (in the head; the h1 is overwritten by JS from project/phase, since
 	the two placeholders cannot diverge) and the JSON data blob
-	(project, phase, generated, stats, ready, mermaid, validation, devColours,
-	depKinds), which lands in the roadmap-data script element near the foot of
-	the document. Render does a global string replace, so the data-blob token
+	(project, phase, generated, stats, overview, tasks, ready, mermaid,
+	graphDirection, validation, devColours, depKinds), which lands in the
+	roadmap-data script element near the foot of the document. `overview` is
+	roadmap.py's own sort/tier-group computation for the Overview and
+	Milestones sections (see overview_layout() and roadmap-conventions.md);
+	the template renders it as given and never re-sorts or re-groups
+	milestones itself. Render does a global string replace, so the data-blob token
 	must appear verbatim exactly once in this file (the render step asserts
 	this); a second copy here would inject the blob into this comment and the
 	mermaid edge arrows would close the comment early and spill the JSON onto
@@ -36,7 +40,7 @@
 	--color-primary-bg:      #fff7fb;
 	--color-primary-text:    #4b0030;
 	/* Status semantics: green finished, gray blank, red stop, purple parked,
-	   cinnamon shelved, faded gray struck, yellow external */
+	   cinnamon shelved, dotted gray struck, yellow external */
 	--color-done:            #008217;
 	--color-done-bg:         #e0ffd9;
 	--color-todo:            #6f6f6f;
@@ -47,14 +51,22 @@
 	--color-paused-bg:       #fdf4ff;
 	--color-deferred:        #ac5c00;
 	--color-deferred-bg:     #fff8f3;
-	--color-out-of-scope:    #8b8b8b;
+	--color-out-of-scope:    #717171;
 	--color-out-of-scope-bg: #f6f6f6;
 	--color-gate:            #7d6f00;
 	--color-gate-bg:         #fff9e5;
-	/* Milestone-level derived state (see roadmap-conventions.md): azure is
-	   unclaimed by task status and distinct from sky (structural), so a
-	   part-done milestone reads as "live" rather than the same gray as
-	   untouched work. */
+	/* Tier backgrounds (see roadmap.py TIER_STYLE): the fill behind a
+	   tier's subgraph in the dependency graph, slate while the tier is
+	   underway, taupe while it is deferred. Muted mid-tones, never a node
+	   colour: every node stroke clears 3:1 against them. */
+	--color-tier-underway:    #2f3b4c;
+	--color-tier-underway-bg: #c3cede;
+	--color-tier-deferred:    #4a3826;
+	--color-tier-deferred-bg: #dccbb9;
+	/* In progress (see roadmap-conventions.md): azure marks a claimed task
+	   still in play and the milestone state it drives, the way milestone
+	   states share their task-status hues. Distinct from sky (structural),
+	   though close enough that diagram labels also carry a marker. */
 	--color-in-progress:     #0071af;
 	--color-in-progress-bg:  #e8f2ff;
 	/* Dev-chip palette: assignee is free-text with no roster (never
@@ -104,10 +116,14 @@
 		--color-paused-bg:       #3a004f;
 		--color-deferred:        #ffdfc6;
 		--color-deferred-bg:     #371d00;
-		--color-out-of-scope:    #3e3e3e;
+		--color-out-of-scope:    #898989;
 		--color-out-of-scope-bg: #222222;
 		--color-gate:            #ffe53e;
 		--color-gate-bg:         #292300;
+		--color-tier-underway:    #d5deea;
+		--color-tier-underway-bg: #343e4f;
+		--color-tier-deferred:    #ecdccb;
+		--color-tier-deferred-bg: #4a3c2f;
 		--color-in-progress:     #c6e0ff;
 		--color-in-progress-bg:  #001c30;
 		--color-dev-teal:        #00ffe4;
@@ -155,10 +171,14 @@
 	--color-paused-bg:       #3a004f;
 	--color-deferred:        #ffdfc6;
 	--color-deferred-bg:     #371d00;
-	--color-out-of-scope:    #3e3e3e;
+	--color-out-of-scope:    #898989;
 	--color-out-of-scope-bg: #222222;
 	--color-gate:            #ffe53e;
 	--color-gate-bg:         #292300;
+	--color-tier-underway:    #d5deea;
+	--color-tier-underway-bg: #343e4f;
+	--color-tier-deferred:    #ecdccb;
+	--color-tier-deferred-bg: #4a3c2f;
 	--color-in-progress:     #c6e0ff;
 	--color-in-progress-bg:  #001c30;
 	--color-dev-teal:        #00ffe4;
@@ -231,9 +251,6 @@ h2 {
 h2 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-milestone); flex-shrink: 0; }
 
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.1rem 1.3rem; min-width: 0; }
-.card--hero { background: var(--color-milestone-bg); border-color: var(--color-milestone); }
-.card--hero .kpi { font-size: 2.1rem; font-weight: 600; color: var(--color-milestone-text); }
-.card--hero .kpi small { font-size: 1rem; font-weight: 400; color: var(--color-milestone); margin-left: 0.5rem; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.9rem; margin-top: 0.9rem; }
 .grid > * { min-width: 0; }
@@ -242,6 +259,41 @@ h2 .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-m
 .mini .count { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--muted); }
 .progress-bar { height: 6px; background: var(--line); border-radius: 3px; margin-top: 0.55rem; overflow: hidden; }
 .progress-fill { height: 100%; border-radius: 3px; }
+
+/* Overview is itself a <details>, shipped open: the progress-card grid
+   follows the summary in the body. Closed by the reader, it shows only the
+   section name and headline bar (both live in the summary). Reuses
+   details.milestone's shape rather than a second pattern. */
+details.overview { border: none; background: none; margin-bottom: 0; }
+details.overview > summary {
+	cursor: pointer; list-style: none; display: flex; align-items: center;
+	flex-wrap: wrap; gap: 0.5rem 1rem; padding: 0;
+}
+details.overview > summary::-webkit-details-marker { display: none; }
+details.overview > summary h2 { margin: 0; }
+details.overview .headline {
+	font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: var(--muted);
+}
+details.overview .body { margin-top: 1rem; }
+
+/* A tier group: its own <details>, expanded per overview.tiers[].expanded.
+   Unwrapped (no tier markup at all) when the phase has no tiered
+   milestones; see the JS below. */
+details.tier { margin-bottom: 1.1rem; }
+details.tier > summary {
+	cursor: pointer; list-style: none; display: flex; align-items: baseline;
+	gap: 0.6rem; margin-bottom: 0.7rem;
+}
+details.tier > summary::-webkit-details-marker { display: none; }
+details.tier > summary h3 {
+	margin: 0; font-family: "IBM Plex Mono", monospace; font-size: 0.78rem;
+	font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+}
+details.tier > summary .readout {
+	font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--muted);
+}
+details.tier > summary .arrow { font-size: 0.7rem; color: var(--muted); transition: transform 0.15s; }
+details.tier[open] > summary .arrow { transform: rotate(90deg); }
 
 details.milestone {
 	background: var(--surface); border: 1px solid var(--m-colour, var(--line));
@@ -257,10 +309,23 @@ details.milestone > summary .mid {
 	background: var(--color-milestone-bg); color: var(--color-milestone-text);
 	border: 1px solid var(--color-milestone); border-radius: 4px; padding: 0.1rem 0.4rem;
 }
-details.milestone > summary .count { margin-left: auto; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+details.milestone > summary .devs { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; margin-left: auto; }
+/* The count sits at the far right of every milestone summary. With dev
+   chips present they take the auto margin and the count follows them;
+   without, the count takes it itself. */
+details.milestone > summary .count { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--muted); white-space: nowrap; margin-left: auto; }
+details.milestone > summary .devs + .count { margin-left: 0; }
 details.milestone .body { padding: 0 1.2rem 1rem; }
 .group h4 { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin: 0.9rem 0 0.35rem; }
 .group ul { list-style: none; margin: 0; padding: 0; }
+/* A status group that folds away (blocked, done, out of scope): closed by default, the
+   summary is its heading plus a task count. Same arrow as details.tier. */
+details.statusgroup > summary {
+	cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 0.45rem;
+}
+details.statusgroup > summary::-webkit-details-marker { display: none; }
+details.statusgroup > summary .arrow { font-size: 0.7rem; color: var(--muted); transition: transform 0.15s; }
+details.statusgroup[open] > summary .arrow { transform: rotate(90deg); }
 .group li { padding: 0.28rem 0; overflow-wrap: break-word; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem; }
 .tid {
 	font-family: "IBM Plex Mono", monospace; font-size: 0.72rem;
@@ -306,10 +371,15 @@ li.oos { text-decoration: line-through; color: var(--muted); }
 .legend .key--mile { font-weight: 600; }
 .legend .key--gate { font-style: italic; }
 .legend .keynote { flex-basis: 100%; }
+/* The two tier swatches: shown only for a tiered phase (see the JS below),
+   laid out as two more keys in the same row. */
+#tier-keys:not([hidden]) { display: contents; }
 
 .nextup li:not(.nextup-devgroup) { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem; padding: 0.3rem 0; }
-.nextup-devgroup { display: block; padding: 0; margin-top: 1rem; }
-.nextup-devgroup:first-child { margin-top: 0; }
+/* li.nextup-devgroup, not .nextup-devgroup: .group li (display:flex) would
+   otherwise outrank it and lay a heading out beside its own list */
+.nextup li.nextup-devgroup { display: block; padding: 0; margin-top: 1rem; }
+.nextup li.nextup-devgroup:first-child { margin-top: 0; }
 .nextup-devgroup h4 { margin: 0 0 0.4rem; font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .signal { color: var(--muted); font-size: 0.78rem; font-family: "IBM Plex Mono", monospace; margin-left: auto; }
 
@@ -378,9 +448,15 @@ li.oos { text-decoration: line-through; color: var(--muted); }
 		<div id="validation"></div>
 
 		<section id="overview">
-			<h2><span class="dot"></span>Overview</h2>
-			<div class="card card--hero"><div class="kpi" id="hero"></div></div>
-			<div class="grid" id="milestone-cards"></div>
+			<details class="overview" open>
+				<summary>
+					<h2><span class="dot"></span>Overview</h2>
+					<span class="headline" id="headline"></span>
+				</summary>
+				<div class="body">
+					<div id="milestone-cards"></div>
+				</div>
+			</details>
 		</section>
 
 		<section id="milestones">
@@ -401,12 +477,17 @@ li.oos { text-decoration: line-through; color: var(--muted); }
 			</div>
 			<div class="legend">
 				<span class="key"><i class="sw" style="background:var(--color-todo-bg);border-color:var(--color-todo)"></i>todo</span>
+				<span class="key"><i class="sw" style="background:var(--color-in-progress-bg);border-color:var(--color-in-progress)"></i>in progress ▸</span>
 				<span class="key"><i class="sw" style="background:var(--color-blocked-bg);border-color:var(--color-blocked);border-width:2px"></i>blocked</span>
 				<span class="key"><i class="sw" style="background:var(--color-paused-bg);border-color:var(--color-paused);border-style:dashed"></i>paused</span>
 				<span class="key"><i class="sw" style="background:var(--color-deferred-bg);border-color:var(--color-deferred);border-style:dashed"></i>deferred</span>
 				<span class="key"><i class="sw" style="background:var(--color-out-of-scope-bg);border-color:var(--color-out-of-scope);border-style:dotted"></i>out of scope</span>
 				<span class="key key--mile"><i class="sw" style="background:var(--color-milestone-bg);border-color:var(--color-milestone)"></i>milestone</span>
 				<span class="key key--gate"><i class="sw" style="background:var(--color-gate-bg);border-color:var(--color-gate);border-style:dashed"></i>external gate</span>
+				<span id="tier-keys" hidden>
+					<span class="key"><i class="sw" style="background:var(--color-tier-underway-bg);border-color:var(--color-tier-underway)"></i>tier underway</span>
+					<span class="key"><i class="sw" style="background:var(--color-tier-deferred-bg);border-color:var(--color-tier-deferred);border-style:dashed"></i>tier deferred</span>
+				</span>
 				<span class="keynote">tasks flow into the milestone node that they complete; done tasks and fully-done milestones are hidden</span>
 			</div>
 		</section>
@@ -418,7 +499,7 @@ li.oos { text-decoration: line-through; color: var(--muted); }
 	</main>
 </div>
 
-<script id="roadmap-data" type="application/json">{"project": "Urheimat", "phase": "PHASE_1", "generated": "2026-09-17T15:44:39", "stats": {"phase": "PHASE_1", "total": 23, "byStatus": {"done": 3, "todo": 3, "blocked": 17, "paused": 0, "deferred": 0, "out_of_scope": 0}, "invalid": [], "donePct": 13, "milestonesTotal": 5, "milestonesDone": 1, "milestones": [{"id": "M1", "name": "Foundations and launch", "total": 2, "done": 2, "byStatus": {"done": 2, "todo": 0, "blocked": 0, "paused": 0, "deferred": 0, "out_of_scope": 0}, "donePct": 100, "state": "done"}, {"id": "M2", "name": "Design spikes", "total": 2, "done": 0, "byStatus": {"done": 0, "todo": 1, "blocked": 1, "paused": 0, "deferred": 0, "out_of_scope": 0}, "donePct": 0, "state": "blocked"}, {"id": "M3", "name": "Persistence", "total": 5, "done": 1, "byStatus": {"done": 1, "todo": 2, "blocked": 2, "paused": 0, "deferred": 0, "out_of_scope": 0}, "donePct": 20, "state": "blocked"}, {"id": "M4", "name": "Simulation depth", "total": 10, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 10, "paused": 0, "deferred": 0, "out_of_scope": 0}, "donePct": 0, "state": "blocked"}, {"id": "M5", "name": "Reconstruction", "total": 4, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 4, "paused": 0, "deferred": 0, "out_of_scope": 0}, "donePct": 0, "state": "blocked"}]}, "tasks": [{"id": "1FN.1", "description": "Create the public GitHub repository and push the existing history", "status": "done", "dependsOn": [], "milestone": "M1", "notes": "https://github.com/JasonWarrenUK/urheimat", "assignee": "Jason"}, {"id": "1FN.2", "description": "Deploy the current client-side game to Vercel from the repository", "status": "done", "dependsOn": ["1FN.1"], "milestone": "M1", "notes": "https://urheimat.vercel.app/", "assignee": "Jason"}, {"id": "2DS.1", "description": "Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived", "status": "todo", "dependsOn": [], "milestone": "M2", "notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.", "assignee": "Jason"}, {"id": "2DS.2", "description": "UI spike: information architecture first, then visual design; defines how the derived states are displayed, and produces concrete mobile and accessibility tasks rather than principles", "status": "blocked", "dependsOn": ["2DS.1", "4SD.1", "4SD.2", "4SD.3"], "milestone": "M2", "notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks.", "assignee": "Jason"}, {"id": "3PL.1", "description": "Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers", "status": "done", "dependsOn": [], "milestone": "M3", "notes": "Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.", "assignee": "Jason"}, {"id": "3PL.2", "description": "Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes", "status": "todo", "dependsOn": ["1FN.2", "3PL.1"], "milestone": "M3", "notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL.", "assignee": "Jason"}, {"id": "3PL.3", "description": "Save and resume a run across sessions and devices", "status": "blocked", "dependsOn": ["3PL.2", "3PL.5"], "milestone": "M3", "notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load.", "assignee": "Jason"}, {"id": "3PL.4", "description": "Leaderboard of finished runs", "status": "blocked", "dependsOn": ["3PL.2"], "milestone": "M3", "notes": "Deliberately not a first-class feature; a small indexed collection is enough.", "assignee": "Jason"}, {"id": "3PL.5", "description": "Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)", "status": "todo", "dependsOn": ["3PL.1"], "milestone": "M3", "notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.", "assignee": "Jason"}, {"id": "4SD.1", "description": "Derive a narrative condition state, replacing numeric prosperity entirely", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "No float, no bar. Prosperity currently drives death at zero and the daughter-band threshold, so the derivation must preserve those mechanics while the player only ever sees prose.", "assignee": "Jason"}, {"id": "4SD.2", "description": "Derive a narrative strain state, replacing the count of straining parts", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "", "assignee": "Jason"}, {"id": "4SD.3", "description": "Derive a narrative action-budget state, replacing the actions-left counter", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "", "assignee": "Jason"}, {"id": "4SD.4", "description": "Semantic drift: place feature values on a similarity graph so drift favours near neighbours", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value.", "assignee": "Jason"}, {"id": "4SD.5", "description": "Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight", "status": "blocked", "dependsOn": ["2DS.1", "4SD.1"], "milestone": "M4", "notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Depends on condition state because prestige is derived from it.", "assignee": "Jason"}, {"id": "4SD.6", "description": "Second founding stock: seed two unrelated ancestral cultures at game start", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "The player still leads a band from one stock and is still scored on recovering that stock's truth; the second exists to contaminate the record.", "assignee": "Jason"}, {"id": "4SD.7", "description": "Substrate inheritance: dying and displaced cultures leave traces in whoever succeeds them", "status": "blocked", "dependsOn": ["4SD.6"], "milestone": "M4", "notes": "Needs a second lineage to inherit from, so it follows the second founding stock. Traces may be unrelated traditions or mutated sibling ones.", "assignee": "Jason"}, {"id": "4SD.8", "description": "Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "A second lever beyond Hold, and a systematic bias for the scholars to fall for.", "assignee": "Jason"}, {"id": "4SD.9", "description": "Richer inter-culture relations: trade, conquest and hostility beyond distance-and-terrain contact", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "", "assignee": "Jason"}, {"id": "4SD.10", "description": "Expand the corpus: more customs, more parts per custom, more values per part", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.", "assignee": "Jason"}, {"id": "5RC.1", "description": "Chronicle carries the evidence the scholars later consume", "status": "blocked", "dependsOn": ["2DS.1"], "milestone": "M5", "notes": "Attestation has to be sourced from something recorded. The chronicle is what the player actually saw happen, which keeps the scoring legible in hindsight.", "assignee": "Jason"}, {"id": "5RC.2", "description": "Uneven attestation derived from in-game events, never from a random roll", "status": "blocked", "dependsOn": ["5RC.1"], "milestone": "M5", "notes": "A culture that kept Carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Makes being legible to the future a goal in itself.", "assignee": "Jason"}, {"id": "5RC.3", "description": "Deeper scholar model: weighted evidence, competing hypotheses and sub-grouping rather than flat comparison", "status": "blocked", "dependsOn": ["5RC.2"], "milestone": "M5", "notes": "", "assignee": "Jason"}, {"id": "5RC.4", "description": "Scoring accounts for the second stock: contamination misleads, but the player's own ancestral truth stays the target", "status": "blocked", "dependsOn": ["4SD.6"], "milestone": "M5", "notes": "False unity across the two stocks becomes a scoreable error. Soft-linked to the scholar model, which it should reflect but need not wait for.", "assignee": "Jason"}], "ready": {"phase": "PHASE_1", "candidates": [{"id": "2DS.1", "description": "Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived", "milestone": "M2", "milestoneName": "Design spikes", "milestoneDonePct": 0, "directDependents": 11, "transitiveUnblocks": 15, "isMilestoneSink": false, "notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.", "assignee": "Jason"}, {"id": "3PL.2", "description": "Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes", "milestone": "M3", "milestoneName": "Persistence", "milestoneDonePct": 20, "directDependents": 2, "transitiveUnblocks": 2, "isMilestoneSink": false, "notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL.", "assignee": "Jason"}, {"id": "3PL.5", "description": "Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)", "milestone": "M3", "milestoneName": "Persistence", "milestoneDonePct": 20, "directDependents": 1, "transitiveUnblocks": 1, "isMilestoneSink": false, "notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.", "assignee": "Jason"}]}, "mermaid": "graph TD\n\tclassDef todo fill:var(--color-todo-bg),stroke:var(--color-todo),color:var(--color-todo)\n\tclassDef blocked fill:var(--color-blocked-bg),stroke:var(--color-blocked),color:var(--color-blocked),stroke-width:2px\n\tclassDef paused fill:var(--color-paused-bg),stroke:var(--color-paused),color:var(--color-paused),stroke-dasharray:4 3\n\tclassDef deferred fill:var(--color-deferred-bg),stroke:var(--color-deferred),color:var(--color-deferred),stroke-dasharray:2 4,font-style:italic\n\tclassDef done fill:var(--color-done-bg),stroke:var(--color-done),color:var(--color-done)\n\tclassDef outOfScope fill:var(--color-out-of-scope-bg),stroke:var(--color-out-of-scope),color:var(--color-out-of-scope),stroke-dasharray:2 2\n\tclassDef mile fill:var(--color-milestone-bg),stroke:var(--color-milestone),color:var(--color-milestone),font-weight:bold\n\tclassDef external fill:var(--color-gate-bg),stroke:var(--color-gate),color:var(--color-gate),stroke-dasharray:4 3,font-style:italic\n\t2DS.1[\"2DS.1: Gameplay-loop spike: interrogate the cor…\"]\n\t3PL.2[\"3PL.2: Wire Auth.js with a GitHub OAuth app and…\"]\n\t3PL.4[\"3PL.4: Leaderboard of finished runs\"]\n\t3PL.5[\"3PL.5: Wire integration tests for the runs and…\"]\n\t3PL.3[\"3PL.3: Save and resume a run across sessions an…\"]\n\tM3[\"M3: Persistence\"]:::mile\n\t4SD.1[\"4SD.1: Derive a narrative condition state, repl…\"]\n\t4SD.2[\"4SD.2: Derive a narrative strain state, replaci…\"]\n\t4SD.3[\"4SD.3: Derive a narrative action-budget state,…\"]\n\t2DS.2[\"2DS.2: UI spike: information architecture first…\"]\n\tM2[\"M2: Design spikes\"]:::mile\n\t4SD.4[\"4SD.4: Semantic drift: place feature values on…\"]\n\t4SD.5[\"4SD.5: Prestige asymmetry: borrowing flows down…\"]\n\t4SD.6[\"4SD.6: Second founding stock: seed two unrelate…\"]\n\t4SD.7[\"4SD.7: Substrate inheritance: dying and displac…\"]\n\t4SD.8[\"4SD.8: Taboo and deliberate archaism: sanctify…\"]\n\t4SD.9[\"4SD.9: Richer inter-culture relations: trade, c…\"]\n\t4SD.10[\"4SD.10: Expand the corpus: more customs, more p…\"]\n\tM4[\"M4: Simulation depth\"]:::mile\n\t5RC.1[\"5RC.1: Chronicle carries the evidence the schol…\"]\n\t5RC.2[\"5RC.2: Uneven attestation derived from in-game…\"]\n\t5RC.3[\"5RC.3: Deeper scholar model: weighted evidence,…\"]\n\t5RC.4[\"5RC.4: Scoring accounts for the second stock: c…\"]\n\tM5[\"M5: Reconstruction\"]:::mile\n\t2DS.1 --\u003e 4SD.1\n\t2DS.1 --\u003e 4SD.2\n\t2DS.1 --\u003e 4SD.3\n\t2DS.1 --\u003e 2DS.2\n\t2DS.1 --\u003e 4SD.4\n\t2DS.1 --\u003e 4SD.5\n\t2DS.1 --\u003e 4SD.6\n\t2DS.1 --\u003e 4SD.8\n\t2DS.1 --\u003e 4SD.9\n\t2DS.1 --\u003e 4SD.10\n\t2DS.1 --\u003e 5RC.1\n\t3PL.2 --\u003e 3PL.4\n\t3PL.2 --\u003e 3PL.3\n\t3PL.4 --\u003e M3\n\t3PL.5 --\u003e 3PL.3\n\t3PL.3 --\u003e M3\n\t4SD.1 --\u003e 2DS.2\n\t4SD.1 --\u003e 4SD.5\n\t4SD.2 --\u003e 2DS.2\n\t4SD.2 --\u003e M4\n\t4SD.3 --\u003e 2DS.2\n\t4SD.3 --\u003e M4\n\t2DS.2 --\u003e M2\n\t4SD.4 -.-\u003e 4SD.10\n\t4SD.4 --\u003e M4\n\t4SD.5 --\u003e M4\n\t4SD.6 --\u003e 4SD.7\n\t4SD.6 --\u003e 5RC.4\n\t4SD.7 --\u003e M4\n\t4SD.8 --\u003e M4\n\t4SD.9 --\u003e M4\n\t4SD.10 --\u003e M4\n\t5RC.1 --\u003e 5RC.2\n\t5RC.2 --\u003e 5RC.3\n\t5RC.3 -.-\u003e 5RC.4\n\t5RC.3 --\u003e M5\n\t5RC.4 --\u003e M5\n\tclass 2DS.1,3PL.2,3PL.5 todo\n\tclass 2DS.2,3PL.3,3PL.4,4SD.1,4SD.10,4SD.2,4SD.3,4SD.4,4SD.5,4SD.6,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4 blocked", "validation": [], "devColours": {"Jason": "lime"}, "depKinds": {"1FN.1": {"kind": "task", "status": "done"}, "1FN.2": {"kind": "task", "status": "done"}, "2DS.1": {"kind": "task", "status": "todo"}, "2DS.2": {"kind": "task", "status": "blocked"}, "3PL.1": {"kind": "task", "status": "done"}, "3PL.2": {"kind": "task", "status": "todo"}, "3PL.3": {"kind": "task", "status": "blocked"}, "3PL.4": {"kind": "task", "status": "blocked"}, "3PL.5": {"kind": "task", "status": "todo"}, "4SD.1": {"kind": "task", "status": "blocked"}, "4SD.2": {"kind": "task", "status": "blocked"}, "4SD.3": {"kind": "task", "status": "blocked"}, "4SD.4": {"kind": "task", "status": "blocked"}, "4SD.5": {"kind": "task", "status": "blocked"}, "4SD.6": {"kind": "task", "status": "blocked"}, "4SD.7": {"kind": "task", "status": "blocked"}, "4SD.8": {"kind": "task", "status": "blocked"}, "4SD.9": {"kind": "task", "status": "blocked"}, "4SD.10": {"kind": "task", "status": "blocked"}, "5RC.1": {"kind": "task", "status": "blocked"}, "5RC.2": {"kind": "task", "status": "blocked"}, "5RC.3": {"kind": "task", "status": "blocked"}, "5RC.4": {"kind": "task", "status": "blocked"}, "M1": {"kind": "milestone"}, "M2": {"kind": "milestone"}, "M3": {"kind": "milestone"}, "M4": {"kind": "milestone"}, "M5": {"kind": "milestone"}}}</script>
+<script id="roadmap-data" type="application/json">{"project": "Urheimat", "phase": "PHASE_1", "generated": "2026-09-30T23:20:13", "stats": {"phase": "PHASE_1", "total": 43, "inScope": 43, "byStatus": {"done": 4, "todo": 3, "blocked": 36, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 1, "invalid": [], "donePct": 9, "milestonesTotal": 6, "milestonesDone": 1, "milestones": [{"id": "M1", "name": "Foundations and launch", "total": 2, "inScope": 2, "done": 2, "byStatus": {"done": 2, "todo": 0, "blocked": 0, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 100, "tier": 0, "state": "done"}, {"id": "M2", "name": "Design spikes", "total": 3, "inScope": 3, "done": 0, "byStatus": {"done": 0, "todo": 1, "blocked": 2, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 1, "donePct": 0, "tier": 0, "state": "inProgress"}, {"id": "M3", "name": "Persistence", "total": 5, "inScope": 5, "done": 2, "byStatus": {"done": 2, "todo": 2, "blocked": 1, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 40, "tier": 0, "state": "inProgress"}, {"id": "M4", "name": "Simulation depth", "total": 12, "inScope": 12, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 12, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 0, "tier": 0, "state": "blocked"}, {"id": "M5", "name": "Reconstruction", "total": 5, "inScope": 5, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 5, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 0, "tier": 0, "state": "blocked"}, {"id": "M6", "name": "The situation loop", "total": 16, "inScope": 16, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 16, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 0, "tier": 0, "state": "blocked"}]}, "overview": {"tiers": null, "milestones": [{"id": "M3", "name": "Persistence", "total": 5, "inScope": 5, "done": 2, "byStatus": {"done": 2, "todo": 2, "blocked": 1, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 40, "tier": 0, "state": "inProgress", "tierLabel": "Core", "devs": ["Jason"]}, {"id": "M2", "name": "Design spikes", "total": 3, "inScope": 3, "done": 0, "byStatus": {"done": 0, "todo": 1, "blocked": 2, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 1, "donePct": 0, "tier": 0, "state": "inProgress", "tierLabel": "Core", "devs": ["Jason"]}, {"id": "M4", "name": "Simulation depth", "total": 12, "inScope": 12, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 12, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 0, "tier": 0, "state": "blocked", "tierLabel": "Core", "devs": ["Jason"]}, {"id": "M5", "name": "Reconstruction", "total": 5, "inScope": 5, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 5, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 0, "tier": 0, "state": "blocked", "tierLabel": "Core", "devs": ["Jason"]}, {"id": "M6", "name": "The situation loop", "total": 16, "inScope": 16, "done": 0, "byStatus": {"done": 0, "todo": 0, "blocked": 16, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 0, "tier": 0, "state": "blocked", "tierLabel": "Core", "devs": ["Jason"]}, {"id": "M1", "name": "Foundations and launch", "total": 2, "inScope": 2, "done": 2, "byStatus": {"done": 2, "todo": 0, "blocked": 0, "paused": 0, "deferred": 0, "out_of_scope": 0}, "inProgress": 0, "donePct": 100, "tier": 0, "state": "done", "tierLabel": "Core", "devs": ["Jason"]}]}, "tasks": [{"id": "1FN.1", "description": "Create the public GitHub repository and push the existing history", "status": "done", "display": "done", "dependsOn": [], "milestone": "M1", "notes": "https://github.com/JasonWarrenUK/urheimat", "assignee": "Jason", "started": ""}, {"id": "1FN.2", "description": "Deploy the current client-side game to Vercel from the repository", "status": "done", "display": "done", "dependsOn": ["1FN.1"], "milestone": "M1", "notes": "https://urheimat.vercel.app/", "assignee": "Jason", "started": ""}, {"id": "2DS.1", "description": "Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived", "status": "todo", "display": "in_progress", "dependsOn": [], "milestone": "M2", "notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.", "assignee": "Jason", "started": "2026-09-30"}, {"id": "2DS.2", "description": "UI spike: information architecture first, then visual design; defines how the derived states are displayed, and produces concrete mobile and accessibility tasks rather than principles", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1", "4SD.2", "6SL.6"], "milestone": "M2", "notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the granularity of the notebook's believed/true toggle, the timelapse after band death and what a watched lull shows. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2j, 2u, 3t, 5d).", "assignee": "Jason", "started": ""}, {"id": "2DS.3", "description": "Notebook design spike: the visual layout, mechanical behaviour and prose structure of the scholars' notebook", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M2", "notes": "Prose only, no totals. Works from the subjects table in the spike log, combined or spread as the design finds best; settles how the believed/true toggle works and how a band that died early reads. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2c, 2e, 2g, 2j).", "assignee": "Jason", "started": ""}, {"id": "3PL.1", "description": "Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers", "status": "done", "display": "done", "dependsOn": [], "milestone": "M3", "notes": "Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.", "assignee": "Jason", "started": ""}, {"id": "3PL.2", "description": "Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes", "status": "done", "display": "done", "dependsOn": ["1FN.2", "3PL.1"], "milestone": "M3", "notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.", "assignee": "Jason", "started": ""}, {"id": "3PL.3", "description": "Save and resume a run across sessions and devices", "status": "blocked", "display": "blocked", "dependsOn": ["3PL.2", "3PL.5"], "milestone": "M3", "notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.", "assignee": "Jason", "started": ""}, {"id": "3PL.4", "description": "Leaderboard of finished runs", "status": "todo", "display": "todo", "dependsOn": ["3PL.2"], "milestone": "M3", "notes": "Deliberately not a first-class feature; a small indexed collection is enough.", "assignee": "Jason", "started": ""}, {"id": "3PL.5", "description": "Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)", "status": "todo", "display": "todo", "dependsOn": ["3PL.1"], "milestone": "M3", "notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.", "assignee": "Jason", "started": ""}, {"id": "4SD.2", "description": "Remove the aggregate strain count; the per-custom fit line is all that remains", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.3"], "milestone": "M4", "notes": "Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b).", "assignee": "Jason", "started": ""}, {"id": "4SD.4", "description": "Semantic drift: place feature values on a similarity graph so drift favours near neighbours", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value.", "assignee": "Jason", "started": ""}, {"id": "4SD.5", "description": "Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.6"], "milestone": "M4", "notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.6). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).", "assignee": "Jason", "started": ""}, {"id": "4SD.6", "description": "Second founding stock: seed two unrelated ancestral cultures at game start", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "The player still leads a band from one stock and is still scored on recovering that stock's truth; the second exists to contaminate the record.", "assignee": "Jason", "started": ""}, {"id": "4SD.7", "description": "Substrate inheritance: dying and displaced cultures leave traces in whoever succeeds them", "status": "blocked", "display": "blocked", "dependsOn": ["4SD.6"], "milestone": "M4", "notes": "Needs a second lineage to inherit from, so it follows the second founding stock. Traces may be unrelated traditions or mutated sibling ones.", "assignee": "Jason", "started": ""}, {"id": "4SD.8", "description": "Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.9"], "milestone": "M4", "notes": "Decides whether sanctifying exists and how it costs; the spike log holds a think-through of its impact under a loop with no random drift. Revival draws on the spirit's complete memory against the band's fading one. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4f, 1g).", "assignee": "Jason", "started": ""}, {"id": "4SD.9", "description": "Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started", "status": "blocked", "display": "blocked", "dependsOn": ["4SD.11", "6SL.5"], "milestone": "M4", "notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).", "assignee": "Jason", "started": ""}, {"id": "4SD.10", "description": "Expand the corpus: more customs, more parts per custom, more values per part", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.", "assignee": "Jason", "started": ""}, {"id": "4SD.11", "description": "Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.5"], "milestone": "M4", "notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).", "assignee": "Jason", "started": ""}, {"id": "4SD.12", "description": "Writing as a gated custom in grades, from tallies to full record", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.5", "4SD.11"], "milestone": "M4", "notes": "A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).", "assignee": "Jason", "started": ""}, {"id": "4SD.13", "description": "Dated knowledge between every pair of bands, with recognition by graded resemblance", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.1"], "milestone": "M4", "notes": "What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).", "assignee": "Jason", "started": ""}, {"id": "4SD.14", "description": "Tag material traces value by value across the corpus", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M4", "notes": "Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).", "assignee": "Jason", "started": ""}, {"id": "5RC.1", "description": "The evidence model: what the scholars can draw on, band by band", "status": "blocked", "display": "blocked", "dependsOn": ["4SD.12", "4SD.13", "4SD.14"], "milestone": "M5", "notes": "The scholars know the end state perfectly and cannot converse with anyone. For a vanished band they have material remains, others' writing about it, its own writing and tales among other peoples. The chronicle is one record among several. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2o, 2p, 2q).", "assignee": "Jason", "started": ""}, {"id": "5RC.2", "description": "Attestation derived from the evidence model, band by band and value by value, never from a random roll", "status": "blocked", "display": "blocked", "dependsOn": ["5RC.1"], "milestone": "M5", "notes": "A band that kept carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2q).", "assignee": "Jason", "started": ""}, {"id": "5RC.3", "description": "Deeper scholar model: weighted evidence, competing hypotheses and sub-grouping rather than flat comparison", "status": "blocked", "display": "blocked", "dependsOn": ["5RC.2"], "milestone": "M5", "notes": "", "assignee": "Jason", "started": ""}, {"id": "5RC.4", "description": "Scoring accounts for the second stock: contamination misleads, but the player's own ancestral truth stays the target", "status": "blocked", "display": "blocked", "dependsOn": ["4SD.6"], "milestone": "M5", "notes": "False unity across the two stocks becomes a scoreable error. Soft-linked to the scholar model, which it should reflect but need not wait for.", "assignee": "Jason", "started": ""}, {"id": "5RC.5", "description": "Build the notebook to the 2DS.3 design: prose only, the subjects table, the believed/true toggle", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.3", "5RC.2", "5RC.3"], "milestone": "M5", "notes": "A band can be given a wrong origin entirely; bands that died early are treated by the evidence they left. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2g, 2i, 2j).", "assignee": "Jason", "started": ""}, {"id": "6SL.1", "description": "World step and leaders: a fixed 25-year step for every band, leaders with a child at 18 and death between 36 and 75, family ages tracked", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M6", "notes": "Succession passes to the nearest adult descendant; the age range guarantees one exists. A more robust descent and inheritance system is a later phase. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3b, 3c, 3q).", "assignee": "Jason", "started": ""}, {"id": "6SL.2", "description": "Remove the order menu and the action budget: an era becomes situations, answers, step", "status": "blocked", "display": "blocked", "dependsOn": ["2DS.1"], "milestone": "M6", "notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).", "assignee": "Jason", "started": ""}, {"id": "6SL.3", "description": "Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.2"], "milestone": "M6", "notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).", "assignee": "Jason", "started": ""}, {"id": "6SL.4", "description": "Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.3"], "milestone": "M6", "notes": "Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).", "assignee": "Jason", "started": ""}, {"id": "6SL.5", "description": "Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.2"], "milestone": "M6", "notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).", "assignee": "Jason", "started": ""}, {"id": "6SL.6", "description": "Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.3"], "milestone": "M6", "notes": "No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).", "assignee": "Jason", "started": ""}, {"id": "6SL.7", "description": "Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.3"], "milestone": "M6", "notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k).", "assignee": "Jason", "started": ""}, {"id": "6SL.8", "description": "Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.3", "6SL.5"], "milestone": "M6", "notes": "Pressure behaves like weather, with peaks and lulls and no climb towards the end. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3i, 3p, 3t).", "assignee": "Jason", "started": ""}, {"id": "6SL.9", "description": "Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.1"], "milestone": "M6", "notes": "Ancestral answers draw on what the band remembers. The spirit is a frame only, never named in the game. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1d, 1e, 1g, 1h).", "assignee": "Jason", "started": ""}, {"id": "6SL.10", "description": "Daughter band as an outcome of pressure or opportunity, with the player choosing which branch to follow", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.6", "6SL.8"], "milestone": "M6", "notes": "The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).", "assignee": "Jason", "started": ""}, {"id": "6SL.11", "description": "Moves: forced by events, or player-started with diegetic justification or a consequence", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.3"], "milestone": "M6", "notes": "In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).", "assignee": "Jason", "started": ""}, {"id": "6SL.12", "description": "Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.5"], "milestone": "M6", "notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).", "assignee": "Jason", "started": ""}, {"id": "6SL.13", "description": "Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.5", "4SD.12"], "milestone": "M6", "notes": "The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).", "assignee": "Jason", "started": ""}, {"id": "6SL.14", "description": "Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.2"], "milestone": "M6", "notes": "The player sees no reference to the notebook during play. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).", "assignee": "Jason", "started": ""}, {"id": "6SL.15", "description": "Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.1", "4SD.11", "4SD.12"], "milestone": "M6", "notes": "Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).", "assignee": "Jason", "started": ""}, {"id": "6SL.16", "description": "Family opinion as a storylet trigger", "status": "blocked", "display": "blocked", "dependsOn": ["6SL.12"], "milestone": "M6", "notes": "The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).", "assignee": "Jason", "started": ""}], "ready": {"phase": "PHASE_1", "candidates": [{"id": "3PL.5", "description": "Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)", "milestone": "M3", "milestoneName": "Persistence", "milestoneDonePct": 40, "directDependents": 1, "transitiveUnblocks": 1, "isMilestoneSink": false, "notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.", "assignee": "Jason"}, {"id": "3PL.4", "description": "Leaderboard of finished runs", "milestone": "M3", "milestoneName": "Persistence", "milestoneDonePct": 40, "directDependents": 0, "transitiveUnblocks": 0, "isMilestoneSink": true, "notes": "Deliberately not a first-class feature; a small indexed collection is enough.", "assignee": "Jason"}], "claimed": [{"id": "2DS.1", "description": "Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived", "milestone": "M2", "milestoneName": "Design spikes", "status": "todo", "display": "in_progress", "started": "2026-09-30", "assignee": "Jason"}]}, "mermaid": "graph TD\n\tclassDef todo fill:var(--color-todo-bg),stroke:var(--color-todo),color:var(--color-todo)\n\tclassDef inProgress fill:var(--color-in-progress-bg),stroke:var(--color-in-progress),color:var(--color-in-progress)\n\tclassDef blocked fill:var(--color-blocked-bg),stroke:var(--color-blocked),color:var(--color-blocked),stroke-width:2px\n\tclassDef paused fill:var(--color-paused-bg),stroke:var(--color-paused),color:var(--color-paused),stroke-dasharray:4 3\n\tclassDef deferred fill:var(--color-deferred-bg),stroke:var(--color-deferred),color:var(--color-deferred),stroke-dasharray:2 4,font-style:italic\n\tclassDef done fill:var(--color-done-bg),stroke:var(--color-done),color:var(--color-done)\n\tclassDef outOfScope fill:var(--color-out-of-scope-bg),stroke:var(--color-out-of-scope),color:var(--color-out-of-scope),stroke-dasharray:2 2\n\tclassDef mile fill:var(--color-milestone-bg),stroke:var(--color-milestone),color:var(--color-milestone),font-weight:bold\n\tclassDef external fill:var(--color-gate-bg),stroke:var(--color-gate),color:var(--color-gate),stroke-dasharray:4 3,font-style:italic\n\t2DS.1[\"2DS.1: Gameplay-loop spike: interrogate the c… ▸\"]\n\t2DS.3[\"2DS.3: Notebook design spike: the visual layout…\"]\n\t3PL.4[\"3PL.4: Leaderboard of finished runs\"]\n\t3PL.5[\"3PL.5: Wire integration tests for the runs and…\"]\n\t3PL.3[\"3PL.3: Save and resume a run across sessions an…\"]\n\tM3[\"M3: Persistence\"]:::mile\n\t4SD.4[\"4SD.4: Semantic drift: place feature values on…\"]\n\t4SD.6[\"4SD.6: Second founding stock: seed two unrelate…\"]\n\t4SD.7[\"4SD.7: Substrate inheritance: dying and displac…\"]\n\t4SD.10[\"4SD.10: Expand the corpus: more customs, more p…\"]\n\t4SD.14[\"4SD.14: Tag material traces value by value acro…\"]\n\t6SL.1[\"6SL.1: World step and leaders: a fixed 25-year…\"]\n\t4SD.13[\"4SD.13: Dated knowledge between every pair of b…\"]\n\t6SL.2[\"6SL.2: Remove the order menu and the action bud…\"]\n\t6SL.3[\"6SL.3: Layer 1 pressures: surface the land's an…\"]\n\t4SD.2[\"4SD.2: Remove the aggregate strain count; the p…\"]\n\t6SL.4[\"6SL.4: Answer effects: the one-turn keep, refor…\"]\n\t6SL.5[\"6SL.5: Prerequisite structure and storylet engi…\"]\n\t4SD.11[\"4SD.11: Territory as a gated custom: every band…\"]\n\t4SD.9[\"4SD.9: Inter-culture relations: raids, conquest…\"]\n\t4SD.12[\"4SD.12: Writing as a gated custom in grades, fr…\"]\n\t5RC.1[\"5RC.1: The evidence model: what the scholars ca…\"]\n\t5RC.2[\"5RC.2: Attestation derived from the evidence mo…\"]\n\t5RC.3[\"5RC.3: Deeper scholar model: weighted evidence,…\"]\n\t5RC.4[\"5RC.4: Scoring accounts for the second stock: c…\"]\n\t5RC.5[\"5RC.5: Build the notebook to the 2DS.3 design:…\"]\n\tM5[\"M5: Reconstruction\"]:::mile\n\t6SL.6[\"6SL.6: Condition as strands (food, numbers, sta…\"]\n\t2DS.2[\"2DS.2: UI spike: information architecture first…\"]\n\tM2[\"M2: Design spikes\"]:::mile\n\t4SD.5[\"4SD.5: Prestige asymmetry: borrowing flows down…\"]\n\t6SL.7[\"6SL.7: Scripted answers for AI bands, shaped by…\"]\n\t6SL.8[\"6SL.8: Weather and lulls: situation count by pr…\"]\n\t6SL.9[\"6SL.9: Band memory: what the people remember of…\"]\n\t4SD.8[\"4SD.8: Taboo and deliberate archaism: sanctify…\"]\n\tM4[\"M4: Simulation depth\"]:::mile\n\t6SL.10[\"6SL.10: Daughter band as an outcome of pressure…\"]\n\t6SL.11[\"6SL.11: Moves: forced by events, or player-star…\"]\n\t6SL.12[\"6SL.12: Storylet corpus, first batch: enough au…\"]\n\t6SL.13[\"6SL.13: Run ending: history arrives once writte…\"]\n\t6SL.14[\"6SL.14: Intro and framing rewrite: no scholars,…\"]\n\t6SL.15[\"6SL.15: Derive the new displayed states: recogn…\"]\n\t6SL.16[\"6SL.16: Family opinion as a storylet trigger\"]\n\tM6[\"M6: The situation loop\"]:::mile\n\t2DS.1 --\u003e 2DS.3\n\t2DS.1 --\u003e 4SD.4\n\t2DS.1 --\u003e 4SD.6\n\t2DS.1 --\u003e 4SD.10\n\t2DS.1 --\u003e 4SD.14\n\t2DS.1 --\u003e 6SL.1\n\t2DS.1 --\u003e 6SL.2\n\t2DS.1 --\u003e 2DS.2\n\t2DS.3 --\u003e 5RC.5\n\t2DS.3 --\u003e M2\n\t3PL.4 --\u003e M3\n\t3PL.5 --\u003e 3PL.3\n\t3PL.3 --\u003e M3\n\t4SD.4 -.-\u003e 4SD.10\n\t4SD.4 --\u003e M4\n\t4SD.6 --\u003e 4SD.7\n\t4SD.6 --\u003e 5RC.4\n\t4SD.7 --\u003e M4\n\t4SD.10 -.-\u003e 4SD.14\n\t4SD.10 --\u003e M4\n\t4SD.14 --\u003e 5RC.1\n\t4SD.14 --\u003e M4\n\t6SL.1 --\u003e 4SD.13\n\t6SL.1 --\u003e 6SL.9\n\t6SL.1 --\u003e 6SL.15\n\t4SD.13 --\u003e 5RC.1\n\t4SD.13 --\u003e M4\n\t6SL.2 --\u003e 6SL.3\n\t6SL.2 --\u003e 6SL.5\n\t6SL.2 --\u003e 6SL.14\n\t6SL.3 --\u003e 4SD.2\n\t6SL.3 --\u003e 6SL.4\n\t6SL.3 --\u003e 6SL.6\n\t6SL.3 --\u003e 6SL.7\n\t6SL.3 --\u003e 6SL.8\n\t6SL.3 --\u003e 6SL.11\n\t4SD.2 --\u003e 2DS.2\n\t4SD.2 --\u003e M4\n\t6SL.4 --\u003e M6\n\t6SL.5 --\u003e 4SD.11\n\t6SL.5 --\u003e 4SD.9\n\t6SL.5 --\u003e 4SD.12\n\t6SL.5 --\u003e 6SL.8\n\t6SL.5 --\u003e 6SL.12\n\t6SL.5 --\u003e 6SL.13\n\t4SD.11 --\u003e 4SD.9\n\t4SD.11 --\u003e 4SD.12\n\t4SD.11 --\u003e 6SL.15\n\t4SD.9 --\u003e M4\n\t4SD.12 --\u003e 5RC.1\n\t4SD.12 --\u003e M4\n\t4SD.12 --\u003e 6SL.13\n\t4SD.12 --\u003e 6SL.15\n\t5RC.1 --\u003e 5RC.2\n\t5RC.2 --\u003e 5RC.3\n\t5RC.2 --\u003e 5RC.5\n\t5RC.3 -.-\u003e 5RC.4\n\t5RC.3 --\u003e 5RC.5\n\t5RC.4 --\u003e M5\n\t5RC.5 --\u003e M5\n\t6SL.6 --\u003e 2DS.2\n\t6SL.6 --\u003e 4SD.5\n\t6SL.6 --\u003e 6SL.10\n\t2DS.2 --\u003e M2\n\t4SD.5 --\u003e M4\n\t6SL.7 --\u003e M6\n\t6SL.8 --\u003e 6SL.10\n\t6SL.9 --\u003e 4SD.8\n\t6SL.9 --\u003e M6\n\t4SD.8 --\u003e M4\n\t6SL.10 --\u003e M6\n\t6SL.11 --\u003e M6\n\t6SL.12 --\u003e 6SL.16\n\t6SL.13 --\u003e M6\n\t6SL.14 --\u003e M6\n\t6SL.15 --\u003e M6\n\t6SL.16 --\u003e M6\n\tclass 3PL.4,3PL.5 todo\n\tclass 2DS.1 inProgress\n\tclass 2DS.2,2DS.3,3PL.3,4SD.10,4SD.11,4SD.12,4SD.13,4SD.14,4SD.2,4SD.4,4SD.5,4SD.6,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.5,6SL.1,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.2,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked", "graphDirection": "TD", "validation": [], "devColours": {"Jason": "lime"}, "depKinds": {"1FN.1": {"kind": "task", "status": "done", "display": "done"}, "1FN.2": {"kind": "task", "status": "done", "display": "done"}, "2DS.1": {"kind": "task", "status": "todo", "display": "in_progress"}, "2DS.2": {"kind": "task", "status": "blocked", "display": "blocked"}, "2DS.3": {"kind": "task", "status": "blocked", "display": "blocked"}, "3PL.1": {"kind": "task", "status": "done", "display": "done"}, "3PL.2": {"kind": "task", "status": "done", "display": "done"}, "3PL.3": {"kind": "task", "status": "blocked", "display": "blocked"}, "3PL.4": {"kind": "task", "status": "todo", "display": "todo"}, "3PL.5": {"kind": "task", "status": "todo", "display": "todo"}, "4SD.2": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.4": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.5": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.6": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.7": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.8": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.9": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.10": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.11": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.12": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.13": {"kind": "task", "status": "blocked", "display": "blocked"}, "4SD.14": {"kind": "task", "status": "blocked", "display": "blocked"}, "5RC.1": {"kind": "task", "status": "blocked", "display": "blocked"}, "5RC.2": {"kind": "task", "status": "blocked", "display": "blocked"}, "5RC.3": {"kind": "task", "status": "blocked", "display": "blocked"}, "5RC.4": {"kind": "task", "status": "blocked", "display": "blocked"}, "5RC.5": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.1": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.2": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.3": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.4": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.5": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.6": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.7": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.8": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.9": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.10": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.11": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.12": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.13": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.14": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.15": {"kind": "task", "status": "blocked", "display": "blocked"}, "6SL.16": {"kind": "task", "status": "blocked", "display": "blocked"}, "M1": {"kind": "milestone"}, "M2": {"kind": "milestone"}, "M3": {"kind": "milestone"}, "M4": {"kind": "milestone"}, "M5": {"kind": "milestone"}, "M6": {"kind": "milestone"}}}</script>
 <script type="module">
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
 
@@ -442,19 +523,22 @@ if (DATA.validation && DATA.validation.length) {
 /* Milestone-level state (distinct from task status): computed server-side by
    roadmap.py's milestone_state() and carried as m.state, so the artefact
    never re-derives it and cannot disagree with the CLI's own stats/render
-   paths. States: deferred, done, inProgress, todo, blocked, paused. */
+   paths. Milestone states: empty, done, deferred, inProgress, blocked, todo
+   (see roadmap-conventions.md; `empty` is a flagged bug, not a legitimate
+   state, and borrows the blocked/red colour). The same map also colours
+   dependency chips by a *task's* display status, which still uses `paused`
+   and adds in_progress (a claimed task) and out_of_scope: task status and
+   milestone state are different vocabularies sharing one colour table. */
 const STATE_VAR = {
-	deferred: "deferred", done: "done", inProgress: "in-progress",
-	todo: "todo", blocked: "blocked", paused: "paused",
+	empty: "blocked", done: "done", deferred: "deferred",
+	inProgress: "in-progress", blocked: "blocked", todo: "todo",
+	paused: "paused", in_progress: "in-progress", out_of_scope: "out-of-scope",
 };
-const STATE_RANK = { inProgress: 0, todo: 1, done: 2, blocked: 3, paused: 4, deferred: 5 };
-/* Overview cards and Milestones details share this one ordering, computed
-   once here rather than in Python, since build_stats' milestones[] stays in
-   roadmap order for other consumers (_human_stats, next-task-*). */
-const sortedMilestones = [...DATA.stats.milestones].sort((a, b) =>
-	(STATE_RANK[a.state] - STATE_RANK[b.state])
-	|| (b.donePct - a.donePct)
-	|| a.name.localeCompare(b.name));
+/* Overview cards and Milestones details both render DATA.overview.milestones
+   in the order roadmap.py's overview_layout() already sorted (see
+   roadmap-conventions.md's milestone sort rules): partially-done first,
+   then tier, then donePct, then milestone id. The artefact never re-sorts. */
+const sortedMilestones = DATA.overview.milestones;
 
 /* A dev-chip helper: colour + label for an assignee, empty string when unset. */
 const devChip = assignee => {
@@ -468,45 +552,67 @@ const devChip = assignee => {
 const depChip = id => {
 	const k = DATA.depKinds?.[id];
 	if (!k) return `<span class="chip">${esc(id)}</span>`;
-	const varName = k.kind === "task" ? STATE_VAR[k.status] ?? "todo"
+	const varName = k.kind === "task" ? STATE_VAR[k.display ?? k.status] ?? "todo"
 		: k.kind === "milestone" ? "milestone" : "gate";
 	return `<span class="chip" style="--chip-fg:var(--color-${varName});--chip-bg:var(--color-${varName}-bg)">${esc(id)}</span>`;
 };
 
-/* Section 1 — Overview */
+/* Section 1: Overview. Title Case throughout the headline bar; the
+   section itself is an open-by-default <details> (see the overview.body
+   CSS), and the headline is the only thing left visible once collapsed. */
 const st = DATA.stats;
-document.getElementById("hero").innerHTML =
-	`${st.byStatus.done}/${st.total} tasks<small>${st.donePct}% complete</small>` +
-	`<small>${st.milestonesDone}/${st.milestonesTotal} milestones</small>`;
+/* Every done/total readout counts in-scope tasks only (inScope, computed by
+   roadmap.py's build_stats()): an out_of_scope task is struck from play, so
+   it is neither done nor outstanding. One readout shape serves the project
+   headline and each tier's own. */
+const readout = s =>
+	`${s.done}/${s.inScope} Tasks · ${s.donePct}% Complete · ` +
+	`${s.milestonesDone}/${s.milestonesTotal} Milestones`;
+document.getElementById("headline").textContent =
+	readout({ ...st, done: st.byStatus.done });
 
-document.getElementById("milestone-cards").innerHTML = sortedMilestones.map(m => `
+/* A milestone's own count: "No tasks" for an empty one (a flagged bug),
+   "Out of scope" when every task it holds was struck, else done/inScope. */
+const milestoneCount = (m, suffix = "") =>
+	m.state === "empty" ? "No tasks"
+	: !m.inScope ? "Out of scope"
+	: `${m.done}/${m.inScope}${suffix}`;
+
+const milestoneCard = m => `
 	<div class="card mini" style="--m-colour:var(--color-${STATE_VAR[m.state]})">
 		<h3>${esc(m.id)}: ${esc(m.name)}</h3>
-		<span class="count">${m.done}/${m.total} done · ${m.donePct}%</span>
+		<span class="count">${milestoneCount(m, ` done · ${m.donePct}%`)}</span>
 		<div class="progress-bar"><div class="progress-fill"
 			style="width:${m.donePct}%;background:var(--color-${STATE_VAR[m.state]})"></div></div>
-	</div>`).join("");
+	</div>`;
 
-/* Section 2 — Milestones. Groups lead with actionable work; milestones
-   themselves follow the same order as the Overview cards above (A3), so a
-   reader scanning top-to-bottom sees the same priority twice, not two
-   different orderings of the same data. */
+/* Section 2 groups lead with actionable work; milestones themselves follow
+   DATA.overview's own sort/tier-group order (roadmap.py's overview_layout,
+   see roadmap-conventions.md), so a reader scanning top-to-bottom sees the
+   same priority twice across Overview and Milestones, not two different
+   orderings of the same data; Overview's tier grouping mirrors it too. */
+/* The fourth field marks a group that renders as its own closed <details>:
+   blocked, done and out-of-scope tasks are nothing a reader can pick up, so
+   they fold away behind a heading that carries their count. */
 const GROUPS = [
-	["todo",        "○ To Do",        "todo"],
-	["blocked",     "✗ Blocked",      "blocked"],
-	["paused",      "⏸ Paused",       "paused"],
-	["deferred",    "⤓ Deferred",     "deferred"],
-	["done",        "✓ Done",         "done"],
-	["out_of_scope","⊘ Out of Scope", "out-of-scope"],
+	["in_progress", "▸ In Progress",  "in-progress",  false],
+	["todo",        "○ To Do",        "todo",         false],
+	["blocked",     "✗ Blocked",      "blocked",      true],
+	["paused",      "⏸ Paused",       "paused",       false],
+	["deferred",    "⤓ Deferred",     "deferred",     false],
+	["done",        "✓ Done",         "done",         true],
+	["out_of_scope","⊘ Out of Scope", "out-of-scope", true],
 ];
-const readyIds = new Set(DATA.ready.candidates.map(c => c.id));
 const tasksByMilestone = {};
 for (const t of DATA.tasks) (tasksByMilestone[t.milestone] ??= []).push(t);
 
-document.getElementById("milestone-details").innerHTML = sortedMilestones.map(m => {
+const devChips = m => m.devs?.length
+	? `<span class="devs">${m.devs.map(devChip).join("")}</span>` : "";
+
+const milestoneDetails = m => {
 	const tasks = tasksByMilestone[m.id] || [];
-	const groups = GROUPS.map(([status, label, varName]) => {
-		const members = tasks.filter(t => t.status === status);
+	const groups = GROUPS.map(([status, label, varName, collapsed]) => {
+		const members = tasks.filter(t => (t.display ?? t.status) === status);
 		if (!members.length) return "";
 		const items = members.map(t => {
 			const deps = (t.dependsOn && t.dependsOn.length)
@@ -515,18 +621,54 @@ document.getElementById("milestone-details").innerHTML = sortedMilestones.map(m 
 				<span class="tid">${esc(t.id)}</span>${devChip(t.assignee)}
 				<span class="tasktext">${esc(t.description)}</span>${deps}</li>`;
 		}).join("");
+		if (collapsed) return `<details class="group statusgroup">
+			<summary><span class="arrow">▸</span><h4 style="color:var(--color-${varName})">${label} (${members.length})</h4></summary>
+			<ul>${items}</ul></details>`;
 		return `<div class="group">
 			<h4 style="color:var(--color-${varName})">${label}</h4><ul>${items}</ul></div>`;
 	}).join("");
 	// All milestones render collapsed; the reader chooses what to expand
 	return `<details class="milestone" style="--m-colour:var(--color-${STATE_VAR[m.state]})">
 		<summary><span class="mid">${esc(m.id)}</span>${esc(m.name)}
-			<span class="count">${m.done}/${m.total}</span></summary>
+			${devChips(m)}
+			<span class="count">${milestoneCount(m)}</span></summary>
 		<div class="body">${groups || "<p class='depnote'>No tasks.</p>"}</div>
 	</details>`;
-}).join("");
+};
+
+const milestonesById = Object.fromEntries(DATA.overview.milestones.map(m => [m.id, m]));
+
+if (DATA.overview.tiers) {
+	// Tiered phase: one <details class="tier"> per tier, expanded flag and
+	// milestone membership/order both computed server-side (overview_layout).
+	// Overview's tier header carries the tier's own readout (g.stats), the
+	// per-tier counterpart of the headline; Milestones' keeps the bare name.
+	document.getElementById("milestone-cards").innerHTML = DATA.overview.tiers.map(g => `
+		<details class="tier"${g.expanded ? " open" : ""}>
+			<summary><span class="arrow">▸</span><h3>${esc(g.tierLabel)}</h3>
+				<span class="readout">${esc(readout(g.stats))}</span></summary>
+			<div class="grid">${g.milestoneIds.map(id => milestoneCard(milestonesById[id])).join("")}</div>
+		</details>`).join("");
+	document.getElementById("milestone-details").innerHTML = DATA.overview.tiers.map(g => `
+		<details class="tier"${g.expanded ? " open" : ""}>
+			<summary><span class="arrow">▸</span><h3>${esc(g.tierLabel)}</h3></summary>
+			<div>${g.milestoneIds.map(id => milestoneDetails(milestonesById[id])).join("")}</div>
+		</details>`).join("");
+} else {
+	// No tiered milestones: flat, unwrapped list, no tier markup at all.
+	// milestone-cards still needs its own grid wrapper now that the static
+	// container is plain (the tiered branch above puts a grid inside each
+	// tier <details> instead of on the shared outer container).
+	document.getElementById("milestone-cards").innerHTML =
+		`<div class="grid">${sortedMilestones.map(milestoneCard).join("")}</div>`;
+	document.getElementById("milestone-details").innerHTML = sortedMilestones.map(milestoneDetails).join("");
+}
 
 /* Section 3 — Dependency graph */
+/* A tiered phase draws each tier as its own subgraph (roadmap.py's
+   mermaid_source()), so its legend gains the two tier backgrounds; an
+   untiered phase has no subgraph and keeps the keys hidden. */
+document.getElementById("tier-keys").hidden = !DATA.overview.tiers;
 /* ELK lays out this dense a graph with far fewer crossings than the default
    dagre engine; if its module fails to load, dagre still renders. */
 let layout = "dagre";
@@ -629,7 +771,7 @@ const candidateLi = c => `
 		<span class="signal">unblocks ${c.transitiveUnblocks}${c.isMilestoneSink ? " · completes milestone" : ""}</span>
 	</li>`;
 const readyAssignees = new Set(DATA.ready.candidates.map(c => c.assignee).filter(Boolean));
-document.getElementById("ready").innerHTML = !DATA.ready.candidates.length
+const readyHtml = !DATA.ready.candidates.length
 	? "<li>No unblocked tasks: clear a blocker or a gate.</li>"
 	: readyAssignees.size > 1
 	? [...readyAssignees].sort().map(dev => `
@@ -641,6 +783,22 @@ document.getElementById("ready").innerHTML = !DATA.ready.candidates.length
 				<ul style="list-style:none;margin:0;padding:0">${DATA.ready.candidates.filter(c => !c.assignee).map(candidateLi).join("")}</ul>
 			</li>` : "")
 	: DATA.ready.candidates.map(candidateLi).join("");
+/* Claims in play lead, since someone is already on them; the ready set then
+   gets its own heading so the two lists never read as one. A parked claim
+   (paused/deferred wins over a claim) stays in its Milestones group. */
+const claimLi = c => `
+	<li>
+		<span class="tid">${esc(c.id)}</span>${devChip(c.assignee)}
+		<span class="tasktext">${esc(c.description)}</span>
+		<span class="signal">since ${esc(c.started)}${c.status === "todo" ? "" : ` · ${esc(c.status)}`}</span>
+	</li>`;
+const claimed = (DATA.ready.claimed ?? []).filter(c => c.display === "in_progress");
+document.getElementById("ready").innerHTML = claimed.length
+	? `<li class="nextup-devgroup"><h4 style="color:var(--color-in-progress)">▸ In progress</h4>
+		<ul style="list-style:none;margin:0;padding:0">${claimed.map(claimLi).join("")}</ul></li>
+		<li class="nextup-devgroup"><h4>Ready</h4>
+		<ul style="list-style:none;margin:0;padding:0">${readyHtml}</ul></li>`
+	: readyHtml;
 
 /* Nav highlight */
 const links = [...document.querySelectorAll("nav a")];

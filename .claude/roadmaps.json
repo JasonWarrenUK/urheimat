@@ -42,7 +42,8 @@
 						"status": "todo",
 						"dependsOn": [],
 						"notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-09-30"
 					},
 					{
 						"id": "2DS.2",
@@ -50,11 +51,20 @@
 						"status": "blocked",
 						"dependsOn": [
 							"2DS.1",
-							"4SD.1",
 							"4SD.2",
-							"4SD.3"
+							"6SL.6"
 						],
-						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks.",
+						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the granularity of the notebook's believed/true toggle, the timelapse after band death and what a watched lull shows. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2j, 2u, 3t, 5d).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "2DS.3",
+						"description": "Notebook design spike: the visual layout, mechanical behaviour and prose structure of the scholars' notebook",
+						"status": "blocked",
+						"dependsOn": [
+							"2DS.1"
+						],
+						"notes": "Prose only, no totals. Works from the subjects table in the spike log, combined or spread as the design finds best; settles how the believed/true toggle works and how a band that died early reads. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2c, 2e, 2g, 2j).",
 						"assignee": "Jason"
 					}
 				]
@@ -122,32 +132,14 @@
 				"goal": "Deepen the drift model and inter-culture dynamics so reconstruction has something harder to work on.",
 				"tasks": [
 					{
-						"id": "4SD.1",
-						"description": "Derive a narrative condition state, replacing numeric prosperity entirely",
-						"status": "blocked",
-						"dependsOn": [
-							"2DS.1"
-						],
-						"notes": "No float, no bar. Prosperity currently drives death at zero and the daughter-band threshold, so the derivation must preserve those mechanics while the player only ever sees prose.",
-						"assignee": "Jason"
-					},
-					{
 						"id": "4SD.2",
-						"description": "Derive a narrative strain state, replacing the count of straining parts",
+						"description": "Remove the aggregate strain count; the per-custom fit line is all that remains",
 						"status": "blocked",
 						"dependsOn": [
-							"2DS.1"
+							"6SL.3"
 						],
-						"assignee": "Jason"
-					},
-					{
-						"id": "4SD.3",
-						"description": "Derive a narrative action-budget state, replacing the actions-left counter",
-						"status": "blocked",
-						"dependsOn": [
-							"2DS.1"
-						],
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"notes": "Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b)."
 					},
 					{
 						"id": "4SD.4",
@@ -164,10 +156,9 @@
 						"description": "Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight",
 						"status": "blocked",
 						"dependsOn": [
-							"2DS.1",
-							"4SD.1"
+							"6SL.6"
 						],
-						"notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Depends on condition state because prestige is derived from it.",
+						"notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.6). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).",
 						"assignee": "Jason"
 					},
 					{
@@ -195,19 +186,21 @@
 						"description": "Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost",
 						"status": "blocked",
 						"dependsOn": [
-							"2DS.1"
+							"6SL.9"
 						],
-						"notes": "A second lever beyond Hold, and a systematic bias for the scholars to fall for.",
+						"notes": "Decides whether sanctifying exists and how it costs; the spike log holds a think-through of its impact under a loop with no random drift. Revival draws on the spirit's complete memory against the band's fading one. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4f, 1g).",
 						"assignee": "Jason"
 					},
 					{
 						"id": "4SD.9",
-						"description": "Richer inter-culture relations: trade, conquest and hostility beyond distance-and-terrain contact",
+						"description": "Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started",
 						"status": "blocked",
 						"dependsOn": [
-							"2DS.1"
+							"4SD.11",
+							"6SL.5"
 						],
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l)."
 					},
 					{
 						"id": "4SD.10",
@@ -221,6 +214,50 @@
 						],
 						"notes": "Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.",
 						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.11",
+						"description": "Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.5"
+						],
+						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.12",
+						"description": "Writing as a gated custom in grades, from tallies to full record",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.5",
+							"4SD.11"
+						],
+						"notes": "A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.13",
+						"description": "Dated knowledge between every pair of bands, with recognition by graded resemblance",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.1"
+						],
+						"notes": "What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.14",
+						"description": "Tag material traces value by value across the corpus",
+						"status": "blocked",
+						"dependsOn": [
+							"2DS.1"
+						],
+						"softDependsOn": [
+							"4SD.10"
+						],
+						"notes": "Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).",
+						"assignee": "Jason"
 					}
 				]
 			},
@@ -231,22 +268,24 @@
 				"tasks": [
 					{
 						"id": "5RC.1",
-						"description": "Chronicle carries the evidence the scholars later consume",
+						"description": "The evidence model: what the scholars can draw on, band by band",
 						"status": "blocked",
 						"dependsOn": [
-							"2DS.1"
+							"4SD.12",
+							"4SD.13",
+							"4SD.14"
 						],
-						"notes": "Attestation has to be sourced from something recorded. The chronicle is what the player actually saw happen, which keeps the scoring legible in hindsight.",
+						"notes": "The scholars know the end state perfectly and cannot converse with anyone. For a vanished band they have material remains, others' writing about it, its own writing and tales among other peoples. The chronicle is one record among several. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2o, 2p, 2q).",
 						"assignee": "Jason"
 					},
 					{
 						"id": "5RC.2",
-						"description": "Uneven attestation derived from in-game events, never from a random roll",
+						"description": "Attestation derived from the evidence model, band by band and value by value, never from a random roll",
 						"status": "blocked",
 						"dependsOn": [
 							"5RC.1"
 						],
-						"notes": "A culture that kept Carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Makes being legible to the future a goal in itself.",
+						"notes": "A band that kept carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2q).",
 						"assignee": "Jason"
 					},
 					{
@@ -269,6 +308,190 @@
 							"5RC.3"
 						],
 						"notes": "False unity across the two stocks becomes a scoreable error. Soft-linked to the scholar model, which it should reflect but need not wait for.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "5RC.5",
+						"description": "Build the notebook to the 2DS.3 design: prose only, the subjects table, the believed/true toggle",
+						"status": "blocked",
+						"dependsOn": [
+							"2DS.3",
+							"5RC.2",
+							"5RC.3"
+						],
+						"notes": "A band can be given a wrong origin entirely; bands that died early are treated by the evidence they left. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2g, 2i, 2j).",
+						"assignee": "Jason"
+					}
+				]
+			},
+			{
+				"id": "M6",
+				"name": "The situation loop",
+				"goal": "Replace the order menu with situations and answers, so that every change in a band's customs is something somebody saw happen.",
+				"tasks": [
+					{
+						"id": "6SL.1",
+						"description": "World step and leaders: a fixed 25-year step for every band, leaders with a child at 18 and death between 36 and 75, family ages tracked",
+						"status": "blocked",
+						"dependsOn": [
+							"2DS.1"
+						],
+						"notes": "Succession passes to the nearest adult descendant; the age range guarantees one exists. A more robust descent and inheritance system is a later phase. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3b, 3c, 3q).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.2",
+						"description": "Remove the order menu and the action budget: an era becomes situations, answers, step",
+						"status": "blocked",
+						"dependsOn": [
+							"2DS.1"
+						],
+						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.3",
+						"description": "Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.2"
+						],
+						"notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.4",
+						"description": "Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.3"
+						],
+						"notes": "Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.5",
+						"description": "Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.2"
+						],
+						"notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.6",
+						"description": "Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.3"
+						],
+						"notes": "No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.7",
+						"description": "Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.3"
+						],
+						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.8",
+						"description": "Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.3",
+							"6SL.5"
+						],
+						"notes": "Pressure behaves like weather, with peaks and lulls and no climb towards the end. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3i, 3p, 3t).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.9",
+						"description": "Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.1"
+						],
+						"notes": "Ancestral answers draw on what the band remembers. The spirit is a frame only, never named in the game. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1d, 1e, 1g, 1h).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.10",
+						"description": "Daughter band as an outcome of pressure or opportunity, with the player choosing which branch to follow",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.6",
+							"6SL.8"
+						],
+						"notes": "The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.11",
+						"description": "Moves: forced by events, or player-started with diegetic justification or a consequence",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.3"
+						],
+						"notes": "In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.12",
+						"description": "Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.5"
+						],
+						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.13",
+						"description": "Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.5",
+							"4SD.12"
+						],
+						"notes": "The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.14",
+						"description": "Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.2"
+						],
+						"notes": "The player sees no reference to the notebook during play. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.15",
+						"description": "Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.1",
+							"4SD.11",
+							"4SD.12"
+						],
+						"notes": "Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.16",
+						"description": "Family opinion as a storylet trigger",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.12"
+						],
+						"notes": "The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).",
 						"assignee": "Jason"
 					}
 				]
