@@ -39,7 +39,7 @@
 					{
 						"id": "2DS.1",
 						"description": "Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [],
 						"notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.",
 						"assignee": "Jason",
@@ -60,7 +60,7 @@
 					{
 						"id": "2DS.3",
 						"description": "Notebook design spike: the visual layout, mechanical behaviour and prose structure of the scholars' notebook",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
@@ -144,7 +144,7 @@
 					{
 						"id": "4SD.4",
 						"description": "Semantic drift: place feature values on a similarity graph so drift favours near neighbours",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
@@ -164,7 +164,7 @@
 					{
 						"id": "4SD.6",
 						"description": "Second founding stock: seed two unrelated ancestral cultures at game start",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
@@ -205,7 +205,7 @@
 					{
 						"id": "4SD.10",
 						"description": "Expand the corpus: more customs, more parts per custom, more values per part",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
@@ -249,7 +249,7 @@
 					{
 						"id": "4SD.14",
 						"description": "Tag material traces value by value across the corpus",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
@@ -332,7 +332,7 @@
 					{
 						"id": "6SL.1",
 						"description": "World step and leaders: a fixed 25-year step for every band, leaders with a child at 18 and death between 36 and 75, family ages tracked",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
@@ -342,7 +342,7 @@
 					{
 						"id": "6SL.2",
 						"description": "Remove the order menu and the action budget: an era becomes situations, answers, step",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
 						],
