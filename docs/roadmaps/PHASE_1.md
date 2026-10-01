@@ -1,6 +1,6 @@
 # Urheimat PHASE_1 Roadmap
 
-Urheimat is playable but private, shallow in places, and built on a loop nobody has yet interrogated. This phase does three things at once: gets it onto a public URL, answers the open design questions before building further on them, and deepens the simulation and reconstruction models that the game's whole argument rests on.
+Urheimat is playable but private and shallow in places, and the gameplay-loop spike has now replaced the loop it was built on. This phase does three things at once: gets it onto a public URL, answers the open design questions before building further on them, and rebuilds the loop and deepens the simulation and reconstruction models that the game's whole argument rests on.
 
 **Critical path:** `2DS.1 → 6SL.2 → 6SL.3 → 6SL.6 → 2DS.2`; the gameplay-loop spike reported on 2026-09-30 and its decisions live in `docs/spikes/2DS.1-gameplay-loop.md`. The situation loop (Milestone 6) now gates the simulation, reconstruction and UI work, and the UI spike cannot start until condition is derived. The launch and persistence work runs parallel to all of it.
 
@@ -58,7 +58,7 @@ Urheimat is playable but private, shallow in places, and built on a loop nobody 
 - [ ] **4SD.5**: Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight _(blocked: depends on 6SL.6)_
   - Note: Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.6). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).
 - [ ] **4SD.6**: Second founding stock: seed two unrelated ancestral cultures at game start _(blocked: depends on 2DS.1)_
-  - Note: The player still leads a band from one stock and is still scored on recovering that stock's truth; the second exists to contaminate the record.
+  - Note: The player's line still descends from one stock; the second exists to contaminate the record and to make a mistaken origin possible (spike decision 2i).
 - [ ] **4SD.7**: Substrate inheritance: dying and displaced cultures leave traces in whoever succeeds them _(blocked: depends on 4SD.6)_
   - Note: Needs a second lineage to inherit from, so it follows the second founding stock. Traces may be unrelated traditions or mutated sibling ones.
 - [ ] **4SD.8**: Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost _(blocked: depends on 6SL.9)_
@@ -87,8 +87,8 @@ Urheimat is playable but private, shallow in places, and built on a loop nobody 
 - [ ] **5RC.2**: Attestation derived from the evidence model, band by band and value by value, never from a random roll _(blocked: depends on 5RC.1)_
   - Note: A band that kept carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2q).
 - [ ] **5RC.3**: Deeper scholar model: weighted evidence, competing hypotheses and sub-grouping rather than flat comparison _(blocked: depends on 5RC.2)_
-- [ ] **5RC.4**: Scoring accounts for the second stock: contamination misleads, but the player's own ancestral truth stays the target _(blocked: depends on 4SD.6)_
-  - Note: False unity across the two stocks becomes a scoreable error. Soft-linked to the scholar model, which it should reflect but need not wait for.
+- [ ] **5RC.4**: The notebook accounts for the second stock: contamination misleads, and a band can be given the wrong origin entirely _(blocked: depends on 4SD.6)_
+  - Note: False unity across the two stocks, and false separation within one, are both readings the scholars can reach. Soft-linked to the scholar model, which it should reflect but need not wait for.
 - [ ] **5RC.5**: Build the notebook to the 2DS.3 design: prose only, the subjects table, the believed/true toggle _(blocked: depends on 2DS.3, 5RC.2, 5RC.3)_
   - Note: A band can be given a wrong origin entirely; bands that died early are treated by the evidence they left. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2g, 2i, 2j).
 
@@ -175,7 +175,7 @@ graph LR
 	5RC.1["5RC.1: The evidence model: what the scholars ca…"]
 	5RC.2["5RC.2: Attestation derived from the evidence mo…"]
 	5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
-	5RC.4["5RC.4: Scoring accounts for the second stock: c…"]
+	5RC.4["5RC.4: The notebook accounts for the second sto…"]
 	5RC.5["5RC.5: Build the notebook to the 2DS.3 design:…"]
 	M5["M5: Reconstruction"]:::mile
 	6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
