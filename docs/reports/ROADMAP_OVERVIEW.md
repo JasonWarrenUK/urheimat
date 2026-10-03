@@ -1,6 +1,6 @@
 # Urheimat PHASE_1: Roadmap Overview
 
-**43 tasks across 6 milestones.** Files: `.claude/roadmaps.json` (machine-readable), `docs/roadmaps/PHASE_1.md` (full task list with Mermaid dependency diagram), `docs/spikes/2DS.1-gameplay-loop.md` (the design decisions most of the phase now rests on).
+**46 tasks across 6 milestones.** Files: `.claude/roadmaps.json` (machine-readable), `docs/roadmaps/PHASE_1.md` (full task list with Mermaid dependency diagram), `docs/spikes/2DS.1-gameplay-loop.md` (the design decisions most of the phase now rests on), `docs/spikes/2DS.3-notebook-design.md` (the notebook's design).
 
 > The gameplay-loop spike (2DS.1) reported on 2026-09-30. It changed the premise, removed the order menu and the action budget, and added a sixth milestone to build the loop that replaces them. Thirty-six of the 43 tasks are blocked, nearly all of them behind that milestone's first steps. Two are actionable today, both in persistence: the data-layer integration tests and the leaderboard, which waits on a design decision rather than on code. The spike itself stays claimed until its pull request merges.
 

@@ -24,8 +24,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [x] **2DS.1**: Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived
   - Note: Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.
 - [ ] **2DS.2**: UI spike: information architecture first, then visual design; defines how the derived states are displayed, and produces concrete mobile and accessibility tasks rather than principles _(blocked: depends on 2DS.1, 4SD.2, 6SL.6)_
-  - Note: Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the granularity of the notebook's believed/true toggle, the timelapse after band death and what a watched lull shows. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2j, 2u, 3t, 5d).
-- [ ] **2DS.3**: Notebook design spike: the visual layout, mechanical behaviour and prose structure of the scholars' notebook _(depends on 2DS.1)_
+  - Note: Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a).
+- [x] **2DS.3**: Notebook design spike: the structure, toggle behaviour, prose and wireframe-level layout of the scholars' notebook
   - Note: Prose only, no totals. Works from the subjects table in the spike log, combined or spread as the design finds best; settles how the believed/true toggle works and how a band that died early reads. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2c, 2e, 2g, 2j).
 
 ---
@@ -40,8 +40,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.
 - [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2, 3PL.5)_
   - Note: The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.
-- [ ] **3PL.4**: Leaderboard of finished runs _(depends on 3PL.2)_
-  - Note: Deliberately not a first-class feature; a small indexed collection is enough.
+- [ ] **3PL.4**: Archive of finished runs: unranked records (people, seed, how it ended), each able to rebuild its notebook on demand _(blocked: depends on 3PL.2, 5RC.5)_
+  - Note: Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c).
 - [ ] **3PL.5**: Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI) _(depends on 3PL.1)_
   - Note: The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.
 
@@ -75,6 +75,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).
 - [ ] **4SD.14**: Tag material traces value by value across the corpus _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
+- [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(blocked: depends on 6SL.1)_
+  - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).
 
 ---
 
@@ -83,14 +85,18 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 **Goal:** Make the scholars fallible in ways that reward how the player played, not just what survived.
 
 - [ ] **5RC.1**: The evidence model: what the scholars can draw on, band by band _(blocked: depends on 4SD.12, 4SD.13, 4SD.14)_
-  - Note: The scholars know the end state perfectly and cannot converse with anyone. For a vanished band they have material remains, others' writing about it, its own writing and tales among other peoples. The chronicle is one record among several. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2o, 2p, 2q).
+  - Note: The scholars know the end state perfectly and cannot converse with anyone. For a vanished band they have material remains, others' writing about it, its own writing and tales among other peoples. The chronicle is one record among several. The evidence kinds widen beyond those four; undecided candidates are listed in the 2DS.3 log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2o, 2p, 2q) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 5a, 5b).
 - [ ] **5RC.2**: Attestation derived from the evidence model, band by band and value by value, never from a random roll _(blocked: depends on 5RC.1)_
   - Note: A band that kept carved stones, held a long stable period or sat in broad contact leaves more for the scholars. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2q).
 - [ ] **5RC.3**: Deeper scholar model: weighted evidence, competing hypotheses and sub-grouping rather than flat comparison _(blocked: depends on 5RC.2)_
 - [ ] **5RC.4**: The notebook accounts for the second stock: contamination misleads, and a band can be given the wrong origin entirely _(blocked: depends on 4SD.6)_
   - Note: False unity across the two stocks, and false separation within one, are both readings the scholars can reach. Soft-linked to the scholar model, which it should reflect but need not wait for.
-- [ ] **5RC.5**: Build the notebook to the 2DS.3 design: prose only, the subjects table, the believed/true toggle _(blocked: depends on 2DS.3, 5RC.2, 5RC.3)_
-  - Note: A band can be given a wrong origin entirely; bands that died early are treated by the evidence they left. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2g, 2i, 2j).
+- [ ] **5RC.5**: Notebook shell: two books (the scholars' and the true), a whole-book switch on every page, chapters and navigation _(depends on 2DS.3)_
+  - Note: Opens on the scholars' side; a flip lands on the other book's contents page. Introduction followed by a UI link to your line's trail of chapters; contents with world summaries first, then bands as a family tree; chapter pages link to contents, parent and daughters and every band named in the prose. Prose only, no totals. Deterministic from the stored run so an archived notebook can be rebuilt. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 3a, 3d, 3e, 4b to 4d, 6a to 6f, 7b).
+- [ ] **5RC.6**: The scholars' book: one named scholar's account, over the peoples and family tree the scholars believe in _(blocked: depends on 5RC.5, 5RC.2, 5RC.3)_
+  - Note: The scholar comes from a small authored cast; their biases tip close calls only. Sources are cited. Rival schools are the other cast members, cited by name. A band can be given a wrong origin entirely. A vanished band's chapter is shorter and hedged by evidence kind; a band with no evidence has no chapter. Decided in the 2DS.1 spike (2i) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1d, 3b, 3f to 3j, 5a, 5c).
+- [ ] **5RC.7**: The true book: an omniscient history of every band, in a voice distinct from the scholar's _(blocked: depends on 5RC.5, 4SD.15)_
+  - Note: Recounts the whole run so the player is reminded of what happened. Band chapters are a chronological narrative followed by short thematic sections. Remarks on the scholars' errors in its own voice; carries the silences. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f, 3c, 3i, 4e, 6e).
 
 ---
 
@@ -125,7 +131,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 6SL.5, 4SD.12)_
   - Note: The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).
 - [ ] **6SL.14**: Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed _(blocked: depends on 6SL.2)_
-  - Note: The player sees no reference to the notebook during play. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).
+  - Note: The player sees no reference to the notebook during play, so the chronicle line "Your testimony ends here" (engine.ts:483) goes too. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).
 - [ ] **6SL.15**: Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation _(blocked: depends on 6SL.1, 4SD.11, 4SD.12)_
   - Note: Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).
 - [ ] **6SL.16**: Family opinion as a storylet trigger _(blocked: depends on 6SL.12)_
@@ -150,20 +156,23 @@ graph LR
 	1FN.2["1FN.2: Deploy the current client-side game to V…"]
 	M1["M1: Foundations and launch"]:::mile
 	2DS.1["2DS.1: Gameplay-loop spike: interrogate the cor…"]
-	2DS.3["2DS.3: Notebook design spike: the visual layout…"]
+	2DS.3["2DS.3: Notebook design spike: the structure, to…"]
 	3PL.1["3PL.1: Build the MongoDB data layer: runs and s…"]
 	3PL.2["3PL.2: Wire Auth.js with a GitHub OAuth app and…"]
-	3PL.4["3PL.4: Leaderboard of finished runs"]
 	3PL.5["3PL.5: Wire integration tests for the runs and…"]
 	3PL.3["3PL.3: Save and resume a run across sessions an…"]
-	M3["M3: Persistence"]:::mile
 	4SD.4["4SD.4: Semantic drift: place feature values on…"]
 	4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
 	4SD.7["4SD.7: Substrate inheritance: dying and displac…"]
 	4SD.10["4SD.10: Expand the corpus: more customs, more p…"]
 	4SD.14["4SD.14: Tag material traces value by value acro…"]
+	5RC.5["5RC.5: Notebook shell: two books (the scholars'…"]
+	3PL.4["3PL.4: Archive of finished runs: unranked recor…"]
+	M3["M3: Persistence"]:::mile
 	6SL.1["6SL.1: World step and leaders: a fixed 25-year…"]
 	4SD.13["4SD.13: Dated knowledge between every pair of b…"]
+	4SD.15["4SD.15: Record history: each band's custom chan…"]
+	5RC.7["5RC.7: The true book: an omniscient history of…"]
 	6SL.2["6SL.2: Remove the order menu and the action bud…"]
 	6SL.3["6SL.3: Layer 1 pressures: surface the land's an…"]
 	4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
@@ -176,7 +185,7 @@ graph LR
 	5RC.2["5RC.2: Attestation derived from the evidence mo…"]
 	5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
 	5RC.4["5RC.4: The notebook accounts for the second sto…"]
-	5RC.5["5RC.5: Build the notebook to the 2DS.3 design:…"]
+	5RC.6["5RC.6: The scholars' book: one named scholar's…"]
 	M5["M5: Reconstruction"]:::mile
 	6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
 	2DS.2["2DS.2: UI spike: information architecture first…"]
@@ -210,9 +219,8 @@ graph LR
 	2DS.3 --> M2
 	3PL.1 --> 3PL.2
 	3PL.1 --> 3PL.5
-	3PL.2 --> 3PL.4
 	3PL.2 --> 3PL.3
-	3PL.4 --> M3
+	3PL.2 --> 3PL.4
 	3PL.5 --> 3PL.3
 	3PL.3 --> M3
 	4SD.4 -.-> 4SD.10
@@ -224,11 +232,19 @@ graph LR
 	4SD.10 --> M4
 	4SD.14 --> 5RC.1
 	4SD.14 --> M4
+	5RC.5 --> 3PL.4
+	5RC.5 --> 5RC.7
+	5RC.5 --> 5RC.6
+	3PL.4 --> M3
 	6SL.1 --> 4SD.13
+	6SL.1 --> 4SD.15
 	6SL.1 --> 6SL.9
 	6SL.1 --> 6SL.15
 	4SD.13 --> 5RC.1
 	4SD.13 --> M4
+	4SD.15 --> 5RC.7
+	4SD.15 --> M4
+	5RC.7 --> M5
 	6SL.2 --> 6SL.3
 	6SL.2 --> 6SL.5
 	6SL.2 --> 6SL.14
@@ -257,11 +273,11 @@ graph LR
 	4SD.12 --> 6SL.15
 	5RC.1 --> 5RC.2
 	5RC.2 --> 5RC.3
-	5RC.2 --> 5RC.5
+	5RC.2 --> 5RC.6
 	5RC.3 -.-> 5RC.4
-	5RC.3 --> 5RC.5
+	5RC.3 --> 5RC.6
 	5RC.4 --> M5
-	5RC.5 --> M5
+	5RC.6 --> M5
 	6SL.6 --> 2DS.2
 	6SL.6 --> 4SD.5
 	6SL.6 --> 6SL.10
@@ -279,7 +295,7 @@ graph LR
 	6SL.14 --> M6
 	6SL.15 --> M6
 	6SL.16 --> M6
-	class 2DS.3,3PL.4,3PL.5,4SD.10,4SD.14,4SD.4,4SD.6,6SL.1,6SL.2 todo
-	class 2DS.2,3PL.3,4SD.11,4SD.12,4SD.13,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.5,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
-	class 1FN.1,1FN.2,2DS.1,3PL.1,3PL.2 done
+	class 3PL.5,4SD.10,4SD.14,4SD.4,4SD.6,5RC.5,6SL.1,6SL.2 todo
+	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.13,4SD.15,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2 done
 ```
