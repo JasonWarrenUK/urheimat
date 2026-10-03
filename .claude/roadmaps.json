@@ -17,7 +17,8 @@
 						"status": "done",
 						"dependsOn": [],
 						"notes": "https://github.com/JasonWarrenUK/urheimat",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"ended": "2026-09-15"
 					},
 					{
 						"id": "1FN.2",
@@ -27,7 +28,8 @@
 							"1FN.1"
 						],
 						"notes": "https://urheimat.vercel.app/",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"ended": "2026-09-16"
 					}
 				]
 			},
@@ -43,7 +45,8 @@
 						"dependsOn": [],
 						"notes": "Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.",
 						"assignee": "Jason",
-						"started": "2026-09-30"
+						"started": "2026-09-30",
+						"ended": "2026-10-01"
 					},
 					{
 						"id": "2DS.2",
@@ -66,14 +69,15 @@
 						],
 						"notes": "Prose only, no totals. Works from the subjects table in the spike log, combined or spread as the design finds best; settles how the believed/true toggle works and how a band that died early reads. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2c, 2e, 2g, 2j).",
 						"assignee": "Jason",
-						"started": "2026-10-01"
+						"started": "2026-10-01",
+						"ended": "2026-10-03"
 					}
 				]
 			},
 			{
 				"id": "M3",
 				"name": "Persistence",
-				"goal": "Runs survive the session and finished runs are comparable, attributed to a signed-in player.",
+				"goal": "Runs survive the session and finished runs are kept, attributed to a signed-in player.",
 				"tasks": [
 					{
 						"id": "3PL.1",
@@ -81,7 +85,8 @@
 						"status": "done",
 						"dependsOn": [],
 						"notes": "Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"ended": "2026-09-17"
 					},
 					{
 						"id": "3PL.2",
@@ -92,7 +97,8 @@
 							"3PL.1"
 						],
 						"notes": "Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"ended": "2026-09-18"
 					},
 					{
 						"id": "3PL.3",

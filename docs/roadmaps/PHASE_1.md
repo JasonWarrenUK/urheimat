@@ -32,7 +32,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 ## Milestone 3: Persistence
 
-**Goal:** Runs survive the session and finished runs are comparable, attributed to a signed-in player.
+**Goal:** Runs survive the session and finished runs are kept, attributed to a signed-in player.
 
 - [x] **3PL.1**: Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers
   - Note: Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.
