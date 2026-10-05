@@ -1,6 +1,6 @@
-import type { SlotDef, TraitValue, Terrain } from '$lib/types';
+import type { SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
 
-const V = (name: string, aff?: Partial<Record<Terrain, number>>): TraitValue => ({ name, aff });
+const V = (name: string, aff?: Partial<Record<Terrain, number>>, tags?: ValueTags): TraitValue => ({ name, aff, ...tags });
 const ST: Partial<Record<Terrain, number>> = { steppe: 3 };
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];

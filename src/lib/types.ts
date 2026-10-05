@@ -1,4 +1,18 @@
-export interface TraitValue {
+import type { Noun, Verb } from '$lib/sim/vocabulary';
+
+// One way of understanding what a practice does: send the spirit to the afterlife.
+export interface Reading {
+	verb: Verb;
+	object: Noun;
+	target?: Noun;
+}
+
+export interface ValueTags {
+	about?: readonly Noun[];
+	readings?: readonly Reading[];
+}
+
+export interface TraitValue extends ValueTags {
 	name: string;
 	aff?: Partial<Record<Terrain, number>>;
 }
