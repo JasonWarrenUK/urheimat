@@ -11,6 +11,7 @@ import type {
 	Rng,
 	Terrain
 } from '$lib/types';
+import { partTable } from './similarity';
 import { FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
 export function rngFrom(seed: number, state?: number): Rng {
@@ -374,9 +375,11 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 		slot.features.forEach((f, fi) => {
 			if (r() > 0.35) return;
 			const cur = c.traits[si][fi],
-				neutral = isNeutral(si, fi, cur);
+				neutral = isNeutral(si, fi, cur),
+				near = partTable(si, fi);
 			const scores = f.values.map((_v, vi) => {
-				let s = aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
+				// The land's pull moves a custom by small steps to near values; untagged parts aren't scaled.
+				let s = (near ? near[cur][vi] / 1000 : 1) * aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
 				nbs.forEach((n) => {
 					if (snapshot[n.k.id][si][fi] === vi) s += 0.9 * n.w;
 				});
