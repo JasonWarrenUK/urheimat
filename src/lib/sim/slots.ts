@@ -1,4 +1,4 @@
-import type { AffLevel, Affinity, FeatureDef, Reading, SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, FeatureDef, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
 import type { Noun, Verb } from './vocabulary';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
@@ -21,18 +21,22 @@ const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags): TraitVal
 // (null = no target). Every value carries its full grid; cells left out were struck deliberately.
 const R = (verb: Verb, object: Noun, ...targets: (Noun | null)[]): Reading[] =>
 	targets.map((target) => (target === null ? { verb, object } : { verb, object, target }));
+// Readings that hold only for certain material in hand.
+const when = (readings: Reading[], ...material: Noun[]): Reading[] => readings.map((r) => ({ ...r, when: material }));
+// Material transitions: what an act accepts and what it leaves.
+const T = (accepts: Transition['accepts'], yields: Transition['yields']): Transition => ({ accepts, yields });
+const PASS: Transition[] = [T('any', 'same')];
 
 // A custom of up to `count` stages sharing one schema of axes, expanded to flat parts
-// (s1.act, s1.place, … s3.posture). A band uses one to `count` stages; later stages lie dormant
-// by predicate once the previous act carries no reading.
+// (s1.act, s1.place, … s3.posture). A band uses one to `count` stages; a later stage lies dormant
+// once nothing is left in hand for it.
 const staged = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 	Array.from({ length: count }, (_, i) =>
-		axes.map((a) => ({
-			...a,
-			id: `s${i + 1}.${a.id}`,
-			stage: i + 1,
-			applies: a.applies ?? (i > 0 ? { part: 'act', stage: 'previous', has: 'anyReading' } : undefined)
-		}))
+		axes.map((a) => {
+			const own = a.applies === undefined ? [] : Array.isArray(a.applies) ? a.applies : [a.applies];
+			const applies = i > 0 ? [{ inHand: 'some' as const }, ...own] : own;
+			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, applies: applies.length ? applies : undefined };
+		})
 	).flat();
 
 export const RICHNESS: Record<Terrain, number> = {
@@ -232,14 +236,14 @@ export const SLOTS: SlotDef[] = [
 				id: 'act',
 				label: 'act',
 				values: [
-					N('none', 'left as they are'),
+					N('none', 'left as they are', undefined, { material: [T('any', 'nothing')] }),
 					N(
 						'burn',
 						'burnt',
 						{ forest: 'strong', river: 'favours', marsh: 'resists', steppe: 'resists', desert: 'excludes' },
 						{
 							about: ['fire', 'warmth', 'light', 'smoke', 'ash', 'haste', 'purity'],
-							material: ['ash'],
+							material: [T('body', 'ash'), T('bone', 'ash')],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('destroy', 'spirit', null),
@@ -261,7 +265,7 @@ export const SLOTS: SlotDef[] = [
 						{ mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' },
 						{
 							about: ['sky', 'birds', 'wind', 'bone', 'patience', 'openness'],
-							material: ['bone'],
+							material: [T('body', 'bone')],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('sanctify', 'body', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
@@ -280,7 +284,7 @@ export const SLOTS: SlotDef[] = [
 						{ desert: 'strong', mountain: 'favours', marsh: 'resists', coast: 'resists', river: 'resists' },
 						{
 							about: ['permanence', 'dryness', 'salt', 'smoke', 'presence', 'wholeness'],
-							material: ['body'],
+							material: [T('body', 'body')],
 							readings: [
 								...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
 								...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors'),
@@ -294,7 +298,7 @@ export const SLOTS: SlotDef[] = [
 					),
 					N('inter', 'buried', undefined, {
 						about: ['earth', 'darkness', 'depth', 'decay', 'rest', 'boundary'],
-						material: ['body'],
+						material: PASS,
 						readings: [
 							...R('destroy', 'body', null),
 							...R('destroy', 'spirit', null),
@@ -315,7 +319,7 @@ export const SLOTS: SlotDef[] = [
 						{ coast: 'strong', river: 'strong', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' },
 						{
 							about: ['water', 'depth', 'passage', 'cleansing', 'cold', 'hiddenness'],
-							material: [], // nothing remains to hand
+							material: [T('any', 'nothing')],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('destroy', 'spirit', null),
@@ -330,8 +334,12 @@ export const SLOTS: SlotDef[] = [
 							]
 						}
 					),
-					N('scatter', 'scattered', { steppe: 'favours', mountain: 'favours', coast: 'favours' }),
-					N('keep', 'kept among the living', { marsh: 'resists' })
+					N('scatter', 'scattered', { steppe: 'favours', mountain: 'favours', coast: 'favours' }, {
+						material: [T('ash', 'nothing'), T('dust', 'nothing'), T('bone', 'bone')]
+					}),
+					N('keep', 'kept among the living', { marsh: 'resists' }, { material: PASS }),
+					// Affinity and grid to be decided; bone to dust.
+					N('pulverise', 'ground to dust', undefined, { material: [T('bone', 'dust')] })
 				]
 			},
 			{
@@ -378,7 +386,8 @@ export const SLOTS: SlotDef[] = [
 			{
 				id: 'orientation',
 				label: 'orientation',
-				applies: { part: 'act', stage: 'same', has: { material: 'body' } },
+				// An urn can be oriented, so any act with a reading will do.
+				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
 					N('dawn', 'facing the dawn'),
 					N('water/nearest', 'facing the water', { coast: 'favours', river: 'favours', marsh: 'favours' }),
@@ -392,7 +401,8 @@ export const SLOTS: SlotDef[] = [
 			{
 				id: 'posture',
 				label: 'posture',
-				applies: { part: 'act', stage: 'same', has: { material: 'body' } },
+				// Only a whole body has a posture.
+				applies: [{ part: 'act', stage: 'same', has: 'anyReading' }, { inHand: 'body' }],
 				values: [N('supine', 'laid on the back'), N('prone', 'laid face down'), N('flexed', 'drawn up'), N('seated', 'seated')]
 			}
 		]),

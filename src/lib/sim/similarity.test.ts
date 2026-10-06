@@ -3,11 +3,11 @@ import * as fixtures from '../../../tests/fixtures/similarity';
 import * as baseline from '../../../tests/fixtures/drift-baseline';
 import { begin, defaultOrders, endEra, newGame, startTiles } from './engine';
 import { DEFAULT_LENS, type Lens } from './lens';
-import { readingsScore, setScore, termScore, valueScore } from './similarity';
+import { entriesScore, setScore, termScore, valueScore } from './similarity';
 
 const { opposites: opp } = fixtures;
 const crit = DEFAULT_LENS.readings.fields.verb;
-const withCombine = (combine: Lens['readings']['combine']): Lens => ({ ...DEFAULT_LENS, readings: { ...DEFAULT_LENS.readings, combine } });
+const withCombine = (combine: Lens['readings']['combine']): Lens['readings'] => ({ ...DEFAULT_LENS.readings, combine });
 
 describe('terms', () => {
 	it('scores equal words 1 and unrelated words 0', () => {
@@ -33,12 +33,21 @@ describe('flat tag sets (about, material)', () => {
 	it('counts an opposite pair once, at opposite credit', () => {
 		expect(setScore(['earth'], ['sky'], DEFAULT_LENS.about, opp)).toBe(DEFAULT_LENS.about.opposite);
 	});
-	it('scores material likeness apart from belief', () => {
-		const a = { material: ['body'] },
-			b = { material: ['body'] },
-			c = { material: ['ash'] };
+});
+
+describe('material transitions', () => {
+	it('scores what an act leaves apart from what a people believes', () => {
+		const a = { material: [{ accepts: 'body', yields: 'body' }] },
+			b = { material: [{ accepts: 'body', yields: 'body' }] },
+			c = { material: [{ accepts: 'body', yields: 'ash' }] },
+			d = { material: [{ accepts: 'bone', yields: 'ash' }] };
 		expect(valueScore(a, b, DEFAULT_LENS, opp)).toBe(1000);
-		expect(valueScore(a, c, DEFAULT_LENS, opp)).toBe(0);
+		expect(valueScore(a, c, DEFAULT_LENS, opp)).toBeGreaterThan(valueScore(a, d, DEFAULT_LENS, opp));
+	});
+	it('ignores a reading’s when: it is structural, not belief', () => {
+		const a = { readings: [{ verb: 'destroy', object: 'body', when: ['ash'] }] },
+			b = { readings: [{ verb: 'destroy', object: 'body' }] };
+		expect(valueScore(a, b, DEFAULT_LENS, opp)).toBe(1000);
 	});
 });
 
@@ -46,12 +55,12 @@ describe('readings rules', () => {
 	const a = fixtures.boat.readings!,
 		b = fixtures.exposure.readings!;
 	it('max takes the best single pair', () => {
-		expect(readingsScore(a, b, withCombine('max'), opp)).toBeCloseTo(0.4 * 0.5 + 0.4 + 0.2);
+		expect(entriesScore(a, b, withCombine('max'), opp)).toBeCloseTo(0.4 * 0.5 + 0.4 + 0.2);
 	});
 	it('meanAll is at most meanBest, which is at most max', () => {
-		const all = readingsScore(a, b, withCombine('meanAll'), opp);
-		const best = readingsScore(a, b, withCombine('meanBest'), opp);
-		const max = readingsScore(a, b, withCombine('max'), opp);
+		const all = entriesScore(a, b, withCombine('meanAll'), opp);
+		const best = entriesScore(a, b, withCombine('meanBest'), opp);
+		const max = entriesScore(a, b, withCombine('max'), opp);
 		expect(all).toBeLessThanOrEqual(best);
 		expect(best).toBeLessThanOrEqual(max);
 	});

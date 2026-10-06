@@ -11,7 +11,7 @@ import type {
 	Rng,
 	Terrain
 } from '$lib/types';
-import { activeCount, isActive, isActiveIn } from './predicates';
+import { activeCount, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
 import { partTable } from './similarity';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -173,20 +173,24 @@ export function contact(st: GameState, a: Culture, b: Culture): number {
 function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
 	// A homeland culture carries nothing that strains against its own land: strained values are excluded,
 	// strongly favoured ones are four times as likely as mildly favoured ones, neutral parts are uniform.
-	return SLOTS.map((s, si) =>
-		s.features.map((f, fi) => {
+	// Parts are chosen in order, so a staged act only takes what the earlier stages left in hand.
+	return SLOTS.map((s, si) => {
+		const fv: (number | null)[] = s.features.map(() => null);
+		s.features.forEach((f, fi) => {
+			const open = f.values.map((_, vi) => isAvailableIn(s, fv, fi, vi));
 			let w = f.values.map((_, vi) => {
 				const a = aff(si, fi, vi, terrain);
-				return a > 0 ? a * a : 0;
+				return open[vi] && a > 0 ? a * a : 0;
 			});
-			if (!w.some((x) => x > 0)) w = w.map(() => 1);
-			return weighted(
+			if (!w.some((x) => x > 0)) w = open.some(Boolean) ? open.map((o) => (o ? 1 : 0)) : w.map(() => 1);
+			fv[fi] = weighted(
 				r,
 				f.values.map((_, vi) => vi),
 				w
 			);
-		})
-	);
+		});
+		return fv as number[];
+	});
 }
 
 function makeCulture(
@@ -383,6 +387,7 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 				neutral = isNeutral(si, fi, cur),
 				near = partTable(si, fi);
 			const scores = f.values.map((_v, vi) => {
+				if (!isAvailableIn(slot, c.traits[si], fi, vi)) return 0;
 				// The land's pull moves a custom by small steps to near values; untagged parts aren't scaled.
 				let s = (near ? near[cur][vi] / 1000 : 1) * aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
 				nbs.forEach((n) => {
@@ -599,6 +604,7 @@ export function allowedReforms(st: GameState, c: Culture): number[][][] {
 				.filter(
 					(vi) =>
 						vi !== c.traits[si][fi] &&
+						isAvailable(c.traits, si, fi, vi) &&
 						!isNeutral(si, fi, vi) &&
 						(aff(si, fi, vi, t) > 0 || nbs.some((k) => k.traits[si][fi] === vi))
 				)

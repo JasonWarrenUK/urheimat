@@ -1,5 +1,5 @@
 import type { CultureTraits } from '$lib/types';
-import { DEFAULT_LENS, type Lens, type SetLens, type TermCriteria } from './lens';
+import { DEFAULT_LENS, type EntriesLens, type Lens, type SetLens, type TermCriteria } from './lens';
 import { isActiveIn } from './predicates';
 import { SLOTS } from './slots';
 import { OPPOSITES } from './vocabulary';
@@ -8,17 +8,14 @@ import { OPPOSITES } from './vocabulary';
 // from 0 to 1000, worked out once per lens, so play only ever does lookups.
 
 // Loose shapes, so the rules can be tested on words that aren't in the vocabulary.
-interface LooseReading {
-	verb: string;
-	object: string;
-	target?: string;
-}
+export type LooseEntry = Record<string, string | readonly string[] | undefined>;
 export interface LooseTags {
 	about?: readonly string[];
-	readings?: readonly LooseReading[];
-	material?: readonly string[];
+	readings?: readonly LooseEntry[];
+	material?: readonly LooseEntry[];
 }
-const SET_KINDS = ['about', 'material'] as const;
+const SET_KINDS = ['about'] as const;
+const ENTRY_KINDS = ['readings', 'material'] as const;
 export type Opposites = readonly (readonly [string, string])[];
 
 const isOpposite = (a: string, b: string, opp: Opposites): boolean =>
@@ -38,22 +35,26 @@ export function termScore(a: string | undefined, b: string | undefined, c: TermC
 	return 0;
 }
 
-export function readingScore(a: LooseReading, b: LooseReading, lens: Lens, opp: Opposites): number {
-	const f = lens.readings.fields;
-	const keys = Object.keys(f) as (keyof typeof f)[];
+// Two entries (readings, or material transitions) compared field by field; list-valued fields are
+// structural and skipped.
+export function entryScore<E>(a: LooseEntry, b: LooseEntry, lens: EntriesLens<E>, opp: Opposites): number {
+	const fields = lens.fields as Record<string, TermCriteria>;
 	let s = 0,
 		w = 0;
-	keys.forEach((k) => {
-		s += f[k].weight * termScore(a[k], b[k], f[k], opp);
-		w += f[k].weight;
+	Object.keys(fields).forEach((k) => {
+		const x = a[k],
+			y = b[k];
+		if (Array.isArray(x) || Array.isArray(y)) return;
+		s += fields[k].weight * termScore(x as string | undefined, y as string | undefined, fields[k], opp);
+		w += fields[k].weight;
 	});
 	return w ? s / w : 0;
 }
 
-export function readingsScore(a: readonly LooseReading[], b: readonly LooseReading[], lens: Lens, opp: Opposites): number {
-	const grid = a.map((ra) => b.map((rb) => readingScore(ra, rb, lens, opp)));
+export function entriesScore<E>(a: readonly LooseEntry[], b: readonly LooseEntry[], lens: EntriesLens<E>, opp: Opposites): number {
+	const grid = a.map((ra) => b.map((rb) => entryScore(ra, rb, lens, opp)));
 	const mean = (xs: number[]) => xs.reduce((x, y) => x + y, 0) / xs.length;
-	switch (lens.readings.combine) {
+	switch (lens.combine) {
 		case 'max':
 			return Math.max(...grid.flat());
 		case 'meanAll':
@@ -67,7 +68,7 @@ export function readingsScore(a: readonly LooseReading[], b: readonly LooseReadi
 }
 
 // Jaccard over a flat set of words, with each opposite pair counted once in the union and earning
-// opposite credit. Serves both flat kinds: about and material.
+// opposite credit.
 export function setScore(a: readonly string[], b: readonly string[], lens: SetLens, opp: Opposites): number {
 	const sa = new Set(a),
 		sb = new Set(b);
@@ -93,12 +94,15 @@ export function valueScore(a: LooseTags, b: LooseTags, lens: Lens = DEFAULT_LENS
 			w += lens[kind].weight;
 		}
 	});
-	const ra = a.readings ?? [],
-		rb = b.readings ?? [];
-	if (ra.length || rb.length) {
-		s += lens.readings.weight * (ra.length && rb.length ? readingsScore(ra, rb, lens, opp) : 0);
-		w += lens.readings.weight;
-	}
+	ENTRY_KINDS.forEach((kind) => {
+		const ka = a[kind] ?? [],
+			kb = b[kind] ?? [],
+			kl = lens[kind] as EntriesLens<LooseEntry>;
+		if (ka.length || kb.length) {
+			s += kl.weight * (ka.length && kb.length ? entriesScore(ka, kb, kl, opp) : 0);
+			w += kl.weight;
+		}
+	});
 	return w ? Math.round((1000 * s) / w) : 0;
 }
 
@@ -107,7 +111,11 @@ export type PartTable = number[][] | null;
 
 export function buildTables(lens: Lens): PartTable[][] {
 	return SLOTS.map((slot) =>
-		slot.features.map((f) => (f.values.every(isTagged) ? f.values.map((a) => f.values.map((b) => valueScore(a, b, lens))) : null))
+		slot.features.map((f) =>
+			f.values.every((v) => isTagged(v as LooseTags))
+				? f.values.map((a) => f.values.map((b) => valueScore(a as LooseTags, b as LooseTags, lens)))
+				: null
+		)
 	);
 }
 

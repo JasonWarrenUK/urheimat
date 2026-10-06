@@ -2,8 +2,9 @@ import type { ValueTags } from '$lib/types';
 
 // A lens is how similarity is judged for one cause of change: scarcity keeps the reason and
 // swaps the material, upheaval keeps the material and changes the reason. Its shape mirrors the
-// tags: a flat list of words gets one set rule, a list of structured readings gets criteria per
-// property. Add a property to a tag type and every lens stops compiling until it says how to compare it.
+// tags: a flat list of words gets one set rule, a list of structured entries gets criteria per
+// string property. Add a property to a tag type and every lens stops compiling until it says how
+// to compare it; list-valued properties (a reading's `when`) are structural and never compared.
 
 export interface TermCriteria {
 	weight: number;
@@ -17,23 +18,32 @@ export interface SetLens {
 	opposite: number;
 }
 
-export interface ReadingsLens<R> {
+type StringKeys<E> = { [P in keyof Required<E>]: Required<E>[P] extends string ? P : never }[keyof Required<E>];
+
+export interface EntriesLens<E> {
 	weight: number;
-	// How several readings per value become one score: the best single pair, each reading's best
+	// How several entries per value become one score: the best single pair, each entry's best
 	// partner averaged both ways, or every pair averaged.
 	combine: 'max' | 'meanBest' | 'meanAll';
-	fields: { [P in keyof Required<R>]: TermCriteria };
+	fields: { [P in StringKeys<E>]: TermCriteria };
 }
 
 type Tags = Required<ValueTags>;
 export type Lens = {
-	[K in keyof Tags]: Tags[K] extends readonly (infer E)[] ? ([E] extends [string] ? SetLens : ReadingsLens<E>) : never;
+	[K in keyof Tags]: Tags[K] extends readonly (infer E)[] ? ([E] extends [string] ? SetLens : EntriesLens<E>) : never;
 };
 
 // Placeholder values, to be replaced by Jason's picks once the corpus is tagged and corpus-fit has run.
 export const DEFAULT_LENS: Lens = {
 	about: { weight: 0.3, rule: 'jaccard', opposite: 0.25 },
-	material: { weight: 0.2, rule: 'jaccard', opposite: 0.25 },
+	material: {
+		weight: 0.2,
+		combine: 'meanBest',
+		fields: {
+			accepts: { weight: 0.4, sibling: 0.5, opposite: 0.25 },
+			yields: { weight: 0.6, sibling: 0.5, opposite: 0.25 }
+		}
+	},
 	readings: {
 		weight: 0.5,
 		combine: 'meanBest',

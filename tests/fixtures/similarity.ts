@@ -1,5 +1,5 @@
 // A hand-built disposal part on invented words, so the rules are tested apart from the real corpus.
-import type { Opposites, LooseTags } from '../../src/lib/sim/similarity';
+import type { LooseTags, Opposites } from '../../src/lib/sim/similarity';
 
 export const opposites: Opposites = [
 	['send/away', 'send/to'],

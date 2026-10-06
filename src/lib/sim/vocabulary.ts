@@ -4,10 +4,11 @@
 
 // Grown round by round as the corpus is tagged. Destinations are a family: beyond/sky, beyond/stars…
 export const NOUNS = [
-	// what an act works on
+	// what an act works on, and what it leaves
 	'body',
 	'spirit',
 	'memory',
+	'dust',
 	// where it sends them
 	'beyond/sky',
 	'beyond/stars',
