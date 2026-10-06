@@ -73,7 +73,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).
 - [ ] **4SD.13**: Dated knowledge between every pair of bands, with recognition by graded resemblance _(blocked: depends on 6SL.1)_
   - Note: What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).
-- [ ] **4SD.14**: Tag material traces value by value across the corpus _(depends on 2DS.1)_
+- [ ] **4SD.14**: Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
 - [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(blocked: depends on 6SL.1)_
 - [ ] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops _(blocked: depends on 4SD.4)_

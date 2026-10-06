@@ -255,7 +255,7 @@
 					},
 					{
 						"id": "4SD.14",
-						"description": "Tag material traces value by value across the corpus",
+						"description": "Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it",
 						"status": "todo",
 						"dependsOn": [
 							"2DS.1"
@@ -263,7 +263,7 @@
 						"softDependsOn": [
 							"4SD.10"
 						],
-						"notes": "Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l). From the 4SD.4 pilot: traces become a fourth tag kind on values (what a practice leaves in the ground); deictic rules such as facing the first homeland need referents from band history (origin tile, split tile, seat before the last move), which Culture does not yet keep.",
+						"notes": "Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l). From the 4SD.4 pilot: traces become a fourth tag kind on values (what a practice leaves in the ground); deictic rules such as facing the first homeland need referents from band history (origin tile, split tile, seat before the last move), which Culture does not yet keep. The corpus's customs are authored categories, not findings. The scholars reconstruct only categories the evidence supports; a custom that turns out to be an artefact of the authoring rather than of any people is flagged for removal or redefinition in 4SD.16.",
 						"assignee": "Jason"
 					},
 					{
