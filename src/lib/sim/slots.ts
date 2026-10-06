@@ -254,7 +254,24 @@ export const SLOTS: SlotDef[] = [
 							]
 						}
 					),
-					N('expose', 'exposed', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' }),
+					N(
+						'expose',
+						'exposed',
+						{ mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' },
+						{
+							about: ['sky', 'birds', 'wind', 'bone', 'patience', 'openness'],
+							readings: [
+								...R('destroy', 'body', null),
+								...R('sanctify', 'body', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('sanctify', 'spirit', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'body', 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'spirit', null, 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'memory', null),
+								...R('transform', 'body', null, 'beyond/sky', 'ancestors'),
+								...R('transform', 'spirit', null, 'beyond/sky', 'beyond/stars', 'ancestors', 'gods')
+							]
+						}
+					),
 					N('preserve', 'preserved', { desert: 'strong', mountain: 'favours', marsh: 'resists', coast: 'resists', river: 'resists' }),
 					N('inter', 'buried'),
 					N('sink', 'given to the water', { coast: 'strong', river: 'strong', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),

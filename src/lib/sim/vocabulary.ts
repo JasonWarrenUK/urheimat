@@ -21,7 +21,13 @@ export const NOUNS = [
 	'smoke',
 	'ash',
 	'haste',
-	'purity'
+	'purity',
+	'sky',
+	'birds',
+	'wind',
+	'bone',
+	'patience',
+	'openness'
 ] as const satisfies readonly string[];
 
 export const VERBS = ['lay', 'destroy', 'sanctify', 'release', 'transform'] as const satisfies readonly string[];
@@ -31,4 +37,4 @@ export type Verb = (typeof VERBS)[number];
 export type Term = Noun | Verb;
 
 // Pairs that differ on exactly one thing. Opposition is always recorded; each lens decides what it is worth.
-export const OPPOSITES: readonly (readonly [Term, Term])[] = [];
+export const OPPOSITES: readonly (readonly [Term, Term])[] = [['haste', 'patience']];
