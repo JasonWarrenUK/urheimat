@@ -9,6 +9,7 @@ export const NOUNS = [
 	'spirit',
 	'memory',
 	'dust',
+	'parts',
 	// where it sends them
 	'beyond/sky',
 	'beyond/stars',
@@ -96,7 +97,9 @@ export const NOUNS = [
 	'ending',
 	'shrine',
 	'fear',
-	'shame'
+	'shame',
+	'violence',
+	'division'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

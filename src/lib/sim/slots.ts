@@ -244,7 +244,7 @@ export const SLOTS: SlotDef[] = [
 						{ forest: 'strong', river: 'favours', marsh: 'resists', steppe: 'resists', desert: 'excludes' },
 						{
 							about: ['fire', 'warmth', 'light', 'smoke', 'ash', 'haste', 'purity'],
-							material: [T('body', 'ash'), T('bone', 'ash')],
+							material: [T('body', 'ash'), T('bone', 'ash'), T('parts', 'ash')],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('destroy', 'spirit', null),
@@ -266,7 +266,7 @@ export const SLOTS: SlotDef[] = [
 						{ mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' },
 						{
 							about: ['sky', 'birds', 'wind', 'bone', 'patience', 'openness'],
-							material: [T('body', 'bone')],
+							material: [T('body', 'bone'), T('parts', 'bone')],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('sanctify', 'body', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
@@ -361,6 +361,30 @@ export const SLOTS: SlotDef[] = [
 							...R('release', 'spirit', 'ancestors'),
 							...R('transform', 'body', null, 'ancestors', 'gods'),
 							...R('transform', 'spirit', null, 'ancestors', 'gods')
+						]
+					}),
+					N('dismember', 'cut apart', undefined, {
+						about: ['violence', 'division', 'fear', 'labour'],
+						material: [T('body', 'parts')],
+						readings: [
+							...R('destroy', 'body', null),
+							...R('destroy', 'spirit', null),
+							...R('destroy', 'memory', null),
+							...R('sanctify', 'body', 'ancestors', 'gods'),
+							...R('release', 'spirit', null, 'beyond/otherworld'),
+							...R('transform', 'body', null, 'ancestors', 'gods')
+						]
+					}),
+					N('decapitate', 'beheaded', undefined, {
+						about: ['violence', 'fear', 'guardianship', 'identity'],
+						material: [T('body', 'body')],
+						readings: [
+							...R('destroy', 'spirit', null),
+							...R('destroy', 'memory', null),
+							...R('sanctify', 'body', null, 'ancestors', 'gods'),
+							...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors'),
+							...R('transform', 'body', null, 'ancestors', 'gods'),
+							...R('transform', 'spirit', 'ancestors')
 						]
 					}),
 					N('pulverise', 'ground to dust', undefined, {
