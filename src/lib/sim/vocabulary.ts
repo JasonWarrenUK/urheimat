@@ -61,7 +61,8 @@ export const NOUNS = [
 	'living',
 	'land',
 	'height',
-	'enclosure'
+	'enclosure',
+	'distance'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -88,5 +89,6 @@ export const OPPOSITES: readonly (readonly [Term, Term])[] = [
 	['decay', 'permanence'],
 	['hiddenness', 'openness'],
 	['dispersal', 'wholeness'],
-	['nearness', 'passage']
+	['nearness', 'passage'],
+	['distance', 'nearness']
 ];

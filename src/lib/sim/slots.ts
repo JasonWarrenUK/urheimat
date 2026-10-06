@@ -387,7 +387,15 @@ export const SLOTS: SlotDef[] = [
 				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
 					N('ground', 'on open ground'),
-					N('height', 'on a height', { mountain: 'strong', marsh: 'excludes' }),
+					// A natural eminence and a built platform are two values: they leave different traces (4SD.14).
+					N('height/crag', 'on a crag', { mountain: 'strong', marsh: 'excludes' }, {
+						about: ['height', 'sky', 'openness', 'wind', 'distance'],
+						readings: [...R('mark', 'remains', null, 'living', 'land'), ...R('offer', 'remains', 'gods', 'beyond/sky'), ...R('return', 'remains', 'beyond/sky')]
+					}),
+					N('height/tower', 'on a raised platform', { mountain: 'strong', steppe: 'resists', desert: 'resists', marsh: 'excludes' }, {
+						about: ['height', 'sky', 'openness', 'wind', 'distance', 'labour'],
+						readings: [...R('mark', 'remains', null, 'living', 'land'), ...R('offer', 'remains', 'gods', 'beyond/sky'), ...R('return', 'remains', 'beyond/sky')]
+					}),
 					N('house', 'in the house'),
 					N('grove', 'in a grove', { forest: 'strong', river: 'favours', steppe: 'resists', desert: 'excludes' }),
 					N('mound', 'under a mound', { steppe: 'strong', river: 'favours', desert: 'resists', mountain: 'resists', marsh: 'excludes' }, {
