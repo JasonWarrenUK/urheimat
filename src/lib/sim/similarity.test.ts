@@ -90,9 +90,10 @@ describe('values', () => {
 	});
 });
 
-describe('drift fallback', () => {
-	// Valid while no part is fully tagged; tagging the pilot custom means re-capturing the baseline.
-	it('reproduces pre-4SD.4 drift exactly when no part is tagged', () => {
+describe('drift baseline', () => {
+	// A snapshot: re-captured whenever the corpus changes. The untagged fallback was proven against
+	// the pre-4SD.4 capture before any part was fully tagged.
+	it('reproduces the captured traits for seeded passive runs', () => {
 		Object.entries(baseline.traitsBySeed).forEach(([seed, expected]) => {
 			const st = newGame(Number(seed));
 			const t = startTiles(st)[0];

@@ -50,7 +50,12 @@ export const NOUNS = [
 	'freedom',
 	'labour',
 	'intimacy',
-	'completion'
+	'completion',
+	'hearth',
+	'guardianship',
+	'nearness',
+	'abandonment',
+	'indifference'
 ] as const satisfies readonly string[];
 
 export const VERBS = ['destroy', 'sanctify', 'release', 'transform'] as const satisfies readonly string[];
@@ -64,5 +69,6 @@ export const OPPOSITES: readonly (readonly [Term, Term])[] = [
 	['haste', 'patience'],
 	['decay', 'permanence'],
 	['hiddenness', 'openness'],
-	['dispersal', 'wholeness']
+	['dispersal', 'wholeness'],
+	['nearness', 'passage']
 ];

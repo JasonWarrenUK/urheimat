@@ -236,7 +236,8 @@ export const SLOTS: SlotDef[] = [
 				id: 'act',
 				label: 'act',
 				values: [
-					N('none', 'left as they are', undefined, { material: [T('any', 'nothing')] }),
+					// No readings by design: that keeps place, vessel and goods off, and ends the chain.
+					N('none', 'left as they are', undefined, { about: ['abandonment', 'indifference'], material: [T('any', 'nothing')] }),
 					N(
 						'burn',
 						'burnt',
@@ -350,7 +351,18 @@ export const SLOTS: SlotDef[] = [
 							...R('transform', 'spirit', null, 'beyond/sky', 'beyond/stars', 'ancestors')
 						]
 					}),
-					N('keep', 'kept among the living', { marsh: 'resists' }, { material: PASS }),
+					N('keep', 'kept among the living', { marsh: 'resists' }, {
+						about: ['presence', 'permanence', 'hearth', 'guardianship', 'nearness'],
+						material: PASS,
+						readings: [
+							...R('sanctify', 'body', null, 'ancestors', 'gods'),
+							...R('sanctify', 'spirit', null, 'ancestors'),
+							...R('sanctify', 'memory', null),
+							...R('release', 'spirit', 'ancestors'),
+							...R('transform', 'body', null, 'ancestors', 'gods'),
+							...R('transform', 'spirit', null, 'ancestors', 'gods')
+						]
+					}),
 					N('pulverise', 'ground to dust', undefined, {
 						about: ['dust', 'labour', 'intimacy', 'completion'],
 						material: [T('bone', 'dust')],
