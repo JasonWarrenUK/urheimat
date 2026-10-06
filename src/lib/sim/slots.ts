@@ -292,7 +292,23 @@ export const SLOTS: SlotDef[] = [
 							]
 						}
 					),
-					N('inter', 'buried'),
+					N('inter', 'buried', undefined, {
+						about: ['earth', 'darkness', 'depth', 'decay', 'rest', 'boundary'],
+						material: ['body'],
+						readings: [
+							...R('destroy', 'body', null),
+							...R('destroy', 'spirit', null),
+							...R('destroy', 'memory', null),
+							...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('sanctify', 'memory', null),
+							...R('release', 'body', 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('release', 'memory', null),
+							...R('transform', 'body', null, 'ancestors', 'gods'),
+							...R('transform', 'spirit', null, 'ancestors', 'gods')
+						]
+					}),
 					N('sink', 'given to the water', { coast: 'strong', river: 'strong', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),
 					N('scatter', 'scattered', { steppe: 'favours', mountain: 'favours', coast: 'favours' }),
 					N('keep', 'kept among the living', { marsh: 'resists' })
