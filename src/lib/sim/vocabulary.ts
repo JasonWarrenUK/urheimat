@@ -72,7 +72,13 @@ export const NOUNS = [
 	'threshold',
 	'stillness',
 	'wealth',
-	'craft'
+	'craft',
+	'bareness',
+	'directness',
+	'visibility',
+	'stone',
+	'smallness',
+	'cloth'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

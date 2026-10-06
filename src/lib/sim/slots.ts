@@ -461,9 +461,11 @@ export const SLOTS: SlotDef[] = [
 				label: 'vessel',
 				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
-					N('none', 'with no vessel'),
+					// Vessels pass the remains through unchanged; their transitions only gate what they can hold.
+					N('none', 'with no vessel', undefined, { about: ['plainness', 'bareness', 'directness'], material: PASS }),
 					N('boat', 'in a boat', { coast: 'strong', river: 'favours', marsh: 'favours', mountain: 'resists', steppe: 'excludes', desert: 'excludes' }, {
 						about: ['water', 'passage', 'wealth', 'labour', 'craft'],
+						material: PASS,
 						readings: [
 							...R('enclose', 'remains', null),
 							...R('convey', 'remains', 'ancestors', 'gods', 'water', 'beyond/otherworld'),
@@ -472,11 +474,41 @@ export const SLOTS: SlotDef[] = [
 							...R('provide', 'remains', null)
 						]
 					}),
-					N('bier', 'on a bier'),
-					N('pit', 'in a pit', { mountain: 'resists', marsh: 'resists' }),
-					N('chamber', 'in a chamber', { mountain: 'favours', desert: 'favours', marsh: 'excludes' }),
-					N('urn', 'in an urn', { river: 'favours', coast: 'favours', steppe: 'resists' }),
-					N('shroud', 'in a shroud')
+					N('bier', 'on a bier', undefined, {
+						about: ['openness', 'craft', 'lightness', 'visibility'],
+						material: PASS,
+						readings: [...R('convey', 'remains', null, 'beyond/sky'), ...R('display', 'remains', null, 'living')]
+					}),
+					N('pit', 'in a pit', { mountain: 'resists', marsh: 'resists' }, {
+						about: ['earth', 'depth', 'plainness', 'darkness'],
+						material: PASS,
+						readings: [...R('enclose', 'remains', null, 'earth'), ...R('convey', 'remains', 'earth')]
+					}),
+					N('chamber', 'in a chamber', { mountain: 'favours', desert: 'favours', marsh: 'excludes' }, {
+						about: ['enclosure', 'permanence', 'labour', 'wealth', 'stone'],
+						material: PASS,
+						readings: [
+							...R('enclose', 'remains', null, 'ancestors'),
+							...R('protect', 'remains', null, 'living'),
+							...R('display', 'remains', 'living'),
+							...R('provide', 'remains', null, 'beyond/otherworld')
+						]
+					}),
+					N('urn', 'in an urn', { river: 'favours', coast: 'favours', steppe: 'resists' }, {
+						about: ['enclosure', 'craft', 'smallness', 'hearth'],
+						material: [T('ash', 'same'), T('dust', 'same')],
+						readings: [...R('enclose', 'remains', null), ...R('convey', 'remains', 'living', 'beyond/otherworld'), ...R('protect', 'remains', null)]
+					}),
+					N('shroud', 'in a shroud', undefined, {
+						about: ['enclosure', 'intimacy', 'cloth', 'hiddenness'],
+						material: [T('body', 'same'), T('bone', 'same')],
+						readings: [
+							...R('enclose', 'remains', null),
+							...R('convey', 'remains', 'beyond/otherworld'),
+							...R('protect', 'remains', null, 'living'),
+							...R('provide', 'remains', null)
+						]
+					})
 				]
 			},
 			{
