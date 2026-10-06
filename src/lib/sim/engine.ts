@@ -12,7 +12,7 @@ import type {
 	Terrain
 } from '$lib/types';
 import { partTable } from './similarity';
-import { FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
+import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
 export function rngFrom(seed: number, state?: number): Rng {
 	let a = (state ?? seed) | 0;
@@ -42,8 +42,10 @@ function weighted<T>(r: () => number, items: T[], w: number[]): T {
 
 const aff = (slot: number, f: number, v: number, terrain: MapTerrain): number => {
 	const a = SLOTS[slot].features[f].values[v].aff;
-	return a ? a[terrain as Terrain] || 0 : 1;
+	return a ? AFF_WEIGHT[a[terrain as Terrain] ?? 'allows'] : 1;
 };
+// The land strains against a value it resists or excludes.
+export const strains = (slot: number, f: number, v: number, terrain: MapTerrain): boolean => aff(slot, f, v, terrain) < 1;
 const isNeutral = (slot: number, f: number, v: number): boolean => !SLOTS[slot].features[f].values[v].aff;
 export const render = (slot: number, fv: (number | null)[]): string =>
 	SLOTS[slot].render(fv.map((v, f) => (v === null ? '…' : SLOTS[slot].features[f].values[v].name)));
@@ -289,7 +291,7 @@ export function strainedFeatures(st: GameState, c: Culture): [number, number][] 
 	const out: [number, number][] = [];
 	c.traits.forEach((fv, si) =>
 		fv.forEach((v, fi) => {
-			if (aff(si, fi, v, t) === 0) out.push([si, fi]);
+			if (strains(si, fi, v, t)) out.push([si, fi]);
 		})
 	);
 	return out;

@@ -12,9 +12,15 @@ export interface ValueTags {
 	readings?: readonly Reading[];
 }
 
+// What the land itself does to a value, now. Never band state (memory, mobility, numbers).
+// A terrain absent from a table allows the value.
+export type AffLevel = 'strong' | 'favours' | 'allows' | 'resists' | 'excludes';
+export type Affinity = Partial<Record<Terrain, AffLevel>>;
+
 export interface TraitValue extends ValueTags {
+	id?: string;
 	name: string;
-	aff?: Partial<Record<Terrain, number>>;
+	aff?: Affinity;
 }
 
 export type Terrain = 'coast' | 'marsh' | 'river' | 'forest' | 'steppe' | 'desert' | 'mountain';

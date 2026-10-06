@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Culture, GameState, MapTerrain, Orders } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
-	import { aff, allowedReforms, render, sameCustom, vname } from '$lib/sim/engine';
+	import { aff, allowedReforms, render, sameCustom, strains, vname } from '$lib/sim/engine';
 	import { game } from '$lib/game-store.svelte';
 
 	interface Props {
@@ -20,7 +20,7 @@
 	const anyReformed = $derived(reformed.some((x) => x !== undefined));
 	const shown = $derived(player.traits[slotIndex].map((v, fi) => (reformed[fi] !== undefined ? reformed[fi] : v)));
 	const changed = $derived(!sameCustom(player.traits[slotIndex], gameState.ancestral[slotIndex]));
-	const strained = $derived(slot.features.filter((_f, fi) => aff(slotIndex, fi, player.traits[slotIndex][fi], terrain) === 0).map((f) => f.label));
+	const strained = $derived(slot.features.filter((_f, fi) => strains(slotIndex, fi, player.traits[slotIndex][fi], terrain)).map((f) => f.label));
 	const kin = $derived(gameState.cultures.filter((c) => c.alive && !c.isPlayer));
 	const wholeCount = $derived(kin.filter((k) => sameCustom(k.known[slotIndex], gameState.ancestral[slotIndex])).length);
 	const partCount = $derived(
@@ -85,7 +85,7 @@
 			{#each allowed[fi] as vi (vi)}
 				<button onclick={() => pick(fi, vi)}>
 					{f.label}: {vname(slotIndex, fi, vi)}
-					<span class="faint small">{aff(slotIndex, fi, vi, terrain) > 0 ? `fits the ${terrain}` : 'from neighbours'}</span>
+					<span class="faint small">{aff(slotIndex, fi, vi, terrain) >= 1 ? `fits the ${terrain}` : 'from neighbours'}</span>
 				</button>
 			{/each}
 		{/each}

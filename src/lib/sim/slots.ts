@@ -1,9 +1,16 @@
-import type { SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
-
-const V = (name: string, aff?: Partial<Record<Terrain, number>>, tags?: ValueTags): TraitValue => ({ name, aff, ...tags });
-const ST: Partial<Record<Terrain, number>> = { steppe: 3 };
+import type { AffLevel, Affinity, SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
+
+export const AFF_WEIGHT: Record<AffLevel, number> = { strong: 3, favours: 1.5, allows: 1, resists: 0.5, excludes: 0 };
+
+// Legacy tables: numbers, and every terrain left out strains. Converted so the meaning is unchanged;
+// the tagging task restates each one in named levels as it revisits the value.
+type LegacyAff = Partial<Record<Terrain, number>>;
+const legacyLevel = (n: number): AffLevel => (n >= 3 ? 'strong' : n >= 1.5 ? 'favours' : 'excludes');
+const legacyAff = (a: LegacyAff): Affinity => Object.fromEntries(LAND.map((t) => [t, a[t] ? legacyLevel(a[t]) : 'excludes']));
+const V = (name: string, aff?: LegacyAff, tags?: ValueTags): TraitValue => ({ name, aff: aff && legacyAff(aff), ...tags });
+const ST: LegacyAff = { steppe: 3 };
 
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
