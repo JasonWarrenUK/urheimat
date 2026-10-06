@@ -399,7 +399,10 @@ export const SLOTS: SlotDef[] = [
 						about: ['height', 'sky', 'openness', 'wind', 'distance', 'labour'],
 						readings: [...R('mark', 'remains', null, 'living', 'land'), ...R('offer', 'remains', 'gods', 'beyond/sky'), ...R('return', 'remains', 'beyond/sky')]
 					}),
-					N('house', 'in the house'),
+					N('house', 'in the house', undefined, {
+						about: ['hearth', 'nearness', 'presence', 'guardianship', 'enclosure'],
+						readings: [...R('hide', 'remains', null), ...R('hold', 'remains', null, 'living', 'ancestors'), ...R('offer', 'remains', 'gods')]
+					}),
 					N('grove', 'in a grove', { forest: 'strong', river: 'favours', steppe: 'resists', desert: 'excludes' }),
 					N('mound', 'under a mound', { steppe: 'strong', river: 'favours', desert: 'resists', mountain: 'resists', marsh: 'excludes' }, {
 						about: ['earth', 'height', 'openness', 'boundary', 'permanence', 'labour'],
