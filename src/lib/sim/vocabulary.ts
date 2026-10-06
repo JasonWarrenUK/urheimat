@@ -78,7 +78,17 @@ export const NOUNS = [
 	'visibility',
 	'stone',
 	'smallness',
-	'cloth'
+	'cloth',
+	// goods: the dead as a person, and why things go with them
+	'dead',
+	'goods',
+	'equality',
+	'custom',
+	'provision',
+	'identity',
+	'continuity',
+	'hierarchy',
+	'thrift'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -98,7 +108,9 @@ export const VERBS = [
 	'convey',
 	'protect',
 	'display',
-	'provide'
+	'provide',
+	// goods kept among the living
+	'withhold'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
@@ -112,5 +124,6 @@ export const OPPOSITES: readonly (readonly [Term, Term])[] = [
 	['hiddenness', 'openness'],
 	['dispersal', 'wholeness'],
 	['nearness', 'passage'],
-	['distance', 'nearness']
+	['distance', 'nearness'],
+	['equality', 'hierarchy']
 ];

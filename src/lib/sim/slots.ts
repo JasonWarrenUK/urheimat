@@ -516,10 +516,23 @@ export const SLOTS: SlotDef[] = [
 				label: 'goods',
 				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
-					N('kit', 'with the common kit'),
-					N('role', 'with the tools of their trade'),
-					N('standing', 'with the wealth of their standing'),
-					N('nothing', 'with nothing', { desert: 'favours', marsh: 'favours', mountain: 'favours' })
+					// Targets are recipients: the goods go to the dead, so that they fare well wherever they go.
+					N('kit', 'with the common kit', undefined, {
+						about: ['equality', 'custom', 'provision'],
+						readings: [...R('provide', 'goods', 'dead'), ...R('display', 'goods', 'living'), ...R('offer', 'goods', 'gods')]
+					}),
+					N('role', 'with the tools of their trade', undefined, {
+						about: ['identity', 'craft', 'labour', 'continuity'],
+						readings: [...R('provide', 'goods', 'dead'), ...R('display', 'goods', 'living'), ...R('return', 'goods', 'dead')]
+					}),
+					N('standing', 'with the wealth of their standing', undefined, {
+						about: ['wealth', 'hierarchy', 'visibility', 'permanence'],
+						readings: [...R('provide', 'goods', 'dead'), ...R('display', 'goods', 'living', 'ancestors'), ...R('offer', 'goods', 'gods'), ...R('return', 'goods', 'dead')]
+					}),
+					N('nothing', 'with nothing', { desert: 'favours', marsh: 'favours', mountain: 'favours' }, {
+						about: ['plainness', 'thrift', 'equality'],
+						readings: [...R('withhold', 'goods', 'living')]
+					})
 				]
 			},
 			{
