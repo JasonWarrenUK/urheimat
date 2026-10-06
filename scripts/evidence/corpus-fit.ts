@@ -8,6 +8,7 @@
 
 import { newGame, begin, startTiles, endEra, defaultOrders } from '../../src/lib/sim/engine';
 import { DEFAULT_LENS, NEAR, type Lens } from '../../src/lib/sim/lens';
+import { isActive } from '../../src/lib/sim/predicates';
 import { bandSimilarity, partTable } from '../../src/lib/sim/similarity';
 import { SLOTS } from '../../src/lib/sim/slots';
 import type { Culture, CultureTraits } from '../../src/lib/types';
@@ -45,7 +46,9 @@ function kinDistance(a: Culture, b: Culture, all: Culture[]): number {
 	return i >= 0 ? i + lb.indexOf(la[i]) : la.length + lb.length;
 }
 
-const sameShare = (a: CultureTraits, b: CultureTraits) => mean(a.flatMap((s, si) => s.map((v, fi) => (v === b[si][fi] ? 1 : 0))));
+// Dormant parts are left out wherever a band's values are compared.
+const sameShare = (a: CultureTraits, b: CultureTraits) =>
+	mean(a.flatMap((s, si) => s.flatMap((v, fi) => (isActive(a, si, fi) && isActive(b, si, fi) ? [v === b[si][fi] ? 1 : 0] : []))));
 
 function runs() {
 	return Array.from({ length: SEEDS }, (_, i) => {
@@ -65,14 +68,15 @@ function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 	// 1. Unique runs
 	const players = states.map((st) => st.cultures[st.playerId as number].traits);
 	const sameRun = mean(
-		parts.map((p) => {
+		parts.flatMap((p) => {
 			let same = 0, n = 0;
 			for (let i = 0; i < players.length; i++)
 				for (let j = i + 1; j < players.length; j++) {
+					if (!isActive(players[i], p.si, p.fi) || !isActive(players[j], p.si, p.fi)) continue;
 					n++;
 					if (players[i][p.si][p.fi] === players[j][p.si][p.fi]) same++;
 				}
-			return same / n;
+			return n ? [same / n] : [];
 		})
 	);
 	console.log(`1 Unique runs: two seeds share a part's value ${pct(sameRun)} of the time (lower = more unique)`);
@@ -91,7 +95,14 @@ function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 	orphans.forEach((o) => console.log(`    orphan  ${o}`));
 
 	// 3. Spread
-	const spread = mean(states.flatMap((st) => parts.map((p) => new Set(st.cultures.filter((c) => c.alive).map((c) => c.traits[p.si][p.fi])).size / p.values.length)));
+	const spread = mean(
+		states.flatMap((st) =>
+			parts.flatMap((p) => {
+				const live = st.cultures.filter((c) => c.alive && isActive(c.traits, p.si, p.fi));
+				return live.length ? [new Set(live.map((c) => c.traits[p.si][p.fi])).size / p.values.length] : [];
+			})
+		)
+	);
 	console.log(`3 Spread: bands alive at the end use ${pct(spread)} of each part's values`);
 
 	// 4. Kin familiarity

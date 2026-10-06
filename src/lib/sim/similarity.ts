@@ -1,5 +1,6 @@
 import type { CultureTraits } from '$lib/types';
 import { DEFAULT_LENS, type Lens, type TermCriteria } from './lens';
+import { isActiveIn } from './predicates';
 import { SLOTS } from './slots';
 import { OPPOSITES } from './vocabulary';
 
@@ -119,12 +120,13 @@ export function similarity(si: number, fi: number, a: number, b: number, lens: L
 	return t ? t[a][b] : null;
 }
 
-// Two bands' likeness from 0 to 1: each custom counts equally, its tagged parts share its weight.
-// Null when nothing is tagged yet.
+// Two bands' likeness from 0 to 1: each custom counts equally, its tagged parts live in both bands
+// share its weight. Null when nothing is tagged yet.
 export function bandSimilarity(a: CultureTraits, b: CultureTraits, lens: Lens = DEFAULT_LENS): number | null {
 	const perCustom: number[] = [];
 	SLOTS.forEach((slot, si) => {
 		const scores = slot.features.flatMap((_, fi) => {
+			if (!isActiveIn(slot, a[si], fi) || !isActiveIn(slot, b[si], fi)) return [];
 			const s = similarity(si, fi, a[si][fi], b[si][fi], lens);
 			return s === null ? [] : [s / 1000];
 		});

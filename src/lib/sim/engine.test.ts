@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/engine';
 import { begin, defaultOrders, endEra, newGame, reconstruct, startTiles } from './engine';
-import { FEATURE_COUNT } from './slots';
+import { activeCount } from './predicates';
 
 describe('engine', () => {
 	it('runs a full game deterministically for a given seed', () => {
@@ -18,9 +18,11 @@ describe('engine', () => {
 
 		expect(state.over).toBe(true);
 
+		// Only the parts live in the ancestral culture are scored.
 		const result = reconstruct(state);
-		expect(result.max).toBe(FEATURE_COUNT * 2);
-		expect(result.counts.correct + result.counts.wrong + result.counts.lost).toBe(FEATURE_COUNT);
+		const scored = activeCount(state.ancestral);
+		expect(result.max).toBe(scored * 2);
+		expect(result.counts.correct + result.counts.wrong + result.counts.lost).toBe(scored);
 		expect(result.total).toBeLessThanOrEqual(result.max);
 	});
 

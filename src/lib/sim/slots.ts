@@ -299,10 +299,11 @@ export const SLOTS: SlotDef[] = [
 			}
 		]),
 		// Provisional: one clause per stage in use, until rendering is designed downstream.
+		// Dormant parts arrive as '' and are dropped; a stage whose act is dormant or 'none' is skipped.
 		render: (n) => {
-			const stages = [0, 1, 2].map((k) => n.slice(k * 6, k * 6 + 6)).filter((s) => s[0] !== 'left as they are');
+			const stages = [0, 1, 2].map((k) => n.slice(k * 6, k * 6 + 6)).filter((s) => s[0] && s[0] !== 'left as they are');
 			if (!stages.length) return 'The dead are left where they fall';
-			const text = stages.map((s) => `${s[0]} ${s[1]} ${s[2]}, ${s[3]}, ${s[4]}, ${s[5]}`).join('; then ');
+			const text = stages.map((s) => [s.slice(0, 3).filter(Boolean).join(' '), ...s.slice(3).filter(Boolean)].join(', ')).join('; then ');
 			return text[0].toUpperCase() + text.slice(1);
 		}
 	},
