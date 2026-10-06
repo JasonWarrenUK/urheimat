@@ -399,7 +399,16 @@ export const SLOTS: SlotDef[] = [
 							...R('return', 'remains', 'earth')
 						]
 					}),
-					N('cave', 'in a cave', { mountain: 'strong', desert: 'favours', steppe: 'resists', marsh: 'excludes' }),
+					N('cave', 'in a cave', { mountain: 'strong', desert: 'favours', steppe: 'resists', marsh: 'excludes' }, {
+						about: ['earth', 'darkness', 'depth', 'hiddenness', 'permanence', 'enclosure'],
+						readings: [
+							...R('mark', 'remains', 'ancestors', 'land'),
+							...R('hide', 'remains', null, 'living'),
+							...R('hold', 'remains', null, 'ancestors'),
+							...R('offer', 'remains', 'gods', 'earth'),
+							...R('return', 'remains', 'earth')
+						]
+					}),
 					N('water/edge', "at the water's edge", { coast: 'strong', river: 'strong', marsh: 'favours', desert: 'resists' }),
 					N('water/bog', 'in the bog', { marsh: 'strong', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),
 					N('water/open', 'in open water', { coast: 'strong', river: 'favours', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' })

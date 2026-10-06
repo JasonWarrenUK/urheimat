@@ -60,7 +60,8 @@ export const NOUNS = [
 	'remains',
 	'living',
 	'land',
-	'height'
+	'height',
+	'enclosure'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
