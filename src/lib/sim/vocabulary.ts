@@ -64,7 +64,11 @@ export const NOUNS = [
 	'enclosure',
 	'distance',
 	'plainness',
-	'anonymity'
+	'anonymity',
+	'trees',
+	'shade',
+	'growth',
+	'sanctuary'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

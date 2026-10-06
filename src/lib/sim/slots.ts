@@ -403,7 +403,16 @@ export const SLOTS: SlotDef[] = [
 						about: ['hearth', 'nearness', 'presence', 'guardianship', 'enclosure'],
 						readings: [...R('hide', 'remains', null), ...R('hold', 'remains', null, 'living', 'ancestors'), ...R('offer', 'remains', 'gods')]
 					}),
-					N('grove', 'in a grove', { forest: 'strong', river: 'favours', steppe: 'resists', desert: 'excludes' }),
+					N('grove', 'in a grove', { forest: 'strong', river: 'favours', steppe: 'resists', desert: 'excludes' }, {
+						about: ['trees', 'shade', 'growth', 'hiddenness', 'sanctuary'],
+						readings: [
+							...R('mark', 'remains', 'ancestors', 'land'),
+							...R('hide', 'remains', null),
+							...R('hold', 'remains', 'ancestors'),
+							...R('offer', 'remains', 'gods', 'earth'),
+							...R('return', 'remains', 'earth')
+						]
+					}),
 					N('mound', 'under a mound', { steppe: 'strong', river: 'favours', desert: 'resists', mountain: 'resists', marsh: 'excludes' }, {
 						about: ['earth', 'height', 'openness', 'boundary', 'permanence', 'labour'],
 						readings: [
