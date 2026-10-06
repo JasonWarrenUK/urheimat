@@ -335,11 +335,38 @@ export const SLOTS: SlotDef[] = [
 						}
 					),
 					N('scatter', 'scattered', { steppe: 'favours', mountain: 'favours', coast: 'favours' }, {
-						material: [T('ash', 'nothing'), T('dust', 'nothing'), T('bone', 'bone')]
+						about: ['wind', 'sky', 'dispersal', 'lightness', 'freedom'],
+						material: [T('ash', 'nothing'), T('dust', 'nothing'), T('bone', 'bone')],
+						readings: [
+							...when(R('destroy', 'body', null), 'ash', 'dust'), // bones scattered are bones still
+							...R('destroy', 'spirit', null),
+							...R('destroy', 'memory', null),
+							...R('sanctify', 'body', null, 'beyond/sky', 'ancestors', 'gods'),
+							...R('sanctify', 'spirit', null, 'beyond/sky', 'ancestors', 'gods'),
+							...R('release', 'body', 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('release', 'spirit', null, 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('release', 'memory', null),
+							...R('transform', 'body', null, 'beyond/sky', 'beyond/stars', 'ancestors'),
+							...R('transform', 'spirit', null, 'beyond/sky', 'beyond/stars', 'ancestors')
+						]
 					}),
 					N('keep', 'kept among the living', { marsh: 'resists' }, { material: PASS }),
-					// Affinity and grid to be decided; bone to dust.
-					N('pulverise', 'ground to dust', undefined, { material: [T('bone', 'dust')] })
+					N('pulverise', 'ground to dust', undefined, {
+						about: ['dust', 'labour', 'intimacy', 'completion'],
+						material: [T('bone', 'dust')],
+						readings: [
+							...R('destroy', 'body', null),
+							...R('destroy', 'spirit', null),
+							...R('destroy', 'memory', null),
+							...R('sanctify', 'body', null, 'ancestors', 'gods'),
+							...R('sanctify', 'spirit', null, 'ancestors'),
+							...R('release', 'body', 'ancestors'),
+							...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors'),
+							...R('release', 'memory', null),
+							...R('transform', 'body', null, 'ancestors', 'gods'),
+							...R('transform', 'spirit', null, 'ancestors')
+						]
+					})
 				]
 			},
 			{
