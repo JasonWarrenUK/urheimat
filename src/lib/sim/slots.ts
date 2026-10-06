@@ -1,4 +1,5 @@
-import type { AffLevel, Affinity, FeatureDef, SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, FeatureDef, Reading, SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
+import type { Noun, Verb } from './vocabulary';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
 
@@ -15,6 +16,11 @@ const ST: LegacyAff = { steppe: 3 };
 // A value with an id naming its concept, named affinity levels and tags. The name is provisional
 // display text; rendering transforms it downstream.
 const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags): TraitValue => ({ id, name, aff, ...tags });
+
+// One row of a value's reading grid: a verb and object, with each target it can be aimed at
+// (null = no target). Every value carries its full grid; cells left out were struck deliberately.
+const R = (verb: Verb, object: Noun, ...targets: (Noun | null)[]): Reading[] =>
+	targets.map((target) => (target === null ? { verb, object } : { verb, object, target }));
 
 // A custom of up to `count` stages sharing one schema of axes, expanded to flat parts
 // (s1.act, s1.place, … s3.posture). A band uses one to `count` stages; later stages lie dormant
@@ -227,7 +233,27 @@ export const SLOTS: SlotDef[] = [
 				label: 'act',
 				values: [
 					N('none', 'left as they are'),
-					N('burn', 'burnt', { forest: 'strong', river: 'favours', marsh: 'resists', steppe: 'resists', desert: 'excludes' }),
+					N(
+						'burn',
+						'burnt',
+						{ forest: 'strong', river: 'favours', marsh: 'resists', steppe: 'resists', desert: 'excludes' },
+						{
+							about: ['fire', 'warmth', 'light', 'smoke', 'ash', 'haste', 'purity'],
+							readings: [
+								...R('destroy', 'body', null),
+								...R('destroy', 'spirit', null),
+								...R('destroy', 'memory', null),
+								...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('sanctify', 'spirit', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('sanctify', 'memory', null),
+								...R('release', 'body', 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'spirit', null, 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'memory', null),
+								...R('transform', 'body', null, 'beyond/sky', 'beyond/stars', 'ancestors', 'gods'),
+								...R('transform', 'spirit', null, 'beyond/sky', 'beyond/stars', 'ancestors', 'gods')
+							]
+						}
+					),
 					N('expose', 'exposed', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' }),
 					N('preserve', 'preserved', { desert: 'strong', mountain: 'favours', marsh: 'resists', coast: 'resists', river: 'resists' }),
 					N('inter', 'buried'),
