@@ -309,7 +309,27 @@ export const SLOTS: SlotDef[] = [
 							...R('transform', 'spirit', null, 'ancestors', 'gods')
 						]
 					}),
-					N('sink', 'given to the water', { coast: 'strong', river: 'strong', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),
+					N(
+						'sink',
+						'given to the water',
+						{ coast: 'strong', river: 'strong', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' },
+						{
+							about: ['water', 'depth', 'passage', 'cleansing', 'cold', 'hiddenness'],
+							material: [], // nothing remains to hand
+							readings: [
+								...R('destroy', 'body', null),
+								...R('destroy', 'spirit', null),
+								...R('destroy', 'memory', null),
+								...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'body', 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'memory', null),
+								...R('transform', 'body', null, 'ancestors', 'gods'),
+								...R('transform', 'spirit', null, 'ancestors', 'gods')
+							]
+						}
+					),
 					N('scatter', 'scattered', { steppe: 'favours', mountain: 'favours', coast: 'favours' }),
 					N('keep', 'kept among the living', { marsh: 'resists' })
 				]
