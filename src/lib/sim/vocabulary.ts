@@ -27,7 +27,12 @@ export const NOUNS = [
 	'wind',
 	'bone',
 	'patience',
-	'openness'
+	'openness',
+	'permanence',
+	'dryness',
+	'salt',
+	'presence',
+	'wholeness'
 ] as const satisfies readonly string[];
 
 export const VERBS = ['lay', 'destroy', 'sanctify', 'release', 'transform'] as const satisfies readonly string[];
