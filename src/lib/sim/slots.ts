@@ -432,9 +432,28 @@ export const SLOTS: SlotDef[] = [
 							...R('return', 'remains', 'earth')
 						]
 					}),
-					N('water/edge', "at the water's edge", { coast: 'strong', river: 'strong', marsh: 'favours', desert: 'resists' }),
-					N('water/bog', 'in the bog', { marsh: 'strong', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),
-					N('water/open', 'in open water', { coast: 'strong', river: 'favours', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' })
+					N('water/edge', "at the water's edge", { coast: 'strong', river: 'strong', marsh: 'favours', desert: 'resists' }, {
+						about: ['water', 'boundary', 'passage', 'threshold'],
+						readings: [
+							...R('mark', 'remains', null, 'living', 'land'),
+							...R('hold', 'remains', 'living'),
+							...R('offer', 'remains', 'gods', 'water'),
+							...R('return', 'remains', 'water')
+						]
+					}),
+					N('water/bog', 'in the bog', { marsh: 'strong', steppe: 'resists', mountain: 'resists', desert: 'excludes' }, {
+						about: ['water', 'earth', 'depth', 'hiddenness', 'stillness', 'permanence'],
+						readings: [
+							...R('hide', 'remains', null, 'living'),
+							...R('hold', 'remains', null),
+							...R('offer', 'remains', 'gods', 'earth', 'water'),
+							...R('return', 'remains', 'earth', 'water')
+						]
+					}),
+					N('water/open', 'in open water', { coast: 'strong', river: 'favours', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' }, {
+						about: ['water', 'depth', 'passage', 'distance', 'cold', 'freedom'],
+						readings: [...R('hide', 'remains', null), ...R('offer', 'remains', 'gods', 'water'), ...R('return', 'remains', 'ancestors', 'water')]
+					})
 				]
 			},
 			{
