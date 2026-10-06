@@ -55,10 +55,27 @@ export const NOUNS = [
 	'guardianship',
 	'nearness',
 	'abandonment',
-	'indifference'
+	'indifference',
+	// what a place answers to
+	'remains',
+	'living',
+	'land',
+	'height'
 ] as const satisfies readonly string[];
 
-export const VERBS = ['destroy', 'sanctify', 'release', 'transform'] as const satisfies readonly string[];
+export const VERBS = [
+	// what an act does to the dead
+	'destroy',
+	'sanctify',
+	'release',
+	'transform',
+	// why a place: what it does for them
+	'mark',
+	'hide',
+	'hold',
+	'offer',
+	'return'
+] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
 export type Verb = (typeof VERBS)[number];
