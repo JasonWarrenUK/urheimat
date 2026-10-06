@@ -462,7 +462,16 @@ export const SLOTS: SlotDef[] = [
 				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
 					N('none', 'with no vessel'),
-					N('boat', 'in a boat', { coast: 'strong', river: 'favours', marsh: 'favours', mountain: 'resists', steppe: 'excludes', desert: 'excludes' }),
+					N('boat', 'in a boat', { coast: 'strong', river: 'favours', marsh: 'favours', mountain: 'resists', steppe: 'excludes', desert: 'excludes' }, {
+						about: ['water', 'passage', 'wealth', 'labour', 'craft'],
+						readings: [
+							...R('enclose', 'remains', null),
+							...R('convey', 'remains', 'ancestors', 'gods', 'water', 'beyond/otherworld'),
+							...R('protect', 'remains', null),
+							...R('display', 'remains', 'living'),
+							...R('provide', 'remains', null)
+						]
+					}),
 					N('bier', 'on a bier'),
 					N('pit', 'in a pit', { mountain: 'resists', marsh: 'resists' }),
 					N('chamber', 'in a chamber', { mountain: 'favours', desert: 'favours', marsh: 'excludes' }),

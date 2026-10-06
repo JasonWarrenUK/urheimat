@@ -70,7 +70,9 @@ export const NOUNS = [
 	'growth',
 	'sanctuary',
 	'threshold',
-	'stillness'
+	'stillness',
+	'wealth',
+	'craft'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -84,7 +86,13 @@ export const VERBS = [
 	'hide',
 	'hold',
 	'offer',
-	'return'
+	'return',
+	// what a vessel does for them
+	'enclose',
+	'convey',
+	'protect',
+	'display',
+	'provide'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
