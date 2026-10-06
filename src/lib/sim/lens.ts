@@ -33,8 +33,9 @@ export type Lens = {
 // Placeholder values, to be replaced by Jason's picks once the corpus is tagged and corpus-fit has run.
 export const DEFAULT_LENS: Lens = {
 	about: { weight: 0.3, rule: 'jaccard', opposite: 0.25 },
+	material: { weight: 0.2, rule: 'jaccard', opposite: 0.25 },
 	readings: {
-		weight: 0.7,
+		weight: 0.5,
 		combine: 'meanBest',
 		fields: {
 			verb: { weight: 0.4, sibling: 0.5, opposite: 0.25 },

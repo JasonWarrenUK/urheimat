@@ -12,8 +12,10 @@ const targetIndex = (slot: SlotDef, f: FeatureDef, p: Predicate): number => {
 };
 
 function holds(p: Predicate, target: FeatureDef, v: number): boolean {
-	const readings = target.values[v].readings ?? [];
+	const value = target.values[v],
+		readings = value.readings ?? [];
 	if (p.has === 'anyReading') return readings.length > 0;
+	if ('material' in p.has) return (value.material ?? []).includes(p.has.material);
 	const want = p.has;
 	return readings.some(
 		(r) => (want.verb === undefined || r.verb === want.verb) && (want.object === undefined || r.object === want.object) && (want.target === undefined || r.target === want.target)

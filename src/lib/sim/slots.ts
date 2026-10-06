@@ -239,6 +239,7 @@ export const SLOTS: SlotDef[] = [
 						{ forest: 'strong', river: 'favours', marsh: 'resists', steppe: 'resists', desert: 'excludes' },
 						{
 							about: ['fire', 'warmth', 'light', 'smoke', 'ash', 'haste', 'purity'],
+							material: ['ash'],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('destroy', 'spirit', null),
@@ -260,6 +261,7 @@ export const SLOTS: SlotDef[] = [
 						{ mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' },
 						{
 							about: ['sky', 'birds', 'wind', 'bone', 'patience', 'openness'],
+							material: ['bone'],
 							readings: [
 								...R('destroy', 'body', null),
 								...R('sanctify', 'body', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
@@ -278,6 +280,7 @@ export const SLOTS: SlotDef[] = [
 						{ desert: 'strong', mountain: 'favours', marsh: 'resists', coast: 'resists', river: 'resists' },
 						{
 							about: ['permanence', 'dryness', 'salt', 'smoke', 'presence', 'wholeness'],
+							material: ['body'],
 							readings: [
 								...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
 								...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors'),
@@ -339,7 +342,7 @@ export const SLOTS: SlotDef[] = [
 			{
 				id: 'orientation',
 				label: 'orientation',
-				applies: { part: 'act', stage: 'same', has: { verb: 'lay', object: 'body' } },
+				applies: { part: 'act', stage: 'same', has: { material: 'body' } },
 				values: [
 					N('dawn', 'facing the dawn'),
 					N('water/nearest', 'facing the water', { coast: 'favours', river: 'favours', marsh: 'favours' }),
@@ -353,7 +356,7 @@ export const SLOTS: SlotDef[] = [
 			{
 				id: 'posture',
 				label: 'posture',
-				applies: { part: 'act', stage: 'same', has: { verb: 'lay', object: 'body' } },
+				applies: { part: 'act', stage: 'same', has: { material: 'body' } },
 				values: [N('supine', 'laid on the back'), N('prone', 'laid face down'), N('flexed', 'drawn up'), N('seated', 'seated')]
 			}
 		]),

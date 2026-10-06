@@ -7,9 +7,12 @@ export interface Reading {
 	target?: Noun;
 }
 
+// Three kinds of tag: what a value is about, what a people believes it does, and what physically
+// happens to the remains (which is what predicates and material traces read).
 export interface ValueTags {
 	about?: readonly Noun[];
 	readings?: readonly Reading[];
+	material?: readonly Noun[];
 }
 
 // What the land itself does to a value, now. Never band state (memory, mobility, numbers).
@@ -31,7 +34,7 @@ export type MapTerrain = Terrain | 'water';
 export interface Predicate {
 	part: string;
 	stage?: 'same' | 'previous';
-	has: 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun };
+	has: 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } | { material: Noun };
 }
 
 export interface FeatureDef {

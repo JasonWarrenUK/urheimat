@@ -35,7 +35,7 @@ export const NOUNS = [
 	'wholeness'
 ] as const satisfies readonly string[];
 
-export const VERBS = ['lay', 'destroy', 'sanctify', 'release', 'transform'] as const satisfies readonly string[];
+export const VERBS = ['destroy', 'sanctify', 'release', 'transform'] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
 export type Verb = (typeof VERBS)[number];

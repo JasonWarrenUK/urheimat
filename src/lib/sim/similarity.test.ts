@@ -3,7 +3,7 @@ import * as fixtures from '../../../tests/fixtures/similarity';
 import * as baseline from '../../../tests/fixtures/drift-baseline';
 import { begin, defaultOrders, endEra, newGame, startTiles } from './engine';
 import { DEFAULT_LENS, type Lens } from './lens';
-import { aboutScore, readingsScore, termScore, valueScore } from './similarity';
+import { readingsScore, setScore, termScore, valueScore } from './similarity';
 
 const { opposites: opp } = fixtures;
 const crit = DEFAULT_LENS.readings.fields.verb;
@@ -26,12 +26,19 @@ describe('terms', () => {
 	});
 });
 
-describe('meaning tags', () => {
+describe('flat tag sets (about, material)', () => {
 	it('uses Jaccard', () => {
-		expect(aboutScore(['water'], ['water', 'earth'], DEFAULT_LENS, [])).toBe(0.5);
+		expect(setScore(['water'], ['water', 'earth'], DEFAULT_LENS.about, [])).toBe(0.5);
 	});
 	it('counts an opposite pair once, at opposite credit', () => {
-		expect(aboutScore(['earth'], ['sky'], DEFAULT_LENS, opp)).toBe(DEFAULT_LENS.about.opposite);
+		expect(setScore(['earth'], ['sky'], DEFAULT_LENS.about, opp)).toBe(DEFAULT_LENS.about.opposite);
+	});
+	it('scores material likeness apart from belief', () => {
+		const a = { material: ['body'] },
+			b = { material: ['body'] },
+			c = { material: ['ash'] };
+		expect(valueScore(a, b, DEFAULT_LENS, opp)).toBe(1000);
+		expect(valueScore(a, c, DEFAULT_LENS, opp)).toBe(0);
 	});
 });
 

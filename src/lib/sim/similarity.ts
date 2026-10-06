@@ -1,5 +1,5 @@
 import type { CultureTraits } from '$lib/types';
-import { DEFAULT_LENS, type Lens, type TermCriteria } from './lens';
+import { DEFAULT_LENS, type Lens, type SetLens, type TermCriteria } from './lens';
 import { isActiveIn } from './predicates';
 import { SLOTS } from './slots';
 import { OPPOSITES } from './vocabulary';
@@ -16,7 +16,9 @@ interface LooseReading {
 export interface LooseTags {
 	about?: readonly string[];
 	readings?: readonly LooseReading[];
+	material?: readonly string[];
 }
+const SET_KINDS = ['about', 'material'] as const;
 export type Opposites = readonly (readonly [string, string])[];
 
 const isOpposite = (a: string, b: string, opp: Opposites): boolean =>
@@ -64,17 +66,18 @@ export function readingsScore(a: readonly LooseReading[], b: readonly LooseReadi
 	}
 }
 
-// Jaccard, with each opposite pair counted once in the union and earning opposite credit.
-export function aboutScore(a: readonly string[], b: readonly string[], lens: Lens, opp: Opposites): number {
+// Jaccard over a flat set of words, with each opposite pair counted once in the union and earning
+// opposite credit. Serves both flat kinds: about and material.
+export function setScore(a: readonly string[], b: readonly string[], lens: SetLens, opp: Opposites): number {
 	const sa = new Set(a),
 		sb = new Set(b);
 	const shared = [...sa].filter((x) => sb.has(x)).length;
 	const pairs = [...sa].filter((x) => !sb.has(x)).reduce((n, x) => n + [...sb].filter((y) => !sa.has(y) && isOpposite(x, y, opp)).length, 0);
 	const union = new Set([...sa, ...sb]).size - pairs;
-	return union ? (shared + lens.about.opposite * pairs) / union : 0;
+	return union ? (shared + lens.opposite * pairs) / union : 0;
 }
 
-export const isTagged = (v: LooseTags): boolean => !!(v.about?.length || v.readings?.length);
+export const isTagged = (v: LooseTags): boolean => !!(v.about?.length || v.readings?.length || v.material?.length);
 
 // A kind of tag only counts when at least one of the two values carries it; the weights are
 // shared out among the kinds that count.
@@ -82,12 +85,14 @@ export function valueScore(a: LooseTags, b: LooseTags, lens: Lens = DEFAULT_LENS
 	if (a === b) return 1000;
 	let s = 0,
 		w = 0;
-	const aa = a.about ?? [],
-		ab = b.about ?? [];
-	if (aa.length || ab.length) {
-		s += lens.about.weight * aboutScore(aa, ab, lens, opp);
-		w += lens.about.weight;
-	}
+	SET_KINDS.forEach((kind) => {
+		const ka = a[kind] ?? [],
+			kb = b[kind] ?? [];
+		if (ka.length || kb.length) {
+			s += lens[kind].weight * setScore(ka, kb, lens[kind], opp);
+			w += lens[kind].weight;
+		}
+	});
 	const ra = a.readings ?? [],
 		rb = b.readings ?? [];
 	if (ra.length || rb.length) {
