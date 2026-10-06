@@ -146,8 +146,8 @@
 						"dependsOn": [
 							"6SL.3"
 						],
-						"assignee": "Jason",
-						"notes": "Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b)."
+						"notes": "Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b).",
+						"assignee": "Jason"
 					},
 					{
 						"id": "4SD.4",
@@ -156,7 +156,7 @@
 						"dependsOn": [
 							"2DS.1"
 						],
-						"notes": "Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value.",
+						"notes": "Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value. Built in the pilot: three tag kinds (about, readings as full grids, material as transitions), a vocabulary with path families and an opposites list, lenses mirroring the tag schema with one default lens, value ids, five named affinity levels, staged customs with material flow, part predicates enforced as dormant parts, and the corpus-fit evidence script. Treatment of the dead was rebuilt as three stages of six parts and fully tagged.",
 						"assignee": "Jason",
 						"started": "2026-10-05"
 					},
@@ -208,20 +208,18 @@
 							"4SD.11",
 							"6SL.5"
 						],
-						"assignee": "Jason",
-						"notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l)."
+						"notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).",
+						"assignee": "Jason"
 					},
 					{
 						"id": "4SD.10",
 						"description": "Expand the corpus: more customs, more parts per custom, more values per part",
-						"status": "todo",
+						"status": "blocked",
 						"dependsOn": [
-							"2DS.1"
+							"2DS.1",
+							"4SD.16"
 						],
-						"softDependsOn": [
-							"4SD.4"
-						],
-						"notes": "Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.",
+						"notes": "Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values).",
 						"assignee": "Jason"
 					},
 					{
@@ -231,7 +229,7 @@
 						"dependsOn": [
 							"6SL.5"
 						],
-						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).",
+						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism.",
 						"assignee": "Jason"
 					},
 					{
@@ -265,7 +263,7 @@
 						"softDependsOn": [
 							"4SD.10"
 						],
-						"notes": "Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).",
+						"notes": "Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l). From the 4SD.4 pilot: traces become a fourth tag kind on values (what a practice leaves in the ground); deictic rules such as facing the first homeland need referents from band history (origin tile, split tile, seat before the last move), which Culture does not yet keep.",
 						"assignee": "Jason"
 					},
 					{
@@ -276,6 +274,26 @@
 							"6SL.1"
 						],
 						"notes": "Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.16",
+						"description": "Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops",
+						"status": "blocked",
+						"dependsOn": [
+							"4SD.4"
+						],
+						"notes": "One custom per round, top-down: contract, ids, contract check, then full reading grids per value with cells struck deliberately. Carries the sacred-substance decisions (contract B: a sacred substance taken in the rite; custom id substance), holy-place as a cross-custom reading (needs a predicate for when that custom is absent), the guest render branch becoming a predicate, restating legacy affinity tables in named levels, and the lens sweep via scripts/evidence/corpus-fit.ts, from which Jason picks the default lens values. Decided in the 4SD.4 pilot.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.17",
+						"description": "Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice",
+						"status": "blocked",
+						"dependsOn": [
+							"4SD.16"
+						],
+						"notes": "Reinterpretation: a people keeps boat burial while its reason slides from the body being unclean to the spirit needing the afterlife. Practice leaves material traces; belief leaves none, so the scholars can recover the boat and get the reason wrong. A reading's when-condition limits which readings a band can hold. Decided in the 4SD.4 pilot.",
 						"assignee": "Jason"
 					}
 				]
@@ -361,6 +379,17 @@
 						],
 						"notes": "Recounts the whole run so the player is reminded of what happened. Band chapters are a chronological narrative followed by short thematic sections. Remarks on the scholars' errors in its own voice; carries the silences. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f, 3c, 3i, 4e, 6e).",
 						"assignee": "Jason"
+					},
+					{
+						"id": "5RC.8",
+						"description": "Partial credit in reconstruction: a near verdict with partial points when the scholars land on a similar value",
+						"status": "blocked",
+						"dependsOn": [
+							"4SD.4",
+							"5RC.3"
+						],
+						"notes": "Uses the similarity tables from 4SD.4. Keep it out of the scholars' agreement test: near matches must not count as agreement, since values tied to the same land sit close together. Decided in the 4SD.4 pilot.",
+						"assignee": "Jason"
 					}
 				]
 			},
@@ -396,7 +425,7 @@
 						"dependsOn": [
 							"6SL.2"
 						],
-						"notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).",
+						"notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m). From the 4SD.4 pilot: similarity is judged through a lens per cause of change (scarcity keeps the reason and swaps the material; upheaval the reverse), defined here; and two pulls that affinity tables never encode, memory of past landscapes and settledness, using band history.",
 						"assignee": "Jason"
 					},
 					{
@@ -416,7 +445,7 @@
 						"dependsOn": [
 							"6SL.2"
 						],
-						"notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).",
+						"notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r). From the 4SD.4 pilot: conditions query tags with scope (a custom that releases from an oath), and a band may lack a custom altogether, modelled as custom-level absence rather than a none value.",
 						"assignee": "Jason"
 					},
 					{
