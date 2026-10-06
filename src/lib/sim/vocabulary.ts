@@ -88,7 +88,15 @@ export const NOUNS = [
 	'identity',
 	'continuity',
 	'hierarchy',
-	'thrift'
+	'thrift',
+	// orientation and posture
+	'renewal',
+	'origin',
+	'kinship',
+	'ending',
+	'shrine',
+	'fear',
+	'shame'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -110,7 +118,10 @@ export const VERBS = [
 	'display',
 	'provide',
 	// goods kept among the living
-	'withhold'
+	'withhold',
+	// which way the dead face, and how they lie
+	'face',
+	'rest'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
@@ -125,5 +136,6 @@ export const OPPOSITES: readonly (readonly [Term, Term])[] = [
 	['dispersal', 'wholeness'],
 	['nearness', 'passage'],
 	['distance', 'nearness'],
-	['equality', 'hierarchy']
+	['equality', 'hierarchy'],
+	['light', 'darkness']
 ];

@@ -540,14 +540,23 @@ export const SLOTS: SlotDef[] = [
 				label: 'orientation',
 				// An urn can be oriented, so any act with a reading will do.
 				applies: { part: 'act', stage: 'same', has: 'anyReading' },
+				// Deictic values (water/*, homeland/*, settlement, height, holy-place) are rules the engine
+				// resolves against band state and the map at the time; the corpus holds only the rule.
+				// holy-place is the first cross-custom reference (the band's own holy place): recorded for
+				// the tagging task, since it needs a predicate for when that custom is absent.
 				values: [
-					N('dawn', 'facing the dawn'),
-					N('water/nearest', 'facing the water', { coast: 'favours', river: 'favours', marsh: 'favours' }),
-					N('water/sea', 'facing the sea', { coast: 'strong' }),
-					N('homeland/first', 'facing the first homeland'),
-					N('homeland/split', 'facing the homeland they left'),
-					N('homeland/last-seat', 'facing the last seat'),
-					N('none', 'with no set direction')
+					N('dawn', 'facing the dawn', undefined, { about: ['sky', 'light', 'renewal'], readings: R('face', 'dead', 'beyond/sky', 'gods') }),
+					N('water/nearest', 'facing the water', { coast: 'favours', river: 'favours', marsh: 'favours' }, { about: ['water', 'passage'], readings: R('face', 'dead', 'water') }),
+					N('water/sea', 'facing the sea', { coast: 'strong' }, { about: ['water', 'distance', 'memory'], readings: R('face', 'dead', 'water', 'ancestors') }),
+					N('homeland/first', 'facing the first homeland', undefined, { about: ['memory', 'origin', 'distance'], readings: R('face', 'dead', 'land', 'ancestors') }),
+					N('homeland/split', 'facing the homeland they left', undefined, { about: ['memory', 'kinship', 'distance'], readings: R('face', 'dead', 'land', 'living') }),
+					N('homeland/last-seat', 'facing the last seat', undefined, { about: ['memory', 'nearness'], readings: R('face', 'dead', 'land') }),
+					N('none', 'with no set direction', undefined, { about: ['indifference', 'plainness'] }),
+					N('dusk', 'facing the dusk', undefined, { about: ['darkness', 'passage', 'ending'], readings: R('face', 'dead', 'beyond/otherworld', 'ancestors') }),
+					N('pole', 'facing the still star', undefined, { about: ['sky', 'stillness', 'permanence'], readings: R('face', 'dead', 'beyond/stars', 'gods') }),
+					N('settlement', 'facing the settlement', undefined, { about: ['nearness', 'guardianship', 'presence'], readings: R('face', 'dead', 'living') }),
+					N('holy-place', 'facing the holy place', undefined, { about: ['sanctuary', 'continuity'], readings: R('face', 'dead', 'gods', 'shrine') }),
+					N('height', 'facing the mountain', undefined, { about: ['height', 'distance'], readings: R('face', 'dead', 'beyond/sky', 'gods', 'land') })
 				]
 			},
 			{
@@ -555,7 +564,36 @@ export const SLOTS: SlotDef[] = [
 				label: 'posture',
 				// Only a whole body has a posture.
 				applies: [{ part: 'act', stage: 'same', has: 'anyReading' }, { inHand: 'body' }],
-				values: [N('supine', 'laid on the back'), N('prone', 'laid face down'), N('flexed', 'drawn up'), N('seated', 'seated')]
+				values: [
+					N('supine', 'laid on the back', undefined, {
+						about: ['rest', 'openness', 'visibility'],
+						readings: [...R('rest', 'dead', null), ...R('display', 'dead', 'living')]
+					}),
+					N('prone', 'laid face down', undefined, {
+						about: ['hiddenness', 'fear', 'shame'],
+						readings: [...R('hide', 'dead', null), ...R('protect', 'living', null), ...R('destroy', 'spirit', null)]
+					}),
+					N('flexed', 'drawn up', undefined, {
+						about: ['renewal', 'smallness', 'enclosure'],
+						readings: [...R('return', 'dead', 'earth'), ...R('rest', 'dead', null), ...R('enclose', 'dead', null)]
+					}),
+					N('seated', 'seated', undefined, {
+						about: ['presence', 'guardianship', 'visibility', 'hierarchy'],
+						readings: [...R('display', 'dead', 'living'), ...R('protect', 'dead', 'living'), ...R('hold', 'dead', 'living')]
+					}),
+					N('side', 'laid on the side', undefined, {
+						about: ['rest', 'intimacy'],
+						readings: [...R('rest', 'dead', null), ...R('return', 'dead', 'earth')]
+					}),
+					N('standing', 'set upright', undefined, {
+						about: ['guardianship', 'visibility', 'boundary'],
+						readings: [...R('protect', 'dead', 'living'), ...R('display', 'dead', 'living')]
+					}),
+					N('bound', 'bound', undefined, {
+						about: ['fear', 'enclosure', 'hiddenness'],
+						readings: [...R('protect', 'living', null), ...R('destroy', 'spirit', null), ...R('enclose', 'dead', null)]
+					})
+				]
 			}
 		]),
 		// Provisional: one clause per stage in use, until rendering is designed downstream.
