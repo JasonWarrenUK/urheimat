@@ -387,6 +387,17 @@ export const SLOTS: SlotDef[] = [
 							...R('transform', 'spirit', 'ancestors')
 						]
 					}),
+					N('deflesh', 'stripped to the bone', undefined, {
+						about: ['bone', 'cleansing', 'labour', 'intimacy', 'permanence'],
+						material: [T('body', 'bone'), T('parts', 'bone')],
+						readings: [
+							...R('destroy', 'body', null),
+							...R('sanctify', 'body', null, 'ancestors', 'gods'),
+							...R('sanctify', 'spirit', null),
+							...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors'),
+							...R('transform', 'body', null, 'ancestors')
+						]
+					}),
 					N('pulverise', 'ground to dust', undefined, {
 						about: ['dust', 'labour', 'intimacy', 'completion'],
 						material: [T('bone', 'dust')],
