@@ -1,4 +1,4 @@
-import type { AffLevel, Affinity, SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, FeatureDef, SlotDef, TraitValue, Terrain, ValueTags } from '$lib/types';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
 
@@ -11,6 +11,23 @@ const legacyLevel = (n: number): AffLevel => (n >= 3 ? 'strong' : n >= 1.5 ? 'fa
 const legacyAff = (a: LegacyAff): Affinity => Object.fromEntries(LAND.map((t) => [t, a[t] ? legacyLevel(a[t]) : 'excludes']));
 const V = (name: string, aff?: LegacyAff, tags?: ValueTags): TraitValue => ({ name, aff: aff && legacyAff(aff), ...tags });
 const ST: LegacyAff = { steppe: 3 };
+
+// A value with an id naming its concept, named affinity levels and tags. The name is provisional
+// display text; rendering transforms it downstream.
+const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags): TraitValue => ({ id, name, aff, ...tags });
+
+// A custom of up to `count` stages sharing one schema of axes, expanded to flat parts
+// (s1.act, s1.place, … s3.posture). A band uses one to `count` stages; later stages lie dormant
+// by predicate once the previous act carries no reading.
+const staged = (count: number, axes: FeatureDef[]): FeatureDef[] =>
+	Array.from({ length: count }, (_, i) =>
+		axes.map((a) => ({
+			...a,
+			id: `s${i + 1}.${a.id}`,
+			stage: i + 1,
+			applies: a.applies ?? (i > 0 ? { part: 'act', stage: 'previous', has: 'anyReading' } : undefined)
+		}))
+	).flat();
 
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
@@ -201,41 +218,93 @@ export const SLOTS: SlotDef[] = [
 		id: 'funeral',
 		domain: 'Rite',
 		name: 'Treatment of the dead',
-		features: [
+		// Contract: every people deals with its dead in some deliberate way. Up to three stages, each
+		// an act on the remains with its own place, vessel, goods, orientation and posture. Values are
+		// rules a people follows, never instances. Affinities record the land only, never band state.
+		features: staged(3, [
 			{
-				id: 'disposal',
-				label: 'disposal',
+				id: 'act',
+				label: 'act',
 				values: [
-					V('Mound burial', { steppe: 3, river: 1.5 }),
-					V('Cremation', { forest: 3, river: 1.5 }),
-					V('Sky exposure', { mountain: 3, desert: 1.5 }),
-					V('Boat burial', { coast: 3 }),
-					V('Bog offering', { marsh: 3 }),
-					V('Cave interment', { mountain: 1.5, desert: 3 })
+					N('none', 'left as they are'),
+					N('burn', 'burnt', { forest: 'strong', river: 'favours', marsh: 'resists', steppe: 'resists', desert: 'excludes' }),
+					N('expose', 'exposed', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'excludes' }),
+					N('preserve', 'preserved', { desert: 'strong', mountain: 'favours', marsh: 'resists', coast: 'resists', river: 'resists' }),
+					N('inter', 'buried'),
+					N('sink', 'given to the water', { coast: 'strong', river: 'strong', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),
+					N('scatter', 'scattered', { steppe: 'favours', mountain: 'favours', coast: 'favours' }),
+					N('keep', 'kept among the living', { marsh: 'resists' })
+				]
+			},
+			{
+				id: 'place',
+				label: 'place',
+				applies: { part: 'act', stage: 'same', has: 'anyReading' },
+				values: [
+					N('ground', 'on open ground'),
+					N('height', 'on a height', { mountain: 'strong', marsh: 'excludes' }),
+					N('house', 'in the house'),
+					N('grove', 'in a grove', { forest: 'strong', river: 'favours', steppe: 'resists', desert: 'excludes' }),
+					N('mound', 'under a mound', { steppe: 'strong', river: 'favours', desert: 'resists', mountain: 'resists', marsh: 'excludes' }),
+					N('cave', 'in a cave', { mountain: 'strong', desert: 'favours', steppe: 'resists', marsh: 'excludes' }),
+					N('water/edge', "at the water's edge", { coast: 'strong', river: 'strong', marsh: 'favours', desert: 'resists' }),
+					N('water/bog', 'in the bog', { marsh: 'strong', steppe: 'resists', mountain: 'resists', desert: 'excludes' }),
+					N('water/open', 'in open water', { coast: 'strong', river: 'favours', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' })
+				]
+			},
+			{
+				id: 'vessel',
+				label: 'vessel',
+				applies: { part: 'act', stage: 'same', has: 'anyReading' },
+				values: [
+					N('none', 'with no vessel'),
+					N('boat', 'in a boat', { coast: 'strong', river: 'favours', marsh: 'favours', mountain: 'resists', steppe: 'excludes', desert: 'excludes' }),
+					N('bier', 'on a bier'),
+					N('pit', 'in a pit', { mountain: 'resists', marsh: 'resists' }),
+					N('chamber', 'in a chamber', { mountain: 'favours', desert: 'favours', marsh: 'excludes' }),
+					N('urn', 'in an urn', { river: 'favours', coast: 'favours', steppe: 'resists' }),
+					N('shroud', 'in a shroud')
 				]
 			},
 			{
 				id: 'goods',
-				label: 'grave goods',
+				label: 'goods',
+				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
-					V('weapons', { steppe: 1.5, forest: 1.5, mountain: 1.5 }),
-					V('food and drink'),
-					V('nothing', { desert: 1.5, marsh: 1.5 }),
-					V('the tools of their trade', { river: 1.5, coast: 1.5 })
+					N('kit', 'with the common kit'),
+					N('role', 'with the tools of their trade'),
+					N('standing', 'with the wealth of their standing'),
+					N('nothing', 'with nothing', { desert: 'favours', marsh: 'favours', mountain: 'favours' })
 				]
 			},
 			{
-				id: 'facing',
+				id: 'orientation',
 				label: 'orientation',
+				applies: { part: 'act', stage: 'same', has: { verb: 'lay', object: 'body' } },
 				values: [
-					V('facing the dawn'),
-					V('facing the water', { coast: 1.5, river: 1.5, marsh: 1.5 }),
-					V('facing the homeland'),
-					V('face down')
+					N('dawn', 'facing the dawn'),
+					N('water/nearest', 'facing the water', { coast: 'favours', river: 'favours', marsh: 'favours' }),
+					N('water/sea', 'facing the sea', { coast: 'strong' }),
+					N('homeland/first', 'facing the first homeland'),
+					N('homeland/split', 'facing the homeland they left'),
+					N('homeland/last-seat', 'facing the last seat'),
+					N('none', 'with no set direction')
 				]
+			},
+			{
+				id: 'posture',
+				label: 'posture',
+				applies: { part: 'act', stage: 'same', has: { verb: 'lay', object: 'body' } },
+				values: [N('supine', 'laid on the back'), N('prone', 'laid face down'), N('flexed', 'drawn up'), N('seated', 'seated')]
 			}
-		],
-		render: (n) => `${n[0]}, with ${n[1]}, ${n[2]}`
+		]),
+		// Provisional: one clause per stage in use, until rendering is designed downstream.
+		render: (n) => {
+			const stages = [0, 1, 2].map((k) => n.slice(k * 6, k * 6 + 6)).filter((s) => s[0] !== 'left as they are');
+			if (!stages.length) return 'The dead are left where they fall';
+			const text = stages.map((s) => `${s[0]} ${s[1]} ${s[2]}, ${s[3]}, ${s[4]}, ${s[5]}`).join('; then ');
+			return text[0].toUpperCase() + text.slice(1);
+		}
 	},
 	{
 		id: 'drink',

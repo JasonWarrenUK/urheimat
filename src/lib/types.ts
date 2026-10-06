@@ -26,10 +26,20 @@ export interface TraitValue extends ValueTags {
 export type Terrain = 'coast' | 'marsh' | 'river' | 'forest' | 'steppe' | 'desert' | 'mountain';
 export type MapTerrain = Terrain | 'water';
 
+// When a part applies, as a condition over the tags of another part's current value in the same
+// custom. Written in tags, never value ids. Recorded as data for now; nothing enforces it yet.
+export interface Predicate {
+	part: string;
+	stage?: 'same' | 'previous';
+	has: 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun };
+}
+
 export interface FeatureDef {
 	id: string;
 	label: string;
 	values: TraitValue[];
+	stage?: number;
+	applies?: Predicate;
 }
 
 export interface SlotDef {

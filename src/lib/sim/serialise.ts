@@ -1,7 +1,8 @@
 import type { Culture, GameState, SerializedCulture, SerializedGameState } from '$lib/types';
 import { rngFrom } from './engine';
 
-export const SCHEMA_VERSION = 1;
+// 2: Treatment of the dead rebuilt as three stages of six parts (was three parts).
+export const SCHEMA_VERSION = 2;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, cultures, ...rest } = st;
