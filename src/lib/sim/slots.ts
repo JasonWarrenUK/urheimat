@@ -386,7 +386,10 @@ export const SLOTS: SlotDef[] = [
 				label: 'place',
 				applies: { part: 'act', stage: 'same', has: 'anyReading' },
 				values: [
-					N('ground', 'on open ground'),
+					N('ground', 'on open ground', undefined, {
+						about: ['earth', 'plainness', 'anonymity', 'hiddenness'],
+						readings: [...R('hide', 'remains', null), ...R('offer', 'remains', 'earth'), ...R('return', 'remains', null, 'earth')]
+					}),
 					// A natural eminence and a built platform are two values: they leave different traces (4SD.14).
 					N('height/crag', 'on a crag', { mountain: 'strong', marsh: 'excludes' }, {
 						about: ['height', 'sky', 'openness', 'wind', 'distance'],
