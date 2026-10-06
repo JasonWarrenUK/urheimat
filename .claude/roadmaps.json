@@ -158,7 +158,8 @@
 						],
 						"notes": "Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value. Built in the pilot: three tag kinds (about, readings as full grids, material as transitions), a vocabulary with path families and an opposites list, lenses mirroring the tag schema with one default lens, value ids, five named affinity levels, staged customs with material flow, part predicates enforced as dormant parts, and the corpus-fit evidence script. Treatment of the dead was rebuilt as three stages of six parts and fully tagged.",
 						"assignee": "Jason",
-						"started": "2026-10-05"
+						"started": "2026-10-05",
+						"pr": 5
 					},
 					{
 						"id": "4SD.5",
