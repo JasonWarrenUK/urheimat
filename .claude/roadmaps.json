@@ -207,8 +207,7 @@
 						"description": "Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started",
 						"status": "blocked",
 						"dependsOn": [
-							"4SD.11",
-							"6SL.5"
+							"4SD.11"
 						],
 						"notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).",
 						"assignee": "Jason"
@@ -365,7 +364,6 @@
 						"status": "blocked",
 						"dependsOn": [
 							"5RC.5",
-							"5RC.2",
 							"5RC.3"
 						],
 						"notes": "The scholar comes from a small authored cast; their biases tip close calls only. Sources are cited. Rival schools are the other cast members, cited by name. A band can be given a wrong origin entirely. A vanished band's chapter is shorter and hedged by evidence kind; a band with no evidence has no chapter. Decided in the 2DS.1 spike (2i) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1d, 3b, 3f to 3j, 5a, 5c).",
@@ -527,7 +525,6 @@
 						"description": "Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook",
 						"status": "blocked",
 						"dependsOn": [
-							"6SL.5",
 							"4SD.12"
 						],
 						"notes": "The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).",
@@ -549,7 +546,6 @@
 						"status": "blocked",
 						"dependsOn": [
 							"6SL.1",
-							"4SD.11",
 							"4SD.12"
 						],
 						"notes": "Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).",

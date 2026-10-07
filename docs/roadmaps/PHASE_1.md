@@ -63,7 +63,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Needs a second lineage to inherit from, so it follows the second founding stock. Traces may be unrelated traditions or mutated sibling ones.
 - [ ] **4SD.8**: Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost _(blocked: depends on 6SL.9)_
   - Note: Decides whether sanctifying exists and how it costs; the spike log holds a think-through of its impact under a loop with no random drift. Revival draws on the spirit's complete memory against the band's fading one. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4f, 1g).
-- [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11, 6SL.5)_
+- [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11)_
   - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).
 - [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(blocked: depends on 2DS.1, 4SD.16)_
   - Note: Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.
@@ -95,7 +95,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: False unity across the two stocks, and false separation within one, are both readings the scholars can reach. Soft-linked to the scholar model, which it should reflect but need not wait for.
 - [ ] **5RC.5**: Notebook shell: two books (the scholars' and the true), a whole-book switch on every page, chapters and navigation _(depends on 2DS.3)_
   - Note: Opens on the scholars' side; a flip lands on the other book's contents page. Introduction followed by a UI link to your line's trail of chapters; contents with world summaries first, then bands as a family tree; chapter pages link to contents, parent and daughters and every band named in the prose. Prose only, no totals. Deterministic from the stored run so an archived notebook can be rebuilt. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 3a, 3d, 3e, 4b to 4d, 6a to 6f, 7b).
-- [ ] **5RC.6**: The scholars' book: one named scholar's account, over the peoples and family tree the scholars believe in _(blocked: depends on 5RC.5, 5RC.2, 5RC.3)_
+- [ ] **5RC.6**: The scholars' book: one named scholar's account, over the peoples and family tree the scholars believe in _(blocked: depends on 5RC.5, 5RC.3)_
   - Note: The scholar comes from a small authored cast; their biases tip close calls only. Sources are cited. Rival schools are the other cast members, cited by name. A band can be given a wrong origin entirely. A vanished band's chapter is shorter and hedged by evidence kind; a band with no evidence has no chapter. Decided in the 2DS.1 spike (2i) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1d, 3b, 3f to 3j, 5a, 5c).
 - [ ] **5RC.7**: The true book: an omniscient history of every band, in a voice distinct from the scholar's _(blocked: depends on 5RC.5, 4SD.15)_
 - [ ] **5RC.8**: Partial credit in reconstruction: a near verdict with partial points when the scholars land on a similar value _(blocked: depends on 4SD.4, 5RC.3)_
@@ -131,11 +131,11 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).
 - [ ] **6SL.12**: Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing _(blocked: depends on 6SL.5)_
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
-- [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 6SL.5, 4SD.12)_
+- [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 4SD.12)_
   - Note: The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).
 - [ ] **6SL.14**: Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed _(blocked: depends on 6SL.2)_
   - Note: The player sees no reference to the notebook during play, so the chronicle line "Your testimony ends here" (engine.ts:483) goes too. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).
-- [ ] **6SL.15**: Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation _(blocked: depends on 6SL.1, 4SD.11, 4SD.12)_
+- [ ] **6SL.15**: Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation _(blocked: depends on 6SL.1, 4SD.12)_
   - Note: Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).
 - [ ] **6SL.16**: Family opinion as a storylet trigger _(blocked: depends on 6SL.12)_
   - Note: The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).
@@ -267,14 +267,11 @@ graph LR
 	4SD.2 --> M4
 	6SL.4 --> M6
 	6SL.5 --> 4SD.11
-	6SL.5 --> 4SD.9
 	6SL.5 --> 4SD.12
 	6SL.5 --> 6SL.8
 	6SL.5 --> 6SL.12
-	6SL.5 --> 6SL.13
 	4SD.11 --> 4SD.9
 	4SD.11 --> 4SD.12
-	4SD.11 --> 6SL.15
 	4SD.9 --> M4
 	4SD.12 --> 5RC.1
 	4SD.12 --> M4
@@ -282,7 +279,6 @@ graph LR
 	4SD.12 --> 6SL.15
 	5RC.1 --> 5RC.2
 	5RC.2 --> 5RC.3
-	5RC.2 --> 5RC.6
 	5RC.3 -.-> 5RC.4
 	5RC.3 --> 5RC.6
 	5RC.3 --> 5RC.8
