@@ -607,7 +607,7 @@ export function allowedReforms(st: GameState, c: Culture): number[][][] {
 						vi !== c.traits[si][fi] &&
 						isAvailable(c.traits, si, fi, vi) &&
 						!isNeutral(si, fi, vi) &&
-						(aff(si, fi, vi, t) > 0 || nbs.some((k) => k.traits[si][fi] === vi))
+						(!strains(si, fi, vi, t) || nbs.some((k) => k.traits[si][fi] === vi))
 				)
 		)
 	);
