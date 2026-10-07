@@ -172,8 +172,9 @@ export function contact(st: GameState, a: Culture, b: Culture): number {
 
 // ---------- setup ----------
 function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
-	// A homeland culture carries nothing that strains against its own land: strained values are excluded,
-	// strongly favoured ones are four times as likely as mildly favoured ones, neutral parts are uniform.
+	// A homeland culture rarely carries what strains against its own land: excluded values never arise,
+	// resisted ones are rare, strongly favoured ones are four times as likely as mildly favoured ones,
+	// neutral parts are uniform.
 	// Parts are chosen in order, so a staged act only takes what the earlier stages left in hand.
 	return SLOTS.map((s, si) => {
 		const fv: (number | null)[] = s.features.map(() => null);
