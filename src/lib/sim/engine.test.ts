@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/engine';
-import { begin, defaultOrders, endEra, newGame, reconstruct, startTiles } from './engine';
+import { begin, defaultOrders, endEra, newGame, reconstruct, render, startTiles } from './engine';
 import { activeCount } from './predicates';
+import { SLOTS } from './slots';
 
 describe('engine', () => {
 	it('runs a full game deterministically for a given seed', () => {
@@ -36,5 +37,18 @@ describe('engine', () => {
 		}
 
 		expect(run(fixtures.seed)).toBe(run(fixtures.seed));
+	});
+
+	it('never reconstructs a funeral stage the ancestral people did not have', () => {
+		// Seed 12345's ancestral funeral has one stage; a lost second act must not render as '…'.
+		const state = newGame(fixtures.seed);
+		const tiles = startTiles(state);
+		begin(state, tiles[0].x, tiles[0].y);
+		for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultOrders());
+		const funeral = SLOTS.findIndex((s) => s.id === 'funeral');
+		const stages = (text: string) => text.split('; then ').length;
+		const entry = reconstruct(state).entries[funeral];
+		expect(stages(render(funeral, entry.recFv))).toBeLessThanOrEqual(stages(render(funeral, state.ancestral[funeral])));
+		expect(render(funeral, entry.recFv)).not.toContain('… …');
 	});
 });

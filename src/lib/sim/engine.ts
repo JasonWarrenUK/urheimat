@@ -48,9 +48,10 @@ const aff = (slot: number, f: number, v: number, terrain: MapTerrain): number =>
 // The land strains against a value it resists or excludes.
 export const strains = (slot: number, f: number, v: number, terrain: MapTerrain): boolean => aff(slot, f, v, terrain) < 1;
 const isNeutral = (slot: number, f: number, v: number): boolean => !SLOTS[slot].features[f].values[v].aff;
-// A lost part renders as '…', a dormant one as '' for the slot's render to drop.
+// A dormant part renders as '' for the slot's render to drop, a lost one as '…'. Dormancy is checked
+// first: a lost part in a stage that cannot exist is nothing, not an unknown.
 export const render = (slot: number, fv: (number | null)[]): string =>
-	SLOTS[slot].render(fv.map((v, f) => (v === null ? '…' : isActiveIn(SLOTS[slot], fv, f) ? SLOTS[slot].features[f].values[v].name : '')));
+	SLOTS[slot].render(fv.map((v, f) => (!isActiveIn(SLOTS[slot], fv, f) ? '' : v === null ? '…' : SLOTS[slot].features[f].values[v].name)));
 export const vname = (slot: number, f: number, v: number): string => SLOTS[slot].features[f].values[v].name;
 const clone = (traits: CultureTraits): CultureTraits => traits.map((fv) => fv.slice());
 export const sameCustom = (a: number[], b: number[]): boolean => a.every((v, i) => v === b[i]);
