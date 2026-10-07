@@ -1,15 +1,55 @@
-export interface TraitValue {
+import type { Noun, Verb } from '$lib/sim/vocabulary';
+
+// One way of understanding what a practice does: send the spirit to the afterlife. `when` limits a
+// reading to certain material in hand (scattering destroys a body only when it is ash or dust).
+export interface Reading {
+	verb: Verb;
+	object: Noun;
+	target?: Noun;
+	when?: readonly Noun[];
+}
+
+// What an act does to the remains: given this in hand, it leaves that. 'any' accepts whatever came;
+// 'same' passes it on unchanged; 'nothing' ends the chain. Stage one starts with a body.
+export interface Transition {
+	accepts: Noun | 'any';
+	yields: Noun | 'same' | 'nothing';
+}
+
+// Three kinds of tag: what a value is about, what a people believes it does, and what physically
+// happens to the remains (which is what predicates, availability and material traces read).
+export interface ValueTags {
+	about?: readonly Noun[];
+	readings?: readonly Reading[];
+	material?: readonly Transition[];
+}
+
+// What the land itself does to a value, now. Never band state (memory, mobility, numbers).
+// A terrain absent from a table allows the value.
+export type AffLevel = 'strong' | 'favours' | 'allows' | 'resists' | 'excludes';
+export type Affinity = Partial<Record<Terrain, AffLevel>>;
+
+export interface TraitValue extends ValueTags {
+	id?: string;
 	name: string;
-	aff?: Partial<Record<Terrain, number>>;
+	aff?: Affinity;
 }
 
 export type Terrain = 'coast' | 'marsh' | 'river' | 'forest' | 'steppe' | 'desert' | 'mountain';
 export type MapTerrain = Terrain | 'water';
 
+// When a part applies: a condition over another part's current value in the same custom (written
+// in tags, never value ids), or over the material in hand at this part's stage ('some' = anything).
+export type Predicate =
+	| { part: string; stage?: 'same' | 'previous'; has: 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } }
+	| { inHand: Noun | 'some' };
+
 export interface FeatureDef {
 	id: string;
 	label: string;
 	values: TraitValue[];
+	stage?: number;
+	applies?: Predicate | Predicate[]; // all must hold
 }
 
 export interface SlotDef {

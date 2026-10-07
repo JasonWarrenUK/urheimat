@@ -11,7 +11,9 @@ import type {
 	Rng,
 	Terrain
 } from '$lib/types';
-import { FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
+import { activeCount, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { partTable } from './similarity';
+import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
 export function rngFrom(seed: number, state?: number): Rng {
 	let a = (state ?? seed) | 0;
@@ -41,11 +43,15 @@ function weighted<T>(r: () => number, items: T[], w: number[]): T {
 
 const aff = (slot: number, f: number, v: number, terrain: MapTerrain): number => {
 	const a = SLOTS[slot].features[f].values[v].aff;
-	return a ? a[terrain as Terrain] || 0 : 1;
+	return a ? AFF_WEIGHT[a[terrain as Terrain] ?? 'allows'] : 1;
 };
+// The land strains against a value it resists or excludes.
+export const strains = (slot: number, f: number, v: number, terrain: MapTerrain): boolean => aff(slot, f, v, terrain) < 1;
 const isNeutral = (slot: number, f: number, v: number): boolean => !SLOTS[slot].features[f].values[v].aff;
+// A dormant part renders as '' for the slot's render to drop, a lost one as '…'. Dormancy is checked
+// first: a lost part in a stage that cannot exist is nothing, not an unknown.
 export const render = (slot: number, fv: (number | null)[]): string =>
-	SLOTS[slot].render(fv.map((v, f) => (v === null ? '…' : SLOTS[slot].features[f].values[v].name)));
+	SLOTS[slot].render(fv.map((v, f) => (!isActiveIn(SLOTS[slot], fv, f) ? '' : v === null ? '…' : SLOTS[slot].features[f].values[v].name)));
 export const vname = (slot: number, f: number, v: number): string => SLOTS[slot].features[f].values[v].name;
 const clone = (traits: CultureTraits): CultureTraits => traits.map((fv) => fv.slice());
 export const sameCustom = (a: number[], b: number[]): boolean => a.every((v, i) => v === b[i]);
@@ -166,22 +172,27 @@ export function contact(st: GameState, a: Culture, b: Culture): number {
 
 // ---------- setup ----------
 function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
-	// A homeland culture carries nothing that strains against its own land: strained values are excluded,
-	// strongly favoured ones are four times as likely as mildly favoured ones, neutral parts are uniform.
-	return SLOTS.map((s, si) =>
-		s.features.map((f, fi) => {
+	// A homeland culture rarely carries what strains against its own land: excluded values never arise,
+	// resisted ones are rare, strongly favoured ones are four times as likely as mildly favoured ones,
+	// neutral parts are uniform.
+	// Parts are chosen in order, so a staged act only takes what the earlier stages left in hand.
+	return SLOTS.map((s, si) => {
+		const fv: (number | null)[] = s.features.map(() => null);
+		s.features.forEach((f, fi) => {
+			const open = f.values.map((_, vi) => isAvailableIn(s, fv, fi, vi));
 			let w = f.values.map((_, vi) => {
 				const a = aff(si, fi, vi, terrain);
-				return a > 0 ? a * a : 0;
+				return open[vi] && a > 0 ? a * a : 0;
 			});
-			if (!w.some((x) => x > 0)) w = w.map(() => 1);
-			return weighted(
+			if (!w.some((x) => x > 0)) w = open.some(Boolean) ? open.map((o) => (o ? 1 : 0)) : w.map(() => 1);
+			fv[fi] = weighted(
 				r,
 				f.values.map((_, vi) => vi),
 				w
 			);
-		})
-	);
+		});
+		return fv as number[];
+	});
 }
 
 function makeCulture(
@@ -288,7 +299,7 @@ export function strainedFeatures(st: GameState, c: Culture): [number, number][] 
 	const out: [number, number][] = [];
 	c.traits.forEach((fv, si) =>
 		fv.forEach((v, fi) => {
-			if (aff(si, fi, v, t) === 0) out.push([si, fi]);
+			if (isActive(c.traits, si, fi) && strains(si, fi, v, t)) out.push([si, fi]);
 		})
 	);
 	return out;
@@ -372,11 +383,15 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 	SLOTS.forEach((slot, si) => {
 		if (c.held.has(si)) return;
 		slot.features.forEach((f, fi) => {
+			if (!isActive(c.traits, si, fi)) return;
 			if (r() > 0.35) return;
 			const cur = c.traits[si][fi],
-				neutral = isNeutral(si, fi, cur);
+				neutral = isNeutral(si, fi, cur),
+				near = partTable(si, fi);
 			const scores = f.values.map((_v, vi) => {
-				let s = aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
+				if (!isAvailableIn(slot, c.traits[si], fi, vi)) return 0;
+				// The land's pull moves a custom by small steps to near values; untagged parts aren't scaled.
+				let s = (near ? near[cur][vi] / 1000 : 1) * aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
 				nbs.forEach((n) => {
 					if (snapshot[n.k.id][si][fi] === vi) s += 0.9 * n.w;
 				});
@@ -399,7 +414,7 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 
 function prosperityStep(st: GameState, c: Culture, consolidations: number): number {
 	const t = st.map.tiles[c.y][c.x];
-	let d = 1.1 - 5.0 * (strainCount(st, c) / FEATURE_COUNT) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
+	let d = 1.1 - 5.0 * (strainCount(st, c) / activeCount(c.traits)) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
 	if (c.migrated) d -= 1;
 	d = Math.max(-2, Math.min(2.5, d));
 	c.prosperity = Math.max(0, Math.min(10, c.prosperity + d));
@@ -502,10 +517,13 @@ export function reconstruct(st: GameState): ReconstructionResult {
 	const alive = st.cultures.filter((c) => c.alive);
 	const terrainOf = (c: Culture) => st.map.tiles[c.y][c.x];
 	const names = (cs: Culture[]) => cs.map((c) => 'the ' + c.name).join(', ');
+	// Only parts live in the ancestral culture are scored; a band witnesses only the parts live in it.
 	const entries = SLOTS.map((slot, si) => {
-		const feats = slot.features.map((f, fi) => {
+		const feats = slot.features.flatMap((f, fi) => {
+			if (!isActive(st.ancestral, si, fi)) return [];
 			const byVal = new Map<number, Culture[]>();
 			alive.forEach((c) => {
+				if (!isActive(c.traits, si, fi)) return;
 				const v = c.traits[si][fi];
 				if (!byVal.has(v)) byVal.set(v, []);
 				byVal.get(v)!.push(c);
@@ -560,9 +578,10 @@ export function reconstruct(st: GameState): ReconstructionResult {
 			} else {
 				note = `${names(best.cs)} all hold it${best.terrains < 2 ? ', all on the same land' : ''}; the truth ${survivors ? 'survived only among ' + names(survivors) : 'died out'}`;
 			}
-			return { f: fi, label: f.label, rec, conf, truth, verdict, pts, note };
+			return [{ f: fi, label: f.label, rec, conf, truth, verdict, pts, note }];
 		});
-		return { slot: si, feats, pts: feats.reduce((a, x) => a + x.pts, 0), recFv: feats.map((x) => x.rec) };
+		const recFv = slot.features.map((_, fi) => feats.find((x) => x.f === fi)?.rec ?? null);
+		return { slot: si, feats, pts: feats.reduce((a, x) => a + x.pts, 0), recFv };
 	});
 	const all = entries.flatMap((e) => e.feats);
 	const total = all.reduce((a, e) => a + e.pts, 0);
@@ -571,7 +590,7 @@ export function reconstruct(st: GameState): ReconstructionResult {
 		wrong: all.filter((e) => e.verdict === 'wrong').length,
 		lost: all.filter((e) => e.verdict === 'lost').length
 	};
-	return { entries, total, max: FEATURE_COUNT * 2, counts, survivors: alive.length };
+	return { entries, total, max: all.length * 2, counts, survivors: alive.length };
 }
 
 // per slot, per feature: the values a player may reform to (terrain-favoured, or practised by a neighbour in contact)
@@ -580,13 +599,16 @@ export function allowedReforms(st: GameState, c: Culture): number[][][] {
 	const nbs = st.cultures.filter((k) => k.alive && k.id !== c.id && contact(st, c, k) >= 0.5);
 	return SLOTS.map((slot, si) =>
 		slot.features.map((f, fi) =>
-			f.values
+			!isActive(c.traits, si, fi)
+				? []
+				: f.values
 				.map((_, vi) => vi)
 				.filter(
 					(vi) =>
 						vi !== c.traits[si][fi] &&
+						isAvailable(c.traits, si, fi, vi) &&
 						!isNeutral(si, fi, vi) &&
-						(aff(si, fi, vi, t) > 0 || nbs.some((k) => k.traits[si][fi] === vi))
+						(!strains(si, fi, vi, t) || nbs.some((k) => k.traits[si][fi] === vi))
 				)
 		)
 	);

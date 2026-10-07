@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Culture, GameState } from '$lib/types';
-	import { SLOTS, FEATURE_COUNT } from '$lib/sim/slots';
+	import { SLOTS } from '$lib/sim/slots';
 	import { contact, sameCustom, vname } from '$lib/sim/engine';
+	import { activeParts } from '$lib/sim/predicates';
 	import { CULTURE_COLOUR, TERRAIN_LABEL } from '$lib/sim/display';
 
 	interface Props {
@@ -26,7 +27,9 @@
 			return `${slot.name.toLowerCase()}: ${parts.join(', ')}`;
 		}).filter((x): x is string => x !== null)
 	);
-	const keptParts = $derived(kin.known.reduce((a, fv, si) => a + fv.filter((v, fi) => v === gameState.ancestral[si][fi]).length, 0));
+	// Only parts live in the ancestral culture count; a dormant part was never there to keep.
+	const ancestralParts = $derived(activeParts(gameState.ancestral));
+	const keptParts = $derived(ancestralParts.filter(([si, fi]) => kin.known[si][fi] === gameState.ancestral[si][fi]).length);
 </script>
 
 <div class="kin" class:dead={!kin.alive}>
@@ -36,7 +39,7 @@
 	</div>
 	<div class="small faint">
 		{#if kin.parent !== null}daughter of the {gameState.cultures[kin.parent].name}; {/if}
-		as last known (era {kin.knownEra}), keeps {keptParts} of {FEATURE_COUNT} ancestral parts{#if kin.alive}; prosperity {w >= 0.5 ? kin.prosperity.toFixed(0) : 'unknown'}{/if}
+		as last known (era {kin.knownEra}), keeps {keptParts} of {ancestralParts.length} ancestral parts{#if kin.alive}; prosperity {w >= 0.5 ? kin.prosperity.toFixed(0) : 'unknown'}{/if}
 	</div>
 	<div class="diff">
 		{#if diffs.length}

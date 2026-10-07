@@ -65,7 +65,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Decides whether sanctifying exists and how it costs; the spike log holds a think-through of its impact under a loop with no random drift. Revival draws on the spirit's complete memory against the band's fading one. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4f, 1g).
 - [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11, 6SL.5)_
   - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).
-- [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(depends on 2DS.1)_
+- [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(blocked: depends on 2DS.1, 4SD.16)_
   - Note: Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.
 - [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(blocked: depends on 6SL.5)_
   - Note: The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).
@@ -73,9 +73,11 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).
 - [ ] **4SD.13**: Dated knowledge between every pair of bands, with recognition by graded resemblance _(blocked: depends on 6SL.1)_
   - Note: What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).
-- [ ] **4SD.14**: Tag material traces value by value across the corpus _(depends on 2DS.1)_
+- [ ] **4SD.14**: Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
 - [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(blocked: depends on 6SL.1)_
+- [ ] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops _(blocked: depends on 4SD.4)_
+- [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(blocked: depends on 4SD.16)_
   - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).
 
 ---
@@ -96,6 +98,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [ ] **5RC.6**: The scholars' book: one named scholar's account, over the peoples and family tree the scholars believe in _(blocked: depends on 5RC.5, 5RC.2, 5RC.3)_
   - Note: The scholar comes from a small authored cast; their biases tip close calls only. Sources are cited. Rival schools are the other cast members, cited by name. A band can be given a wrong origin entirely. A vanished band's chapter is shorter and hedged by evidence kind; a band with no evidence has no chapter. Decided in the 2DS.1 spike (2i) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1d, 3b, 3f to 3j, 5a, 5c).
 - [ ] **5RC.7**: The true book: an omniscient history of every band, in a voice distinct from the scholar's _(blocked: depends on 5RC.5, 4SD.15)_
+- [ ] **5RC.8**: Partial credit in reconstruction: a near verdict with partial points when the scholars land on a similar value _(blocked: depends on 4SD.4, 5RC.3)_
   - Note: Recounts the whole run so the player is reminded of what happened. Band chapters are a chronological narrative followed by short thematic sections. Remarks on the scholars' errors in its own voice; carries the silences. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f, 3c, 3i, 4e, 6e).
 
 ---
@@ -161,11 +164,13 @@ graph LR
 	3PL.2["3PL.2: Wire Auth.js with a GitHub OAuth app and…"]
 	3PL.5["3PL.5: Wire integration tests for the runs and…"]
 	3PL.3["3PL.3: Save and resume a run across sessions an…"]
-	4SD.4["4SD.4: Semantic drift: place feature values on…"]
+	4SD.4["4SD.4: Semantic drift: place feature values o… ▸"]
 	4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
 	4SD.7["4SD.7: Substrate inheritance: dying and displac…"]
+	4SD.16["4SD.16: Tag the corpus: readings, meaning tags,…"]
 	4SD.10["4SD.10: Expand the corpus: more customs, more p…"]
 	4SD.14["4SD.14: Tag material traces value by value acro…"]
+	4SD.17["4SD.17: Band-held belief: a band holds one read…"]
 	5RC.5["5RC.5: Notebook shell: two books (the scholars'…"]
 	3PL.4["3PL.4: Archive of finished runs: unranked recor…"]
 	M3["M3: Persistence"]:::mile
@@ -186,6 +191,7 @@ graph LR
 	5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
 	5RC.4["5RC.4: The notebook accounts for the second sto…"]
 	5RC.6["5RC.6: The scholars' book: one named scholar's…"]
+	5RC.8["5RC.8: Partial credit in reconstruction: a near…"]
 	M5["M5: Reconstruction"]:::mile
 	6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
 	2DS.2["2DS.2: UI spike: information architecture first…"]
@@ -223,15 +229,18 @@ graph LR
 	3PL.2 --> 3PL.4
 	3PL.5 --> 3PL.3
 	3PL.3 --> M3
-	4SD.4 -.-> 4SD.10
-	4SD.4 --> M4
+	4SD.4 --> 4SD.16
+	4SD.4 --> 5RC.8
 	4SD.6 --> 4SD.7
 	4SD.6 --> 5RC.4
 	4SD.7 --> M4
+	4SD.16 --> 4SD.10
+	4SD.16 --> 4SD.17
 	4SD.10 -.-> 4SD.14
 	4SD.10 --> M4
 	4SD.14 --> 5RC.1
 	4SD.14 --> M4
+	4SD.17 --> M4
 	5RC.5 --> 3PL.4
 	5RC.5 --> 5RC.7
 	5RC.5 --> 5RC.6
@@ -276,8 +285,10 @@ graph LR
 	5RC.2 --> 5RC.6
 	5RC.3 -.-> 5RC.4
 	5RC.3 --> 5RC.6
+	5RC.3 --> 5RC.8
 	5RC.4 --> M5
 	5RC.6 --> M5
+	5RC.8 --> M5
 	6SL.6 --> 2DS.2
 	6SL.6 --> 4SD.5
 	6SL.6 --> 6SL.10
@@ -295,7 +306,8 @@ graph LR
 	6SL.14 --> M6
 	6SL.15 --> M6
 	6SL.16 --> M6
-	class 3PL.5,4SD.10,4SD.14,4SD.4,4SD.6,5RC.5,6SL.1,6SL.2 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.13,4SD.15,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
+	class 3PL.5,4SD.10,4SD.14,4SD.6,5RC.5,6SL.1,6SL.2 todo
+	class 4SD.4 inProgress
+	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.13,4SD.15,4SD.16,4SD.17,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
 	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2 done
 ```
