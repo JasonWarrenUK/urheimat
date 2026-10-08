@@ -39,6 +39,19 @@ const staged = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 		})
 	).flat();
 
+// A custom of up to `count` rounds of one set-valued axis. Round one is never empty; a later round
+// applies only if the one before it holds someone, so an empty round ends the sequence.
+const sequence = (count: number, axes: FeatureDef[]): FeatureDef[] =>
+	Array.from({ length: count }, (_, i) =>
+		axes.map((a) => ({
+			...a,
+			id: `s${i + 1}.${a.id}`,
+			stage: i + 1,
+			size: i === 0 ? a.size : ([0, a.size![1]] as const),
+			applies: i > 0 ? { part: a.id, stage: 'previous' as const, has: 'anyMember' as const } : undefined
+		}))
+	).flat();
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -641,33 +654,48 @@ export const SLOTS: SlotDef[] = [
 		}
 	},
 	{
-		id: 'drink',
+		id: 'substance',
 		domain: 'Rite',
-		name: 'The sacred drink',
+		name: 'The sacred substance',
+		// Contract: for a band that has this custom, every value assumes a substance is taken into or
+		// onto the body in the rite, and nothing about what it is, its form or any vessel. The custom is
+		// an authored category, not a finding; whether it describes anything real is open. The takers
+		// are a sequence of up to three rounds, each a set of groups; an empty round ends it.
 		features: [
 			{
-				id: 'base',
-				label: 'drink',
+				id: 'kind',
+				label: 'substance',
 				values: [
-					V('Mead', { forest: 3, steppe: 1.5 }),
-					V("Fermented mare's milk", ST),
-					V('Barley beer', { river: 3, coast: 1.5 }),
-					V('Wine', { coast: 1.5, desert: 1.5, mountain: 1.5 }),
-					V('No drink, but smoke', { mountain: 1.5, marsh: 3 })
+					N('drink/mead', 'Mead', { forest: 'strong', steppe: 'favours', desert: 'resists' }),
+					N('drink/mare-milk', "Fermented mare's milk", { steppe: 'strong', forest: 'resists', marsh: 'resists', mountain: 'resists' }),
+					N('drink/beer', 'Barley beer', { river: 'strong', coast: 'favours', desert: 'resists', mountain: 'resists' }),
+					N('drink/wine', 'Wine', { coast: 'favours', desert: 'favours', mountain: 'favours', steppe: 'resists', marsh: 'resists', forest: 'resists' }),
+					N('plant/herb', 'Herb', { marsh: 'strong', mountain: 'favours', desert: 'resists' }),
+					N('plant/resin', 'Resin', { forest: 'strong', mountain: 'favours', desert: 'favours', marsh: 'resists' })
 				]
 			},
 			{
-				id: 'sharing',
-				label: 'sharing',
-				values: [
-					V('passed in one cup'),
-					V('poured to the gods first'),
-					V('taken by the chief alone'),
-					V('taken by all together')
-				]
-			}
+				id: 'manner',
+				label: 'taken',
+				values: [N('drunk', 'drunk'), N('eaten', 'eaten'), N('inhaled', 'inhaled'), N('smeared', 'smeared')]
+			},
+			...sequence(3, [
+				{
+					id: 'taker',
+					label: 'taken by',
+					size: [1, 3],
+					values: [
+						N('gods', 'the gods'),
+						N('chief', 'the chief'),
+						N('chief/family', "the chief's family"),
+						N('priest', 'the priest or shaman'),
+						N('priest/family', "the priest or shaman's family"),
+						N('tribe/rest', 'the rest of the tribe')
+					]
+				}
+			])
 		],
-		render: (n) => `${n[0]}, ${n[1]}`
+		render: (n) => `${n[0]}, ${n[1]}: ${n.slice(2).filter(Boolean).join('; then ')}`
 	},
 	{
 		id: 'place',

@@ -99,7 +99,7 @@ describe('drift baseline', () => {
 			const t = startTiles(st)[0];
 			begin(st, t.x, t.y);
 			for (let i = 0; i < baseline.eraCount; i++) endEra(st, defaultOrders());
-			expect(st.cultures.map((c) => c.traits.flat(2).join('')).join('|')).toBe(expected);
+			expect(st.cultures.map((c) => c.traits.flat().map((v) => v.join('+')).join('')).join('|')).toBe(expected);
 		});
 	});
 });
