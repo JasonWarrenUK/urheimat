@@ -1,4 +1,4 @@
-import type { CultureTraits, FeatureDef, PartValue, Predicate, Reading, SlotDef, TraitValue, TraitValues } from '$lib/types';
+import type { CultureTraits, FeatureDef, PartTag, PartValue, Predicate, Reading, SlotDef, TraitValue, TraitValues } from '$lib/types';
 import type { Noun } from './vocabulary';
 import { SLOTS } from './slots';
 
@@ -111,3 +111,31 @@ export const activeIn = (slot: SlotDef, fv: TraitValues): number[] => fv.flatMap
 // The values held across the active parts: what a band's strain is counted against. A set counts
 // once per member, an empty set not at all.
 export const heldCount = (traits: CultureTraits): number => activeParts(traits).reduce((n, [si, fi]) => n + traits[si][fi].length, 0);
+
+// ---------- shadows ----------
+
+const partNamed = (f: FeatureDef, name: string): boolean => f.id === name || f.id.endsWith(`.${name}`);
+
+// Whether a condition holds in one custom's current values.
+function tagHolds(slot: SlotDef, fv: Held, tag: PartTag): boolean {
+	return slot.features.some(
+		(f, fi) =>
+			partNamed(f, tag.part) &&
+			isActiveIn(slot, fv, fi) &&
+			(fv[fi] ?? []).some((vi) => {
+				const about = f.values[vi].about ?? [];
+				return (tag.about === undefined || about.includes(tag.about)) && (tag.not === undefined || !about.includes(tag.not));
+			})
+	);
+}
+
+// Whether custom `si` is currently a shadow of another: some rule has every `when` tag holding in its
+// own values and every `holds` tag holding in the other custom's. Hidden customs are not removed from
+// the traits; the display and scoring decide what to do with this.
+export function isShadowed(traits: CultureTraits, si: number): boolean {
+	const slot = SLOTS[si];
+	return (slot.shadows ?? []).some((rule) => {
+		const other = SLOTS.findIndex((s) => s.id === rule.custom);
+		return other >= 0 && rule.when.every((t) => tagHolds(slot, traits[si], t)) && rule.holds.every((t) => tagHolds(SLOTS[other], traits[other], t));
+	});
+}

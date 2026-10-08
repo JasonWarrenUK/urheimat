@@ -223,19 +223,19 @@ export const SLOTS: SlotDef[] = [
 				label: 'offering',
 				values: [
 					N('animal/mount', 'A horse', { steppe: 'strong', river: 'favours', forest: 'resists', marsh: 'resists', mountain: 'resists' }, {
-						about: ['speed', 'strength', 'herds', 'wealth'],
+						about: ['flesh', 'speed', 'strength', 'herds', 'wealth'],
 						readings: [...R('feed', 'gods', null), ...R('appease', 'gods', null), ...R('petition', 'gods', 'guardianship')]
 					}),
 					N('animal/herd', 'Cattle', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists', marsh: 'resists' }, {
-						about: ['herds', 'wealth', 'nourishment'],
+						about: ['flesh', 'herds', 'wealth', 'nourishment'],
 						readings: [...R('feed', 'gods', null), ...R('feed', 'ancestors', null), ...R('appease', 'gods', null), ...R('thank', 'gods', 'plenty'), ...R('petition', 'gods', 'plenty')]
 					}),
 					N('animal/wild', 'Hunted game', { forest: 'strong', mountain: 'favours', desert: 'resists' }, {
-						about: ['wild', 'chase', 'strength', 'blood'],
+						about: ['flesh', 'wild', 'chase', 'strength', 'blood'],
 						readings: [...R('thank', 'gods', 'plenty'), ...R('appease', 'land', null), ...R('feed', 'land', null)]
 					}),
 					N('animal/water', 'Fish and fowl', { coast: 'strong', marsh: 'strong', river: 'favours', mountain: 'resists', desert: 'excludes' }, {
-						about: ['water', 'plenty', 'wild'],
+						about: ['flesh', 'water', 'plenty', 'wild'],
 						readings: [...R('thank', 'land', 'plenty'), ...R('appease', 'gods', null), ...R('renew', 'land', 'renewal')]
 					}),
 					N('harvest', 'Grain and fruit', { river: 'strong', forest: 'favours', steppe: 'resists', desert: 'resists' }, {
@@ -313,6 +313,20 @@ export const SLOTS: SlotDef[] = [
 						readings: [...R('thank', 'land', 'plenty'), ...R('renew', 'land', 'renewal'), ...R('petition', 'gods', 'plenty')]
 					})
 				]
+			}
+		],
+		// A feast of an animal is meat eaten; a feast of a drink is a drink drunk. Either way the people
+		// consume it, which is substance's business, so sacrifice reads as substance while that holds.
+		shadows: [
+			{
+				custom: 'substance',
+				when: [{ part: 'manner', about: 'consumption' }, { part: 'offering', about: 'flesh' }],
+				holds: [{ part: 'kind', about: 'flesh' }, { part: 'manner', about: 'chewing' }, { part: 'taker', not: 'gods' }]
+			},
+			{
+				custom: 'substance',
+				when: [{ part: 'manner', about: 'consumption' }, { part: 'offering', about: 'liquid' }],
+				holds: [{ part: 'kind', about: 'liquid' }, { part: 'manner', about: 'swallowing' }, { part: 'taker', not: 'gods' }]
 			}
 		],
 		render: (n) => `${n[0]}, ${n[1]}, ${n[2]}, at ${n[3]}`
@@ -747,7 +761,7 @@ export const SLOTS: SlotDef[] = [
 				label: 'substance',
 				values: [
 					N('drink/mead', 'Mead', { forest: 'strong', steppe: 'favours', desert: 'resists' }, {
-						about: ['honey', 'sweetness', 'festivity', 'fire'],
+						about: ['liquid', 'honey', 'sweetness', 'festivity', 'fire'],
 						readings: [
 							...R('commune', 'spirit', 'gods', 'ancestors'),
 							...R('bind', 'takers', 'takers'),
@@ -756,15 +770,15 @@ export const SLOTS: SlotDef[] = [
 						]
 					}),
 					N('drink/mare-milk', "Fermented mare's milk", { steppe: 'strong', forest: 'resists', marsh: 'resists', mountain: 'resists' }, {
-						about: ['herds', 'nourishment', 'kinship'],
+						about: ['liquid', 'herds', 'nourishment', 'kinship'],
 						readings: [...R('bind', 'takers', 'takers', 'ancestors'), ...R('heal', 'body', null), ...R('commune', 'spirit', 'ancestors')]
 					}),
 					N('drink/beer', 'Barley beer', { river: 'strong', coast: 'favours', desert: 'resists', mountain: 'resists' }, {
-						about: ['grain', 'plenty', 'labour', 'festivity'],
+						about: ['liquid', 'grain', 'plenty', 'labour', 'festivity'],
 						readings: [...R('bind', 'takers', 'takers'), ...R('heal', 'body', null), ...R('commune', 'spirit', 'gods')]
 					}),
 					N('drink/wine', 'Wine', { coast: 'favours', desert: 'favours', mountain: 'favours', steppe: 'resists', marsh: 'resists', forest: 'resists' }, {
-						about: ['blood', 'vine', 'wealth', 'light'],
+						about: ['liquid', 'blood', 'vine', 'wealth', 'light'],
 						readings: [
 							...R('commune', 'spirit', 'gods', 'beyond/otherworld'),
 							...R('cleanse', 'spirit', null),

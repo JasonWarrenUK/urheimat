@@ -89,3 +89,10 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - All six offerings, both shares, five manners and four occasions carry `about` tags and a grid; the grids are in `slots.ts`.
 - Parked idea: the reading targets (plenty, renewal, guardianship) could inform terrain affinity. Today an affinity records only what the land does to a value; deriving it from meaning tags would be a separate decision.
 - A fifth occasion, `first-harvest`, was added after the grids were approved: river and forest favour it, desert and steppe resist it; about grain, growth, plenty, first; thank(land to plenty), renew(land to renewal), petition(gods to plenty).
+
+### The shadow rule
+
+- Two rules on sacrifice, each a pair of tag conditions. An animal feast (manner about `consumption`, offering about `flesh`) shadows substance when its kind is about `flesh`, its manner about `chewing` and some taker is not about `gods`. A drink feast (offering about `liquid`) shadows it when the kind is about `liquid`, the manner about `swallowing` and some taker is not about `gods`. A harvest feast has no counterpart (no grain kind), so it stays visible.
+- Any human group counts as a consumer; a chief-only meal shadows.
+- Tags added for the rules: `flesh` on the four animal offerings, `liquid` on the four drink kinds.
+- `isShadowed(traits, si)` in `predicates.ts` is a pure helper with tests. Display and scoring do not use it yet.

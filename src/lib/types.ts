@@ -49,6 +49,23 @@ export type Predicate =
 	| { part: string; stage?: 'same' | 'previous'; has: 'anyMember' | 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } }
 	| { inHand: Noun | 'some' };
 
+// A condition on one named part of a custom: some held value of any active part with that name
+// (a staged part matches every round) is about `about`, and, if `not` is given, is not about `not`.
+export interface PartTag {
+	part: string;
+	about?: Noun;
+	not?: Noun;
+}
+
+// A custom that may be a shadow of another: while every `when` tag holds in this custom and every
+// `holds` tag holds in `custom`, this one is hidden and reads as that one. Either side moving away
+// from the match unhides it. Tags only; value ids never appear.
+export interface ShadowRule {
+	custom: string;
+	when: PartTag[];
+	holds: PartTag[];
+}
+
 export interface FeatureDef {
 	id: string;
 	label: string;
@@ -65,6 +82,7 @@ export interface SlotDef {
 	domain: string;
 	name: string;
 	features: FeatureDef[];
+	shadows?: ShadowRule[];
 	render: (values: string[]) => string;
 }
 
