@@ -50,11 +50,13 @@ export type Predicate =
 	| { inHand: Noun | 'some' };
 
 // A condition on one named part of a custom: some held value of any active part with that name
-// (a staged part matches every round) is about `about`, and, if `not` is given, is not about `not`.
+// (a staged part matches every round) is about `about`, is not about `not` and carries a reading
+// matching `has`. Each field given must hold.
 export interface PartTag {
 	part: string;
 	about?: Noun;
 	not?: Noun;
+	has?: { verb?: Verb; object?: Noun; target?: Noun };
 }
 
 // A custom that may be a shadow of another: while every `when` tag holds in this custom and every

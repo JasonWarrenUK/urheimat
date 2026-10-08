@@ -65,6 +65,9 @@ const MANNER_READINGS: Reading[] = [
 	...R('heal', 'body', null)
 ];
 
+// Every daily figure can be read as the greatest power (or an aspect of it) or as a power of its own.
+const HONOUR: Reading[] = [...R('honour', 'power/greatest', null), ...R('honour', 'power/own', null)];
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -183,31 +186,87 @@ export const SLOTS: SlotDef[] = [
 	},
 	{
 		id: 'cult',
-		domain: 'Cosmology',
+		domain: 'Rite',
 		name: 'The daily cult',
+		// Contract: for a band that has this custom, every value assumes a power is honoured by a small
+		// repeated act at household scale; it assumes nothing about which power, when, or who performs
+		// it. Every figure can be read as the greatest power (or an aspect of it) or as a power of its
+		// own; while a band reads it as the greatest power, the cult shadows highGod.
 		features: [
 			{
 				id: 'figure',
 				label: 'figure',
 				values: [
-					V('The Dawn', { steppe: 3, desert: 1.5 }),
-					V('The Moon', { desert: 3, steppe: 1.5 }),
-					V('The Hearth-fire', { forest: 3, mountain: 1.5 }),
-					V('The River', { river: 3, marsh: 1.5 }),
-					V('The Tide', { coast: 3, marsh: 1.5 })
+					N('dawn', 'The Dawn', { steppe: 'strong', desert: 'favours', forest: 'resists' }, {
+						about: ['sky', 'light', 'renewal', 'origin'],
+						readings: [...HONOUR, ...R('petition', 'gods', 'renewal'), ...R('thank', 'gods', 'light')]
+					}),
+					N('moon', 'The Moon', { desert: 'strong', steppe: 'favours', forest: 'resists' }, {
+						about: ['sky', 'darkness', 'cycle', 'stillness'],
+						readings: [...HONOUR, ...R('petition', 'gods', 'renewal'), ...R('appease', 'gods', null)]
+					}),
+					N('hearth', 'The Hearth-fire', { forest: 'strong', mountain: 'favours', desert: 'resists', steppe: 'resists' }, {
+						about: ['fire', 'hearth', 'warmth', 'kinship'],
+						readings: [...HONOUR, ...R('feed', 'gods', null), ...R('bind', 'living', 'kinship'), ...R('petition', 'gods', 'guardianship')]
+					}),
+					N('river', 'The River', { river: 'strong', marsh: 'favours', steppe: 'resists', desert: 'excludes' }, {
+						about: ['water', 'growth', 'plenty', 'passage'],
+						readings: [...HONOUR, ...R('thank', 'gods', 'plenty'), ...R('petition', 'gods', 'plenty'), ...R('appease', 'gods', null)]
+					}),
+					N('tide', 'The Tide', { coast: 'strong', marsh: 'favours', steppe: 'resists', desert: 'excludes', mountain: 'excludes' }, {
+						about: ['water', 'cycle', 'distance', 'passage'],
+						readings: [...HONOUR, ...R('appease', 'gods', null), ...R('petition', 'gods', 'guardianship'), ...R('renew', 'land', 'renewal')]
+					})
 				]
 			},
 			{
-				id: 'when',
+				id: 'timing',
 				label: 'timing',
-				values: [V('at dawn'), V('at dusk'), V('at each new moon'), V('before every meal')]
+				values: [
+					N('dawn', 'at dawn', undefined, {
+						about: ['light', 'renewal', 'origin'],
+						readings: [...R('honour', 'gods', null), ...R('thank', 'gods', 'light'), ...R('petition', 'gods', 'renewal')]
+					}),
+					N('dusk', 'at dusk', undefined, {
+						about: ['darkness', 'rest', 'ending', 'guardianship'],
+						readings: [...R('honour', 'gods', null), ...R('petition', 'gods', 'guardianship'), ...R('appease', 'gods', null)]
+					}),
+					N('new-moon', 'at each new moon', undefined, {
+						about: ['cycle', 'darkness', 'renewal'],
+						readings: [...R('honour', 'gods', null), ...R('renew', 'land', 'renewal'), ...R('petition', 'gods', 'renewal')]
+					}),
+					N('before-meals', 'before every meal', undefined, {
+						about: ['nourishment', 'thrift', 'hearth', 'custom'],
+						readings: [...R('honour', 'gods', null), ...R('thank', 'gods', 'plenty'), ...R('feed', 'gods', null), ...R('bind', 'living', 'kinship')]
+					})
+				]
 			},
 			{
-				id: 'who',
+				id: 'officiant',
 				label: 'officiant',
-				values: [V('the eldest woman'), V('the household head'), V('a priest'), V('the children')]
+				values: [
+					N('elder-woman', 'the eldest woman', undefined, {
+						about: ['age', 'kinship', 'memory', 'continuity'],
+						readings: [...R('honour', 'gods', null), ...R('bind', 'living', 'continuity'), ...R('commune', 'spirit', 'ancestors')]
+					}),
+					N('household-head', 'the household head', undefined, {
+						about: ['authority', 'hearth', 'kinship'],
+						readings: [...R('honour', 'gods', null), ...R('bind', 'living', 'kinship'), ...R('petition', 'gods', 'guardianship')]
+					}),
+					N('priest', 'a priest', undefined, {
+						about: ['priest/self', 'mediation'],
+						readings: [...R('honour', 'gods', null), ...R('commune', 'spirit', 'gods'), ...R('petition', 'gods', 'guardianship'), ...R('cleanse', 'spirit', null)]
+					}),
+					N('children', 'the children', undefined, {
+						about: ['youth', 'innocence', 'renewal', 'continuity'],
+						readings: [...R('honour', 'gods', null), ...R('petition', 'gods', 'renewal'), ...R('bind', 'living', 'continuity')]
+					})
+				]
 			}
 		],
+		// While the band reads its figure as the greatest power, the daily cult is that power's
+		// household honouring and hides behind highGod. Reading it as a power of its own unhides it.
+		shadows: [{ custom: 'highGod', when: [{ part: 'figure', has: { object: 'power/greatest' } }], holds: [{ part: 'domain' }] }],
 		render: (n) => `${n[0]}, honoured ${n[1]} by ${n[2]}`
 	},
 	{

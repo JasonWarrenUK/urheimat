@@ -109,4 +109,22 @@ describe('set-valued parts', () => {
 			expect(isShadowed(newGame(1).ancestral, sub)).toBe(false);
 		});
 	});
+
+	describe('a cult that shadows the greatest power', () => {
+		const cult = SLOTS.findIndex((s) => s.id === 'cult');
+		const figure = SLOTS[cult].features.findIndex((f) => f.id === 'figure');
+		it('shadows while the figure can be read as the greatest power', () => {
+			// Every figure carries that reading until band-held belief (4SD.17) lets a band drop it.
+			expect(isShadowed(newGame(1).ancestral, cult)).toBe(true);
+		});
+		it('unhides once the figure is read only as a power of its own', () => {
+			// A corpus where the river is a power of its own and nothing else: what 4SD.17 will let a band hold.
+			const ownOnly = SLOTS.map((slot, si) =>
+				si !== cult
+					? slot
+					: { ...slot, features: slot.features.map((f, fi) => (fi !== figure ? f : { ...f, values: f.values.map((v) => ({ ...v, readings: v.readings?.filter((r) => r.object !== 'power/greatest') })) })) }
+			);
+			expect(isShadowed(newGame(1).ancestral, cult, ownOnly)).toBe(false);
+		});
+	});
 });

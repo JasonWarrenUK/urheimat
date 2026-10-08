@@ -96,3 +96,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Any human group counts as a consumer; a chief-only meal shadows.
 - Tags added for the rules: `flesh` on the four animal offerings, `liquid` on the four drink kinds.
 - `isShadowed(traits, si)` in `predicates.ts` is a pure helper with tests. Display and scoring do not use it yet.
+
+## Round 3: cult
+
+- Contract: for a band that has this custom, every value assumes a power is honoured by a small repeated act at household scale; it assumes nothing about which power, when, or who performs it. Domain moves from Cosmology to Rite.
+- Cult shadows highGod, and cult is the one hidden. The match is sameness of the revered being, not shared theme words: every figure carries two readings, honour(power/greatest) (the greatest power, or an aspect of it) and honour(power/own) (a power of its own). The rule fires on the first; the band's belief moving to the second is the divergence. A shadow condition can now match a reading (`has` on a PartTag). Until 4SD.17 every band holds the full grid, so every cult is shadowed; 4SD.17 makes it a band choice, and belief leaves no trace.
+- The Dawn as an aspect of a Sea god is allowed by free combination; no consistency check against highGod's domain. highGod stays untagged until its own round.
+- Ids: figure `dawn`, `moon`, `hearth`, `river`, `tide`; timing `dawn`, `dusk`, `new-moon`, `before-meals`; officiant `elder-woman`, `household-head`, `priest`, `children`. The priest shares substance's noun `priest/self`.
+- New verb `honour`; new nouns `power/greatest`, `power/own`, `cycle`, `age`, `youth`, `innocence`. Grids and affinities are in `slots.ts` as approved.

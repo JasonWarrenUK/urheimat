@@ -123,8 +123,16 @@ function tagHolds(slot: SlotDef, fv: Held, tag: PartTag): boolean {
 			partNamed(f, tag.part) &&
 			isActiveIn(slot, fv, fi) &&
 			(fv[fi] ?? []).some((vi) => {
-				const about = f.values[vi].about ?? [];
-				return (tag.about === undefined || about.includes(tag.about)) && (tag.not === undefined || !about.includes(tag.not));
+				const { about = [], readings = [] } = f.values[vi];
+				const want = tag.has;
+				return (
+					(tag.about === undefined || about.includes(tag.about)) &&
+					(tag.not === undefined || !about.includes(tag.not)) &&
+					(want === undefined ||
+						readings.some(
+							(r) => (want.verb === undefined || r.verb === want.verb) && (want.object === undefined || r.object === want.object) && (want.target === undefined || r.target === want.target)
+						))
+				);
 			})
 	);
 }
@@ -132,10 +140,10 @@ function tagHolds(slot: SlotDef, fv: Held, tag: PartTag): boolean {
 // Whether custom `si` is currently a shadow of another: some rule has every `when` tag holding in its
 // own values and every `holds` tag holding in the other custom's. Hidden customs are not removed from
 // the traits; the display and scoring decide what to do with this.
-export function isShadowed(traits: CultureTraits, si: number): boolean {
-	const slot = SLOTS[si];
+export function isShadowed(traits: CultureTraits, si: number, slots: readonly SlotDef[] = SLOTS): boolean {
+	const slot = slots[si];
 	return (slot.shadows ?? []).some((rule) => {
-		const other = SLOTS.findIndex((s) => s.id === rule.custom);
-		return other >= 0 && rule.when.every((t) => tagHolds(slot, traits[si], t)) && rule.holds.every((t) => tagHolds(SLOTS[other], traits[other], t));
+		const other = slots.findIndex((s) => s.id === rule.custom);
+		return other >= 0 && rule.when.every((t) => tagHolds(slot, traits[si], t)) && rule.holds.every((t) => tagHolds(slots[other], traits[other], t));
 	});
 }

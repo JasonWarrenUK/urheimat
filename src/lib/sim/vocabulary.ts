@@ -149,7 +149,14 @@ export const NOUNS = [
 	'consumption',
 	'deposit',
 	'ascent',
-	'endurance'
+	'endurance',
+	// the daily cult: whose power is honoured, and what the officiants are about
+	'power/greatest',
+	'power/own',
+	'cycle',
+	'age',
+	'youth',
+	'innocence'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -186,7 +193,9 @@ export const VERBS = [
 	'appease',
 	'thank',
 	'petition',
-	'renew'
+	'renew',
+	// a small act of reverence
+	'honour'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
