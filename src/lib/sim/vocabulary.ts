@@ -132,7 +132,13 @@ export const NOUNS = [
 	'outside',
 	'fungus',
 	'flesh',
-	'strength'
+	'strength',
+	'offering',
+	'authority',
+	'lineage',
+	'mediation',
+	'calling',
+	'belonging'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

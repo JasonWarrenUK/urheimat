@@ -756,12 +756,30 @@ export const SLOTS: SlotDef[] = [
 					size: [1, 3],
 					values: [
 						// A taker's `about` names its group, so readings can point at who else takes.
-						N('gods', 'the gods', undefined, { about: ['gods'] }),
-						N('chief', 'the chief', undefined, { about: ['chief/self'] }),
-						N('chief/family', "the chief's family", undefined, { about: ['chief/family'] }),
-						N('priest', 'the priest or shaman', undefined, { about: ['priest/self'] }),
-						N('priest/family', "the priest or shaman's family", undefined, { about: ['priest/family'] }),
-						N('tribe/rest', 'the rest of the tribe', undefined, { about: ['tribe/rest'] })
+						N('gods', 'the gods', undefined, {
+							about: ['gods', 'offering'],
+							readings: [...R('commune', 'spirit', 'gods'), ...others(R('bind', 'takers', 'gods'))]
+						}),
+						N('chief', 'the chief', undefined, {
+							about: ['chief/self', 'authority'],
+							readings: [...R('inspire', 'spirit', null), ...others(R('bind', 'takers', 'chief/self'))]
+						}),
+						N('chief/family', "the chief's family", undefined, {
+							about: ['chief/family', 'lineage'],
+							readings: [...others(R('bind', 'takers', 'chief/family')), ...R('commune', 'spirit', 'ancestors')]
+						}),
+						N('priest', 'the priest or shaman', undefined, {
+							about: ['priest/self', 'mediation'],
+							readings: [...R('commune', 'spirit', 'gods', 'ancestors', 'beyond/otherworld'), ...R('inspire', 'spirit', null), ...R('cleanse', 'spirit', null)]
+						}),
+						N('priest/family', "the priest or shaman's family", undefined, {
+							about: ['priest/family', 'calling'],
+							readings: [...others(R('bind', 'takers', 'priest/family')), ...R('commune', 'spirit', 'ancestors')]
+						}),
+						N('tribe/rest', 'the rest of the tribe', undefined, {
+							about: ['tribe/rest', 'belonging'],
+							readings: [...R('bind', 'takers', 'takers'), ...R('heal', 'body', null)]
+						})
 					]
 				}
 			])

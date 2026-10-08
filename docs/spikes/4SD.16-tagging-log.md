@@ -57,3 +57,12 @@ Breaking: saved runs change shape.
 - `heal` is believed healing, a belief and no claim about medicine; it stays.
 - Eaten can take fungus, herbs and meat, so `kind` gains `plant/fungus` and `animal/meat` this round instead of waiting for 4SD.10. Struck on purpose: fungus has no bind and no cleanse(body); meat has no cleanse and no inspire.
 - Cost to watch: with identical readings the manners differ in similarity only through `about`.
+
+### Substance takers
+
+- Each taker group carries its own noun plus one meaning word in `about`: gods `offering`, chief `authority`, chief/family `lineage`, priest/shaman `mediation`, priest/shaman's family `calling`, rest of the tribe `belonging`.
+- Readings: gods commune(spirit to gods) and bind(takers to gods); chief inspire(spirit) and bind(takers to chief/self); chief/family bind(takers to chief/family) and commune(spirit to ancestors); priest/shaman commune(spirit to gods, ancestors, beyond/otherworld), inspire(spirit) and cleanse(spirit); priest/shaman's family bind(takers to priest/family) and commune(spirit to ancestors); rest of the tribe bind(takers to takers) and heal(body). Group-targeted bindings carry `others`.
+
+### Contract check
+
+Every kind reads with every manner and every taker set; odd pairings (resin drunk, meat inhaled) are allowed by the contract and left to affinity and the lens. Nothing in the custom names a vessel, a liquid or a form. Known residue: `bind(takers to takers)` is vacuous for a lone taker.
