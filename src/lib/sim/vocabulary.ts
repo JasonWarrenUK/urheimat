@@ -156,7 +156,15 @@ export const NOUNS = [
 	'cycle',
 	'age',
 	'youth',
-	'innocence'
+	'innocence',
+	// the greatest power: the powers that lack a noun, what it is spoken of as, and what it decides
+	'storm',
+	'sun',
+	'sea',
+	'death',
+	'justice',
+	'female',
+	'male'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -195,7 +203,13 @@ export const VERBS = [
 	'petition',
 	'renew',
 	// a small act of reverence
-	'honour'
+	'honour',
+	// what the greatest power does, and how it is spoken of
+	'rule',
+	'create',
+	'guard',
+	'judge',
+	'address'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];

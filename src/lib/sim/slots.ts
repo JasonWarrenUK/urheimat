@@ -68,6 +68,9 @@ const MANNER_READINGS: Reading[] = [
 // Every daily figure can be read as the greatest power (or an aspect of it) or as a power of its own.
 const HONOUR: Reading[] = [...R('honour', 'power/greatest', null), ...R('honour', 'power/own', null)];
 
+// The greatest power may be spoken of as female or male; a band may hold either, both or neither.
+const ADDRESS: Reading[] = [...R('address', 'power/greatest', 'female', 'male')];
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -86,32 +89,102 @@ export const SLOTS: SlotDef[] = [
 		id: 'highGod',
 		domain: 'Cosmology',
 		name: 'The greatest power',
+		// Contract: for a band that has this custom, every value assumes one power stands above the
+		// others and is spoken of as a person; it assumes nothing about that power's domain, its kind
+		// of person, or whether it has a consort. Its sex is a belief: every kin value can be read as
+		// addressing a female or a male power, and a band may hold either, both or neither.
 		features: [
 			{
 				id: 'domain',
 				label: 'domain',
 				values: [
-					V('Sky', { steppe: 3, mountain: 1.5, desert: 1.5 }),
-					V('Storm', { mountain: 3, forest: 1.5 }),
-					V('Sun', { desert: 3, steppe: 1.5 }),
-					V('Earth', { river: 3, forest: 1.5 }),
-					V('Sea', { coast: 3, marsh: 1.5 }),
-					V('Fire', { mountain: 1.5, forest: 3 })
+					N('sky', 'Sky', { steppe: 'strong', mountain: 'favours', desert: 'favours', forest: 'resists' }, {
+						about: ['sky', 'light', 'openness', 'height'],
+						readings: [...R('rule', 'sky', null), ...R('rule', 'living', null), ...R('guard', 'living', null), ...R('judge', 'living', 'justice')]
+					}),
+					N('storm', 'Storm', { mountain: 'strong', forest: 'favours', desert: 'resists' }, {
+						about: ['storm', 'sky', 'violence', 'water'],
+						readings: [...R('rule', 'sky', null), ...R('judge', 'living', 'justice'), ...R('guard', 'living', null), ...R('provide', 'land', 'renewal')]
+					}),
+					N('sun', 'Sun', { desert: 'strong', steppe: 'favours', forest: 'resists', marsh: 'resists' }, {
+						about: ['sun', 'light', 'warmth', 'cycle'],
+						readings: [...R('rule', 'sky', null), ...R('create', 'living', null), ...R('provide', 'land', 'plenty'), ...R('guard', 'living', null)]
+					}),
+					N('earth', 'Earth', { river: 'strong', forest: 'favours', desert: 'resists' }, {
+						about: ['earth', 'growth', 'plenty', 'depth'],
+						readings: [...R('create', 'living', null), ...R('provide', 'living', 'plenty'), ...R('rule', 'land', null), ...R('guard', 'dead', null)]
+					}),
+					N('sea', 'Sea', { coast: 'strong', marsh: 'favours', mountain: 'resists', steppe: 'resists', desert: 'excludes' }, {
+						about: ['sea', 'water', 'depth', 'distance'],
+						readings: [...R('rule', 'water', null), ...R('provide', 'living', 'plenty'), ...R('judge', 'living', 'justice'), ...R('guard', 'dead', null)]
+					}),
+					N('fire', 'Fire', { forest: 'strong', mountain: 'favours', marsh: 'resists' }, {
+						about: ['fire', 'warmth', 'light', 'hearth'],
+						readings: [...R('rule', 'fire', null), ...R('create', 'living', null), ...R('guard', 'living', null), ...R('provide', 'living', 'warmth')]
+					}),
+					N('moon', 'Moon', { desert: 'strong', steppe: 'favours', forest: 'resists', marsh: 'resists' }, {
+						about: ['sky', 'darkness', 'cycle', 'stillness'],
+						readings: [...R('rule', 'sky', null), ...R('judge', 'living', 'justice'), ...R('provide', 'land', 'renewal'), ...R('guard', 'dead', null)]
+					}),
+					N('beasts', 'Master of beasts', { forest: 'strong', mountain: 'favours', steppe: 'favours', river: 'resists', desert: 'resists' }, {
+						about: ['wild', 'chase', 'herds', 'strength'],
+						readings: [...R('rule', 'wild', null), ...R('guard', 'wild', null), ...R('provide', 'living', 'plenty'), ...R('judge', 'living', 'justice')]
+					}),
+					N('river', 'River', { river: 'strong', marsh: 'favours', mountain: 'resists', desert: 'excludes' }, {
+						about: ['water', 'growth', 'passage', 'plenty'],
+						readings: [...R('rule', 'water', null), ...R('create', 'living', null), ...R('provide', 'living', 'plenty'), ...R('guard', 'land', null)]
+					}),
+					N('wind', 'Wind', { steppe: 'strong', coast: 'favours', mountain: 'favours', forest: 'resists' }, {
+						about: ['air', 'breath', 'sky', 'freedom'],
+						readings: [...R('rule', 'sky', null), ...R('create', 'living', null), ...R('provide', 'land', 'renewal'), ...R('guard', 'living', null)]
+					}),
+					N('death', 'Death', { mountain: 'favours', marsh: 'favours', desert: 'favours', river: 'resists' }, {
+						about: ['death', 'darkness', 'depth', 'boundary'],
+						readings: [...R('rule', 'dead', null), ...R('guard', 'dead', null), ...R('judge', 'dead', 'justice'), ...R('judge', 'living', 'justice')]
+					})
 				]
 			},
-			{ id: 'role', label: 'person', values: [V('Father'), V('Mother'), V('Elder'), V('Lord')] },
+			{
+				id: 'kin',
+				label: 'person',
+				values: [
+					N('parent', 'Parent', undefined, {
+						about: ['kinship', 'origin', 'continuity'],
+						readings: [...ADDRESS, ...R('create', 'living', null), ...R('guard', 'living', null), ...R('provide', 'living', 'plenty')]
+					}),
+					N('elder', 'Elder', undefined, {
+						about: ['age', 'memory', 'custom'],
+						readings: [...ADDRESS, ...R('judge', 'living', 'justice'), ...R('rule', 'living', null), ...R('guard', 'custom', null)]
+					}),
+					N('lord', 'Lord', undefined, {
+						about: ['authority', 'hierarchy', 'wealth'],
+						readings: [...ADDRESS, ...R('rule', 'living', null), ...R('judge', 'living', 'justice'), ...R('guard', 'land', null)]
+					})
+				]
+			},
 			{
 				id: 'consort',
 				label: 'consort',
+				// An empty set is an unwed power. The old unwed value favoured desert and mountain; an empty
+				// set carries no affinity, so that pull waits for the pressure system to weigh absence.
+				size: [0, 2],
 				values: [
-					V('wedded to the Earth', { river: 1.5, forest: 1.5, steppe: 1.5 }),
-					V('wedded to the Sea', { coast: 3, marsh: 1.5 }),
-					V('unwed', { desert: 3, mountain: 1.5 }),
-					V('wedded to the Dawn', { steppe: 3, desert: 1.5 })
+					N('earth', 'wedded to the Earth', { river: 'favours', forest: 'favours', steppe: 'favours' }, {
+						about: ['earth', 'growth', 'kinship'],
+						readings: [...R('bind', 'power/greatest', 'earth'), ...R('create', 'living', null), ...R('renew', 'land', 'renewal')]
+					}),
+					N('sea', 'wedded to the Sea', { coast: 'strong', marsh: 'favours' }, {
+						about: ['sea', 'water', 'distance'],
+						readings: [...R('bind', 'power/greatest', 'sea'), ...R('provide', 'living', 'plenty')]
+					}),
+					N('dawn', 'wedded to the Dawn', { steppe: 'strong', desert: 'favours' }, {
+						about: ['sky', 'light', 'renewal'],
+						readings: [...R('bind', 'power/greatest', 'sky'), ...R('renew', 'land', 'renewal')]
+					})
 				]
 			}
 		],
-		render: (n) => `The ${n[0]} ${n[1]}, ${n[2]}`
+		render: (n) => `The ${n[0]} ${n[1]}${n[2] ? `, ${n[2]}` : ''}`
 	},
 	{
 		id: 'hero',

@@ -104,3 +104,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - The Dawn as an aspect of a Sea god is allowed by free combination; no consistency check against highGod's domain. highGod stays untagged until its own round.
 - Ids: figure `dawn`, `moon`, `hearth`, `river`, `tide`; timing `dawn`, `dusk`, `new-moon`, `before-meals`; officiant `elder-woman`, `household-head`, `priest`, `children`. The priest shares substance's noun `priest/self`.
 - New verb `honour`; new nouns `power/greatest`, `power/own`, `cycle`, `age`, `youth`, `innocence`. Grids and affinities are in `slots.ts` as approved.
+
+## Round 4: highGod
+
+- Contract: for a band that has this custom, every value assumes one power stands above the others and is spoken of as a person; it assumes nothing about that power's domain, its kind of person, or whether it has a consort. Cult's `power/greatest` resolves against it.
+- `role` splits. `kin` (`parent`, `elder`, `lord`) is a part. Sex is a belief, not a part: every kin value carries address(power/greatest to female) and address(power/greatest to male); a band may hold either, both or neither once 4SD.17 lands. Nothing about sex stays in practice, so it leaves no trace. Jason flagged the female/male tags as uneasy ground politically; they record what the imagined people believed, and moving them to readings was his preferred answer.
+- `consort` is set-valued, size [0, 2]: an empty set is unwed, and two consorts are expressible. The old `unwed` value favoured desert and mountain; an empty set carries no affinity, so that pull waits for the pressure system. Parked for 6SL.3: weighing absence.
+- Domain gains five values that the record shows as greatest powers: `moon`, `beasts` (master of animals), `river`, `wind`, `death`. Their grids and affinities are in `slots.ts` as approved.
+- New verbs `rule`, `create`, `guard`, `judge`, `address`; new nouns `storm`, `sun`, `sea`, `death`, `justice`, `female`, `male`.
