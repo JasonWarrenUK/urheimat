@@ -53,7 +53,7 @@ Breaking: saved runs change shape.
 
 ### Substance manner, and two more kinds
 
-- Principle: a grid loses a cell only when the cell is incoherent. All four manners therefore share the same readings: commune(spirit to gods, ancestors, beyond/otherworld), bind(takers to takers), cleanse(body), cleanse(spirit), inspire(spirit), heal(body). They differ by : drunk (liquid, swallowing, inside), eaten (chewing, nourishment, inside), inhaled (breath, air, inside), smeared (skin, marking, outside). Inside against outside is an eighth opposite pair.
--  is believed healing, a belief and no claim about medicine; it stays.
-- Eaten can take fungus, herbs and meat, so  gains  and  this round instead of waiting for 4SD.10. Struck on purpose: fungus has no bind and no cleanse(body); meat has no cleanse and no inspire.
-- Cost to watch: with identical readings the manners differ in similarity only through .
+- Principle: a grid loses a cell only when the cell is incoherent. All four manners therefore share the same readings: commune(spirit to gods, ancestors, beyond/otherworld), bind(takers to takers), cleanse(body), cleanse(spirit), inspire(spirit), heal(body). They differ by `about`: drunk (liquid, swallowing, inside), eaten (chewing, nourishment, inside), inhaled (breath, air, inside), smeared (skin, marking, outside). Inside against outside is an eighth opposite pair.
+- `heal` is believed healing, a belief and no claim about medicine; it stays.
+- Eaten can take fungus, herbs and meat, so `kind` gains `plant/fungus` and `animal/meat` this round instead of waiting for 4SD.10. Struck on purpose: fungus has no bind and no cleanse(body); meat has no cleanse and no inspire.
+- Cost to watch: with identical readings the manners differ in similarity only through `about`.
