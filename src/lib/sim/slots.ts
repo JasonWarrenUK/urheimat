@@ -54,6 +54,17 @@ const sequence = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 		}))
 	).flat();
 
+// What any way of taking the substance may be believed to do; struck only where incoherent, and no
+// manner needs a strike. The manners differ by what they are about.
+const MANNER_READINGS: Reading[] = [
+	...R('commune', 'spirit', 'gods', 'ancestors', 'beyond/otherworld'),
+	...R('bind', 'takers', 'takers'),
+	...R('cleanse', 'body', null),
+	...R('cleanse', 'spirit', null),
+	...R('inspire', 'spirit', null),
+	...R('heal', 'body', null)
+];
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -712,13 +723,31 @@ export const SLOTS: SlotDef[] = [
 							...R('commune', 'spirit', 'gods', 'beyond/otherworld'),
 							...R('heal', 'body', null)
 						]
+					}),
+					N('plant/fungus', 'Fungus', { forest: 'strong', marsh: 'favours', mountain: 'favours', desert: 'resists', steppe: 'resists' }, {
+						about: ['fungus', 'vision', 'decay', 'darkness'],
+						readings: [
+							...R('inspire', 'spirit', null),
+							...R('commune', 'spirit', 'beyond/otherworld', 'ancestors'),
+							...R('cleanse', 'spirit', null),
+							...R('heal', 'body', null)
+						]
+					}),
+					N('animal/meat', 'Meat', { steppe: 'strong', forest: 'favours', river: 'favours', coast: 'favours', desert: 'resists', mountain: 'resists' }, {
+						about: ['flesh', 'herds', 'blood', 'strength'],
+						readings: [...R('bind', 'takers', 'takers', 'ancestors'), ...R('commune', 'spirit', 'gods', 'ancestors'), ...R('heal', 'body', null)]
 					})
 				]
 			},
 			{
 				id: 'manner',
 				label: 'taken',
-				values: [N('drunk', 'drunk'), N('eaten', 'eaten'), N('inhaled', 'inhaled'), N('smeared', 'smeared')]
+				values: [
+					N('drunk', 'drunk', undefined, { about: ['liquid', 'swallowing', 'inside'], readings: MANNER_READINGS }),
+					N('eaten', 'eaten', undefined, { about: ['chewing', 'nourishment', 'inside'], readings: MANNER_READINGS }),
+					N('inhaled', 'inhaled', undefined, { about: ['breath', 'air', 'inside'], readings: MANNER_READINGS }),
+					N('smeared', 'smeared', undefined, { about: ['skin', 'marking', 'outside'], readings: MANNER_READINGS })
+				]
 			},
 			...sequence(3, [
 				{

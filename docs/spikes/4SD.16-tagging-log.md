@@ -50,3 +50,10 @@ Breaking: saved runs change shape.
 - Struck from every `kind` value on purpose: funeral's verbs (destroy, sanctify, release, transform) and `memory` as an object.
 - A reading that names a group may carry `others: true`: it counts only when that group takes in some round and a different group takes in the same round or a later one. A binding goes to a target in the same or an earlier round, never a later one. Predicates and display honour it; the similarity table ignores it and reads the full reading. Only `bind(takers to chief/self)` on mead carries it so far.
 - Open: `bind(takers to takers)` is also vacuous when one person takes alone; not modelled yet.
+
+### Substance manner, and two more kinds
+
+- Principle: a grid loses a cell only when the cell is incoherent. All four manners therefore share the same readings: commune(spirit to gods, ancestors, beyond/otherworld), bind(takers to takers), cleanse(body), cleanse(spirit), inspire(spirit), heal(body). They differ by : drunk (liquid, swallowing, inside), eaten (chewing, nourishment, inside), inhaled (breath, air, inside), smeared (skin, marking, outside). Inside against outside is an eighth opposite pair.
+-  is believed healing, a belief and no claim about medicine; it stays.
+- Eaten can take fungus, herbs and meat, so  gains  and  this round instead of waiting for 4SD.10. Struck on purpose: fungus has no bind and no cleanse(body); meat has no cleanse and no inspire.
+- Cost to watch: with identical readings the manners differ in similarity only through .

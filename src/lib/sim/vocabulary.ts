@@ -120,7 +120,19 @@ export const NOUNS = [
 	'vision',
 	'plants',
 	'fragrance',
-	'sap'
+	'sap',
+	'liquid',
+	'swallowing',
+	'chewing',
+	'breath',
+	'air',
+	'skin',
+	'marking',
+	'inside',
+	'outside',
+	'fungus',
+	'flesh',
+	'strength'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -167,5 +179,6 @@ export const OPPOSITES: readonly (readonly [Term, Term])[] = [
 	['nearness', 'passage'],
 	['distance', 'nearness'],
 	['equality', 'hierarchy'],
-	['light', 'darkness']
+	['light', 'darkness'],
+	['inside', 'outside']
 ];
