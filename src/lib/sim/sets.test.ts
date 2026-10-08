@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/sets';
 import { newGame, sameCustom, sameSet } from './engine';
-import { activeIn, isActiveIn } from './predicates';
+import { activeIn, effectiveReadings, isActiveIn } from './predicates';
 import { SLOTS } from './slots';
 
 describe('set-valued parts', () => {
@@ -44,5 +44,25 @@ describe('set-valued parts', () => {
 				if (round === 0) expect(held[fi].length).toBeGreaterThan(0);
 			});
 		}
+	});
+
+	describe('readings that need another taker', () => {
+		// Parts are [kind, round one, round two]; taker values are 0 the chief, 1 the priest.
+		const verbs = (fv: number[][]) => effectiveReadings(fixtures.bindsToChief, fv, 0).map((r) => r.verb);
+		it('drops a binding to the chief when the chief takes alone', () => {
+			expect(verbs([[0], [0], []])).toEqual(['commune']);
+		});
+		it('keeps it when another group takes in the same round', () => {
+			expect(verbs([[0], [0, 1], []])).toEqual(['bind', 'commune']);
+		});
+		it('keeps it when another group takes in a later round', () => {
+			expect(verbs([[0], [0], [1]])).toEqual(['bind', 'commune']);
+		});
+		it('drops it when the others take only before the chief does', () => {
+			expect(verbs([[0], [1], [0]])).toEqual(['commune']);
+		});
+		it('drops it when the chief takes in no round', () => {
+			expect(verbs([[0], [1], []])).toEqual(['commune']);
+		});
 	});
 });

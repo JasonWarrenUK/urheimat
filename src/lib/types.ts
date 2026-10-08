@@ -7,6 +7,10 @@ export interface Reading {
 	object: Noun;
 	target?: Noun;
 	when?: readonly Noun[];
+	// Counts only when the target takes in the same round or an earlier one and someone else takes
+	// in that round or a later one: a binding to the chief is vacuous if the chief takes alone.
+	// Predicates and display honour it; the similarity table ignores it and reads the full reading.
+	others?: true;
 }
 
 // What an act does to the remains: given this in hand, it leaves that. 'any' accepts whatever came;

@@ -1,4 +1,4 @@
-import type { CultureTraits, FeatureDef, PartValue, Predicate, SlotDef, TraitValue, TraitValues } from '$lib/types';
+import type { CultureTraits, FeatureDef, PartValue, Predicate, Reading, SlotDef, TraitValue, TraitValues } from '$lib/types';
 import type { Noun } from './vocabulary';
 import { SLOTS } from './slots';
 
@@ -55,6 +55,23 @@ const targetIndex = (slot: SlotDef, f: FeatureDef, part: string, rel?: 'same' | 
 	return slot.features.findIndex((g) => g.id === id);
 };
 
+// The readings of a part's held values, less any that name a group nobody else takes beside. The
+// groups are read from the `about` tags of the custom's active set-valued stage parts, round by round.
+export function effectiveReadings(slot: SlotDef, fv: Held, fi: number): Reading[] {
+	const held = fv[fi] ?? [];
+	const all = held.flatMap((vi) => slot.features[fi].values[vi].readings ?? []);
+	if (!all.some((r) => r.others)) return [...all];
+	const rounds = slot.features
+		.flatMap((g, gi) => (g.size && g.stage !== undefined && isActiveIn(slot, fv, gi) ? [{ stage: g.stage, groups: (fv[gi] ?? []).map((vi) => g.values[vi].about ?? []) }] : []))
+		.sort((a, b) => a.stage - b.stage);
+	// Sound when the target takes in some round and a different group takes in that round or a later one.
+	const sound = (target: Noun): boolean => {
+		const first = rounds.findIndex((round) => round.groups.some((about) => about.includes(target)));
+		return first >= 0 && rounds.slice(first).some((round) => round.groups.some((about) => !about.includes(target)));
+	};
+	return all.filter((r) => !r.others || (r.target !== undefined && sound(r.target)));
+}
+
 function holds(slot: SlotDef, fv: Held, f: FeatureDef, p: Predicate): boolean {
 	if ('inHand' in p) {
 		const m = inHand(slot, fv, f.stage);
@@ -66,7 +83,7 @@ function holds(slot: SlotDef, fv: Held, f: FeatureDef, p: Predicate): boolean {
 	if (v === null || !isActiveIn(slot, fv, ti)) return false;
 	if (p.has === 'anyMember') return v.length > 0;
 	// Over a set, a predicate holds when some member matches.
-	const readings = v.flatMap((vi) => slot.features[ti].values[vi].readings ?? []);
+	const readings = effectiveReadings(slot, fv, ti);
 	if (p.has === 'anyReading') return readings.length > 0;
 	const want = p.has;
 	return readings.some(
