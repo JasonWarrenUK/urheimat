@@ -66,3 +66,11 @@ Breaking: saved runs change shape.
 ### Contract check
 
 Every kind reads with every manner and every taker set; odd pairings (resin drunk, meat inhaled) are allowed by the contract and left to affinity and the lens. Nothing in the custom names a vessel, a liquid or a form. Known residue: `bind(takers to takers)` is vacuous for a lone taker.
+
+## Round 2: sacrifice
+
+### Boundary with substance
+
+- Sacrifice may be a shadow of substance. When a band's sacrifice conforms to a shape substance already describes (cattle shared in a feast is meat eaten by the tribe), sacrifice is hidden and reads as substance. If either custom moves so that the match fails, sacrifice is unhidden and shows as its own custom. Either custom can start the split: sacrifice by taking a concrete value outside the rule, substance by moving away from what the rule needs.
+- The link lives at custom level: sacrifice declares `shadows substance` as a pair of tag predicates, one over its own values and one over substance's. Values are not pointers one by one, because the match is a combination of offering and manner.
+- Scope in this task: the declaration and a pure helper `isShadowed(slot, traits)` with tests. Hiding in the notebook UI and excluding a shadowed custom from reconstruction scoring wait for a later task.
