@@ -222,38 +222,92 @@ export const SLOTS: SlotDef[] = [
 				id: 'offering',
 				label: 'offering',
 				values: [
-					N('animal/mount', 'A horse', { steppe: 'strong', river: 'favours', forest: 'resists', marsh: 'resists', mountain: 'resists' }),
-					N('animal/herd', 'Cattle', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists', marsh: 'resists' }),
-					N('animal/wild', 'Hunted game', { forest: 'strong', mountain: 'favours', desert: 'resists' }),
-					N('animal/water', 'Fish and fowl', { coast: 'strong', marsh: 'strong', river: 'favours', mountain: 'resists', desert: 'excludes' }),
-					N('harvest', 'Grain and fruit', { river: 'strong', forest: 'favours', steppe: 'resists', desert: 'resists' }),
-					N('liquid', 'A drink', { desert: 'favours', mountain: 'favours' })
+					N('animal/mount', 'A horse', { steppe: 'strong', river: 'favours', forest: 'resists', marsh: 'resists', mountain: 'resists' }, {
+						about: ['speed', 'strength', 'herds', 'wealth'],
+						readings: [...R('feed', 'gods', null), ...R('appease', 'gods', null), ...R('petition', 'gods', 'guardianship')]
+					}),
+					N('animal/herd', 'Cattle', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists', marsh: 'resists' }, {
+						about: ['herds', 'wealth', 'nourishment'],
+						readings: [...R('feed', 'gods', null), ...R('feed', 'ancestors', null), ...R('appease', 'gods', null), ...R('thank', 'gods', 'plenty'), ...R('petition', 'gods', 'plenty')]
+					}),
+					N('animal/wild', 'Hunted game', { forest: 'strong', mountain: 'favours', desert: 'resists' }, {
+						about: ['wild', 'chase', 'strength', 'blood'],
+						readings: [...R('thank', 'gods', 'plenty'), ...R('appease', 'land', null), ...R('feed', 'land', null)]
+					}),
+					N('animal/water', 'Fish and fowl', { coast: 'strong', marsh: 'strong', river: 'favours', mountain: 'resists', desert: 'excludes' }, {
+						about: ['water', 'plenty', 'wild'],
+						readings: [...R('thank', 'land', 'plenty'), ...R('appease', 'gods', null), ...R('renew', 'land', 'renewal')]
+					}),
+					N('harvest', 'Grain and fruit', { river: 'strong', forest: 'favours', steppe: 'resists', desert: 'resists' }, {
+						about: ['grain', 'growth', 'plenty'],
+						readings: [...R('thank', 'land', 'plenty'), ...R('renew', 'land', 'renewal'), ...R('feed', 'land', null), ...R('feed', 'ancestors', null)]
+					}),
+					N('liquid', 'A drink', { desert: 'favours', mountain: 'favours' }, {
+						about: ['liquid', 'water', 'lightness'],
+						readings: [...R('feed', 'land', null), ...R('feed', 'ancestors', null), ...R('appease', 'gods', null), ...R('thank', 'land', 'plenty')]
+					})
 				]
 			},
 			{
 				id: 'share',
 				label: 'share',
-				values: [N('whole', 'all of it'), N('first', 'the first of it')]
+				values: [
+					N('whole', 'all of it', undefined, {
+						about: ['completion', 'cost', 'giving'],
+						readings: [...R('feed', 'gods', null), ...R('feed', 'ancestors', null), ...R('appease', 'gods', null), ...R('bind', 'gods', 'guardianship')]
+					}),
+					N('first', 'the first of it', undefined, {
+						about: ['first', 'thrift', 'trust'],
+						readings: [...R('thank', 'gods', 'plenty'), ...R('thank', 'land', 'plenty'), ...R('petition', 'gods', 'plenty'), ...R('petition', 'land', 'plenty')]
+					})
+				]
 			},
 			{
 				id: 'manner',
 				label: 'manner',
 				values: [
-					N('burnt', 'burnt', { forest: 'favours', steppe: 'favours', mountain: 'favours', marsh: 'resists' }),
-					N('drowned', 'drowned', { coast: 'favours', river: 'favours', marsh: 'favours', desert: 'resists' }),
-					N('buried', 'buried', { river: 'favours', steppe: 'favours', desert: 'favours' }),
-					N('poured', 'poured out'),
-					N('feast', 'shared in a feast')
+					N('burnt', 'burnt', { forest: 'favours', steppe: 'favours', mountain: 'favours', marsh: 'resists' }, {
+						about: ['fire', 'smoke', 'ascent', 'light'],
+						readings: [...R('feed', 'gods', null), ...R('appease', 'gods', null), ...R('thank', 'gods', 'plenty'), ...R('petition', 'gods', 'plenty')]
+					}),
+					N('drowned', 'drowned', { coast: 'favours', river: 'favours', marsh: 'favours', desert: 'resists' }, {
+						about: ['water', 'depth', 'hiddenness'],
+						readings: [...R('feed', 'gods', null), ...R('appease', 'gods', null), ...R('renew', 'land', 'renewal')]
+					}),
+					N('buried', 'buried', { river: 'favours', steppe: 'favours', desert: 'favours' }, {
+						about: ['earth', 'darkness', 'deposit'],
+						readings: [...R('feed', 'ancestors', null), ...R('feed', 'land', null), ...R('renew', 'land', 'renewal'), ...R('thank', 'land', 'plenty')]
+					}),
+					N('poured', 'poured out', undefined, {
+						about: ['liquid', 'earth', 'offering'],
+						readings: [...R('feed', 'ancestors', null), ...R('feed', 'land', null), ...R('thank', 'land', 'plenty'), ...R('appease', 'gods', null)]
+					}),
+					N('feast', 'shared in a feast', undefined, {
+						about: ['festivity', 'consumption', 'belonging'],
+						readings: [...R('bind', 'gods', 'guardianship'), ...R('thank', 'gods', 'plenty'), ...R('feed', 'ancestors', null)]
+					})
 				]
 			},
 			{
 				id: 'occasion',
 				label: 'occasion',
 				values: [
-					N('midwinter', 'midwinter'),
-					N('midsummer', 'midsummer'),
-					N('first-grass', 'the first grass', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists' }),
-					N('first-catch', 'the first catch', { coast: 'favours', marsh: 'favours', river: 'favours', steppe: 'resists', desert: 'resists', mountain: 'resists' })
+					N('midwinter', 'midwinter', undefined, {
+						about: ['cold', 'darkness', 'renewal', 'endurance'],
+						readings: [...R('renew', 'land', 'renewal'), ...R('petition', 'gods', 'renewal'), ...R('appease', 'gods', null)]
+					}),
+					N('midsummer', 'midsummer', undefined, {
+						about: ['light', 'warmth', 'plenty'],
+						readings: [...R('thank', 'gods', 'plenty'), ...R('thank', 'land', 'plenty'), ...R('bind', 'gods', 'guardianship')]
+					}),
+					N('first-grass', 'the first grass', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists' }, {
+						about: ['growth', 'herds', 'first'],
+						readings: [...R('petition', 'land', 'plenty'), ...R('renew', 'land', 'renewal'), ...R('thank', 'land', 'plenty')]
+					}),
+					N('first-catch', 'the first catch', { coast: 'favours', marsh: 'favours', river: 'favours', steppe: 'resists', desert: 'resists', mountain: 'resists' }, {
+						about: ['water', 'first', 'wild'],
+						readings: [...R('thank', 'land', 'plenty'), ...R('petition', 'gods', 'plenty'), ...R('appease', 'gods', null)]
+					})
 				]
 			}
 		],

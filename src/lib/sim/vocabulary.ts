@@ -138,7 +138,18 @@ export const NOUNS = [
 	'lineage',
 	'mediation',
 	'calling',
-	'belonging'
+	'belonging',
+	'speed',
+	'chase',
+	'wild',
+	'cost',
+	'giving',
+	'first',
+	'trust',
+	'consumption',
+	'deposit',
+	'ascent',
+	'endurance'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -169,7 +180,13 @@ export const VERBS = [
 	'bind',
 	'cleanse',
 	'inspire',
-	'heal'
+	'heal',
+	// what a sacrifice does for a power
+	'feed',
+	'appease',
+	'thank',
+	'petition',
+	'renew'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];

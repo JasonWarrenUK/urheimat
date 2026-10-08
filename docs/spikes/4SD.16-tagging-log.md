@@ -82,3 +82,10 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - A new part `share` separates the whole beast, crop or vessel (`whole`) from the first portion of what was taken for food or use (`first`).
 - `manner` gains `poured` (lifted out of "Drink poured out") and `feast` replaces "shared in a feast"; `occasion` ids are `midwinter`, `midsummer`, `first-grass`, `first-catch`.
 - Affinities restated in named levels; unlisted terrains allow.
+
+### Sacrifice readings
+
+- New verbs: `feed`, `appease`, `thank`, `petition`, `renew`; `bind` is reused. Objects: `gods`, `ancestors`, `land`, `living`. Targets: `plenty`, `renewal`, `guardianship`. Funeral's and substance's verbs are struck.
+- All six offerings, both shares, five manners and four occasions carry `about` tags and a grid; the grids are in `slots.ts`.
+- Parked idea: the reading targets (plenty, renewal, guardianship) could inform terrain affinity. Today an affinity records only what the land does to a value; deriving it from meaning tags would be a separate decision.
+- A fifth occasion, the first harvest, was requested after the grids were approved; its affinities and grid are still to be agreed.
