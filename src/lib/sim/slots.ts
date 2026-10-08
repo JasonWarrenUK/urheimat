@@ -214,41 +214,50 @@ export const SLOTS: SlotDef[] = [
 		id: 'sacrifice',
 		domain: 'Rite',
 		name: 'What is offered',
+		// Contract: for a band that has this custom, every value assumes something is deliberately given
+		// to a power on a set occasion; it assumes nothing about what is given, how, or whether the
+		// people consume part of it (that case shadows substance).
 		features: [
 			{
-				id: 'victim',
+				id: 'offering',
 				label: 'offering',
 				values: [
-					V('A horse', ST),
-					V('Cattle', { steppe: 1.5, river: 1.5, forest: 1.5 }),
-					V('First fruits', { river: 3, forest: 1.5 }),
-					V('Fish and fowl', { coast: 3, marsh: 3 }),
-					V('The hunted deer', { forest: 3, mountain: 1.5 }),
-					V('Drink poured out', { desert: 1.5, mountain: 1.5 })
+					N('animal/mount', 'A horse', { steppe: 'strong', river: 'favours', forest: 'resists', marsh: 'resists', mountain: 'resists' }),
+					N('animal/herd', 'Cattle', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists', marsh: 'resists' }),
+					N('animal/wild', 'Hunted game', { forest: 'strong', mountain: 'favours', desert: 'resists' }),
+					N('animal/water', 'Fish and fowl', { coast: 'strong', marsh: 'strong', river: 'favours', mountain: 'resists', desert: 'excludes' }),
+					N('harvest', 'Grain and fruit', { river: 'strong', forest: 'favours', steppe: 'resists', desert: 'resists' }),
+					N('liquid', 'A drink', { desert: 'favours', mountain: 'favours' })
 				]
+			},
+			{
+				id: 'share',
+				label: 'share',
+				values: [N('whole', 'all of it'), N('first', 'the first of it')]
 			},
 			{
 				id: 'manner',
 				label: 'manner',
 				values: [
-					V('burnt', { forest: 1.5, steppe: 1.5, mountain: 1.5 }),
-					V('drowned', { coast: 1.5, river: 1.5, marsh: 1.5 }),
-					V('buried', { river: 1.5, steppe: 1.5, desert: 1.5 }),
-					V('shared in a feast')
+					N('burnt', 'burnt', { forest: 'favours', steppe: 'favours', mountain: 'favours', marsh: 'resists' }),
+					N('drowned', 'drowned', { coast: 'favours', river: 'favours', marsh: 'favours', desert: 'resists' }),
+					N('buried', 'buried', { river: 'favours', steppe: 'favours', desert: 'favours' }),
+					N('poured', 'poured out'),
+					N('feast', 'shared in a feast')
 				]
 			},
 			{
 				id: 'occasion',
 				label: 'occasion',
 				values: [
-					V('midwinter'),
-					V('midsummer'),
-					V('the first grass', { steppe: 1.5, river: 1.5, forest: 1.5 }),
-					V('the first catch', { coast: 1.5, marsh: 1.5, river: 1.5 })
+					N('midwinter', 'midwinter'),
+					N('midsummer', 'midsummer'),
+					N('first-grass', 'the first grass', { steppe: 'favours', river: 'favours', forest: 'favours', desert: 'resists' }),
+					N('first-catch', 'the first catch', { coast: 'favours', marsh: 'favours', river: 'favours', steppe: 'resists', desert: 'resists', mountain: 'resists' })
 				]
 			}
 		],
-		render: (n) => `${n[0]}, ${n[1]}, at ${n[2]}`
+		render: (n) => `${n[0]}, ${n[1]}, ${n[2]}, at ${n[3]}`
 	},
 	{
 		id: 'funeral',

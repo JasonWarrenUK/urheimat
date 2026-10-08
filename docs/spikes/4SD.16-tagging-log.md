@@ -74,3 +74,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Sacrifice may be a shadow of substance. When a band's sacrifice conforms to a shape substance already describes (cattle shared in a feast is meat eaten by the tribe), sacrifice is hidden and reads as substance. If either custom moves so that the match fails, sacrifice is unhidden and shows as its own custom. Either custom can start the split: sacrifice by taking a concrete value outside the rule, substance by moving away from what the rule needs.
 - The link lives at custom level: sacrifice declares `shadows substance` as a pair of tag predicates, one over its own values and one over substance's. Values are not pointers one by one, because the match is a combination of offering and manner.
 - Scope in this task: the declaration and a pure helper `isShadowed(slot, traits)` with tests. Hiding in the notebook UI and excluding a shadowed custom from reconstruction scoring wait for a later task.
+
+### Sacrifice structure
+
+- Contract: for a band that has this custom, every value assumes something is deliberately given to a power on a set occasion; it assumes nothing about what is given, how, or whether the people consume part of it (that case shadows substance).
+- `victim` becomes `offering` with rules, not instances: `animal/mount`, `animal/herd`, `animal/wild`, `animal/water`, `harvest`, `liquid`. First fruits is a harvest given as a first share.
+- A new part `share` separates the whole beast, crop or vessel (`whole`) from the first portion of what was taken for food or use (`first`).
+- `manner` gains `poured` (lifted out of "Drink poured out") and `feast` replaces "shared in a feast"; `occasion` ids are `midwinter`, `midsummer`, `first-grass`, `first-catch`.
+- Affinities restated in named levels; unlisted terrains allow.
