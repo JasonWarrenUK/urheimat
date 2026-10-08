@@ -43,3 +43,10 @@ Breaking: saved runs change shape.
 5. A predicate over a set is true if some member matches.
 6. The corpus declares which parts are sets and their size range; generation draws a size, then that many distinct members by the usual weighting.
 7. Reconstruction scores a set part correct only on an exact set; the UI lists members. Richer credit belongs to 5RC.5 and 5RC.8.
+
+### Substance readings
+
+- New verbs: `commune`, `bind`, `cleanse`, `inspire`, `heal`. Objects: `body`, `spirit` and `takers`. Targets include the taker groups as nouns: `gods`, `chief/self`, `chief/family`, `priest/self`, `priest/family`, `tribe/rest`. The `/self` nouns make each person and their family path siblings for similarity. Taker value ids are unchanged; each taker value's `about` names its group noun.
+- Struck from every `kind` value on purpose: funeral's verbs (destroy, sanctify, release, transform) and `memory` as an object.
+- A reading that names a group may carry `others: true`: it counts only when that group takes in some round and a different group takes in the same round or a later one. A binding goes to a target in the same or an earlier round, never a later one. Predicates and display honour it; the similarity table ignores it and reads the full reading. Only `bind(takers to chief/self)` on mead carries it so far.
+- Open: `bind(takers to takers)` is also vacuous when one person takes alone; not modelled yet.

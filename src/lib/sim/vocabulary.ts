@@ -99,7 +99,28 @@ export const NOUNS = [
 	'fear',
 	'shame',
 	'violence',
-	'division'
+	'division',
+	// the substance taken in the rite, and who takes it
+	'takers',
+	'chief/self',
+	'chief/family',
+	'priest/self',
+	'priest/family',
+	'tribe/rest',
+	'honey',
+	'sweetness',
+	'festivity',
+	'herds',
+	'nourishment',
+	'grain',
+	'plenty',
+	'blood',
+	'vine',
+	'wealth',
+	'vision',
+	'plants',
+	'fragrance',
+	'sap'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -124,7 +145,13 @@ export const VERBS = [
 	'withhold',
 	// which way the dead face, and how they lie
 	'face',
-	'rest'
+	'rest',
+	// what a substance does when taken
+	'commune',
+	'bind',
+	'cleanse',
+	'inspire',
+	'heal'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];

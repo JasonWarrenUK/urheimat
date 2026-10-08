@@ -23,6 +23,8 @@ const R = (verb: Verb, object: Noun, ...targets: (Noun | null)[]): Reading[] =>
 	targets.map((target) => (target === null ? { verb, object } : { verb, object, target }));
 // Readings that hold only for certain material in hand.
 const when = (readings: Reading[], ...material: Noun[]): Reading[] => readings.map((r) => ({ ...r, when: material }));
+// Readings that count only when someone besides their target takes (see Reading.others).
+const others = (readings: Reading[]): Reading[] => readings.map((r) => ({ ...r, others: true as const }));
 // Material transitions: what an act accepts and what it leaves.
 const T = (accepts: Transition['accepts'], yields: Transition['yields']): Transition => ({ accepts, yields });
 const PASS: Transition[] = [T('any', 'same')];
@@ -666,12 +668,51 @@ export const SLOTS: SlotDef[] = [
 				id: 'kind',
 				label: 'substance',
 				values: [
-					N('drink/mead', 'Mead', { forest: 'strong', steppe: 'favours', desert: 'resists' }),
-					N('drink/mare-milk', "Fermented mare's milk", { steppe: 'strong', forest: 'resists', marsh: 'resists', mountain: 'resists' }),
-					N('drink/beer', 'Barley beer', { river: 'strong', coast: 'favours', desert: 'resists', mountain: 'resists' }),
-					N('drink/wine', 'Wine', { coast: 'favours', desert: 'favours', mountain: 'favours', steppe: 'resists', marsh: 'resists', forest: 'resists' }),
-					N('plant/herb', 'Herb', { marsh: 'strong', mountain: 'favours', desert: 'resists' }),
-					N('plant/resin', 'Resin', { forest: 'strong', mountain: 'favours', desert: 'favours', marsh: 'resists' })
+					N('drink/mead', 'Mead', { forest: 'strong', steppe: 'favours', desert: 'resists' }, {
+						about: ['honey', 'sweetness', 'festivity', 'fire'],
+						readings: [
+							...R('commune', 'spirit', 'gods', 'ancestors'),
+							...R('bind', 'takers', 'takers'),
+							...others(R('bind', 'takers', 'chief/self')),
+							...R('inspire', 'spirit', null)
+						]
+					}),
+					N('drink/mare-milk', "Fermented mare's milk", { steppe: 'strong', forest: 'resists', marsh: 'resists', mountain: 'resists' }, {
+						about: ['herds', 'nourishment', 'kinship'],
+						readings: [...R('bind', 'takers', 'takers', 'ancestors'), ...R('heal', 'body', null), ...R('commune', 'spirit', 'ancestors')]
+					}),
+					N('drink/beer', 'Barley beer', { river: 'strong', coast: 'favours', desert: 'resists', mountain: 'resists' }, {
+						about: ['grain', 'plenty', 'labour', 'festivity'],
+						readings: [...R('bind', 'takers', 'takers'), ...R('heal', 'body', null), ...R('commune', 'spirit', 'gods')]
+					}),
+					N('drink/wine', 'Wine', { coast: 'favours', desert: 'favours', mountain: 'favours', steppe: 'resists', marsh: 'resists', forest: 'resists' }, {
+						about: ['blood', 'vine', 'wealth', 'light'],
+						readings: [
+							...R('commune', 'spirit', 'gods', 'beyond/otherworld'),
+							...R('cleanse', 'spirit', null),
+							...R('inspire', 'spirit', null),
+							...R('heal', 'body', null)
+						]
+					}),
+					N('plant/herb', 'Herb', { marsh: 'strong', mountain: 'favours', desert: 'resists' }, {
+						about: ['plants', 'vision', 'smoke'],
+						readings: [
+							...R('inspire', 'spirit', null),
+							...R('commune', 'spirit', 'beyond/otherworld', 'ancestors'),
+							...R('cleanse', 'body', null),
+							...R('cleanse', 'spirit', null),
+							...R('heal', 'body', null)
+						]
+					}),
+					N('plant/resin', 'Resin', { forest: 'strong', mountain: 'favours', desert: 'favours', marsh: 'resists' }, {
+						about: ['sap', 'fragrance', 'smoke', 'permanence'],
+						readings: [
+							...R('cleanse', 'body', null),
+							...R('cleanse', 'spirit', null),
+							...R('commune', 'spirit', 'gods', 'beyond/otherworld'),
+							...R('heal', 'body', null)
+						]
+					})
 				]
 			},
 			{
@@ -685,12 +726,13 @@ export const SLOTS: SlotDef[] = [
 					label: 'taken by',
 					size: [1, 3],
 					values: [
-						N('gods', 'the gods'),
-						N('chief', 'the chief'),
-						N('chief/family', "the chief's family"),
-						N('priest', 'the priest or shaman'),
-						N('priest/family', "the priest or shaman's family"),
-						N('tribe/rest', 'the rest of the tribe')
+						// A taker's `about` names its group, so readings can point at who else takes.
+						N('gods', 'the gods', undefined, { about: ['gods'] }),
+						N('chief', 'the chief', undefined, { about: ['chief/self'] }),
+						N('chief/family', "the chief's family", undefined, { about: ['chief/family'] }),
+						N('priest', 'the priest or shaman', undefined, { about: ['priest/self'] }),
+						N('priest/family', "the priest or shaman's family", undefined, { about: ['priest/family'] }),
+						N('tribe/rest', 'the rest of the tribe', undefined, { about: ['tribe/rest'] })
 					]
 				}
 			])
