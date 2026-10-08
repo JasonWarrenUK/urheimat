@@ -1,4 +1,4 @@
-import type { CultureTraits, FeatureDef, Predicate, SlotDef, TraitValue, TraitValues } from '$lib/types';
+import type { CultureTraits, FeatureDef, PartValue, Predicate, SlotDef, TraitValue, TraitValues } from '$lib/types';
 import type { Noun } from './vocabulary';
 import { SLOTS } from './slots';
 
@@ -18,6 +18,8 @@ const STAGE_START: Noun = 'body';
 const NOTHING = null;
 type InHand = Noun | null;
 
+type Held = readonly (PartValue | null)[];
+
 const actIndex = (slot: SlotDef, stage: number): number => slot.features.findIndex((g) => g.stage === stage && g.id.endsWith('.act'));
 
 const transition = (value: TraitValue, m: InHand) =>
@@ -26,14 +28,14 @@ const transition = (value: TraitValue, m: InHand) =>
 export const isAvailableValue = (value: TraitValue, m: InHand): boolean => !value.material?.length || transition(value, m) !== undefined;
 
 // What is in hand when stage `stage` begins. Null for an unstaged part, or once the chain has ended.
-export function inHand(slot: SlotDef, fv: readonly (number | null)[], stage: number | undefined): InHand {
+export function inHand(slot: SlotDef, fv: Held, stage: number | undefined): InHand {
 	if (stage === undefined) return NOTHING;
 	let m: InHand = STAGE_START;
 	for (let s = 1; s < stage; s++) {
 		const ai = actIndex(slot, s);
 		if (ai < 0) return NOTHING;
-		const v = fv[ai];
-		if (v === null) return NOTHING;
+		const v = fv[ai]?.[0];
+		if (v === undefined) return NOTHING;
 		const t = transition(slot.features[ai].values[v], m);
 		if (!t || t.yields === 'nothing') return NOTHING;
 		m = t.yields === 'same' ? m : t.yields;
@@ -42,7 +44,7 @@ export function inHand(slot: SlotDef, fv: readonly (number | null)[], stage: num
 }
 
 // Whether value `vi` of part `fi` may be held, given the rest of the custom.
-export const isAvailableIn = (slot: SlotDef, fv: readonly (number | null)[], fi: number, vi: number): boolean =>
+export const isAvailableIn = (slot: SlotDef, fv: Held, fi: number, vi: number): boolean =>
 	isAvailableValue(slot.features[fi].values[vi], inHand(slot, fv, slot.features[fi].stage));
 
 export const isAvailable = (traits: CultureTraits, si: number, fi: number, vi: number): boolean => isAvailableIn(SLOTS[si], traits[si], fi, vi);
@@ -53,7 +55,7 @@ const targetIndex = (slot: SlotDef, f: FeatureDef, part: string, rel?: 'same' | 
 	return slot.features.findIndex((g) => g.id === id);
 };
 
-function holds(slot: SlotDef, fv: readonly (number | null)[], f: FeatureDef, p: Predicate): boolean {
+function holds(slot: SlotDef, fv: Held, f: FeatureDef, p: Predicate): boolean {
 	if ('inHand' in p) {
 		const m = inHand(slot, fv, f.stage);
 		return p.inHand === 'some' ? m !== NOTHING : m === p.inHand;
@@ -62,7 +64,9 @@ function holds(slot: SlotDef, fv: readonly (number | null)[], f: FeatureDef, p: 
 	if (ti < 0) return true; // a predicate pointing nowhere never silences a part
 	const v = fv[ti];
 	if (v === null || !isActiveIn(slot, fv, ti)) return false;
-	const readings = slot.features[ti].values[v].readings ?? [];
+	if (p.has === 'anyMember') return v.length > 0;
+	// Over a set, a predicate holds when some member matches.
+	const readings = v.flatMap((vi) => slot.features[ti].values[vi].readings ?? []);
 	if (p.has === 'anyReading') return readings.length > 0;
 	const want = p.has;
 	return readings.some(
@@ -70,10 +74,10 @@ function holds(slot: SlotDef, fv: readonly (number | null)[], f: FeatureDef, p: 
 	);
 }
 
-export function isActiveIn(slot: SlotDef, fv: readonly (number | null)[], fi: number): boolean {
+export function isActiveIn(slot: SlotDef, fv: Held, fi: number): boolean {
 	const f = slot.features[fi];
 	const v = fv[fi];
-	if (v !== null && f.stage !== undefined && !isAvailableIn(slot, fv, fi, v)) return false;
+	if (v && f.stage !== undefined && !v.every((vi) => isAvailableIn(slot, fv, fi, vi))) return false;
 	const ps = f.applies === undefined ? [] : Array.isArray(f.applies) ? f.applies : [f.applies];
 	return ps.every((p) => holds(slot, fv, f, p));
 }
@@ -86,3 +90,7 @@ export const activeParts = (traits: CultureTraits): [number, number][] =>
 export const activeCount = (traits: CultureTraits): number => activeParts(traits).length;
 
 export const activeIn = (slot: SlotDef, fv: TraitValues): number[] => fv.flatMap((_, fi) => (isActiveIn(slot, fv, fi) ? [fi] : []));
+
+// The values held across the active parts: what a band's strain is counted against. A set counts
+// once per member, an empty set not at all.
+export const heldCount = (traits: CultureTraits): number => activeParts(traits).reduce((n, [si, fi]) => n + traits[si][fi].length, 0);

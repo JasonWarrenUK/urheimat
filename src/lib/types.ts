@@ -38,10 +38,11 @@ export interface TraitValue extends ValueTags {
 export type Terrain = 'coast' | 'marsh' | 'river' | 'forest' | 'steppe' | 'desert' | 'mountain';
 export type MapTerrain = Terrain | 'water';
 
-// When a part applies: a condition over another part's current value in the same custom (written
+// When a part applies: a condition over another part's current values in the same custom (written
 // in tags, never value ids), or over the material in hand at this part's stage ('some' = anything).
+// Over a set it holds when some member matches; `anyMember` holds when the set is not empty.
 export type Predicate =
-	| { part: string; stage?: 'same' | 'previous'; has: 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } }
+	| { part: string; stage?: 'same' | 'previous'; has: 'anyMember' | 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } }
 	| { inHand: Noun | 'some' };
 
 export interface FeatureDef {
@@ -49,6 +50,9 @@ export interface FeatureDef {
 	label: string;
 	values: TraitValue[];
 	stage?: number;
+	// A set-valued part holds between min and max distinct members (min 0 lets it be empty, which
+	// ends a sequence). Any other part holds exactly one value.
+	size?: readonly [min: number, max: number];
 	applies?: Predicate | Predicate[]; // all must hold
 }
 
@@ -60,7 +64,9 @@ export interface SlotDef {
 	render: (values: string[]) => string;
 }
 
-export type TraitValues = number[];
+// What one part holds: the indices of its held values. Length 1 for an ordinary part.
+export type PartValue = number[];
+export type TraitValues = PartValue[];
 export type CultureTraits = TraitValues[];
 
 export interface Drive {
@@ -133,7 +139,7 @@ export interface TeachPlan {
 
 export interface Orders {
 	held: Set<number>;
-	reforms: Record<string, number>;
+	reforms: Record<string, number>; // single-valued parts only
 	move: MovePlan | null;
 	split: boolean;
 	consolidate: number;
@@ -146,9 +152,9 @@ export type Verdict = 'lost' | 'correct' | 'wrong';
 export interface FeatureReconstruction {
 	f: number;
 	label: string;
-	rec: number | null;
+	rec: PartValue | null;
 	conf: Confidence;
-	truth: number;
+	truth: PartValue;
 	verdict: Verdict;
 	pts: number;
 	note: string;
@@ -158,7 +164,7 @@ export interface SlotReconstruction {
 	slot: number;
 	feats: FeatureReconstruction[];
 	pts: number;
-	recFv: (number | null)[];
+	recFv: (PartValue | null)[];
 }
 
 export interface ReconstructionResult {

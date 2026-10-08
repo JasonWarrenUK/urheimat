@@ -6,7 +6,7 @@
 //   4. Kin familiarity: correlation of band likeness with kinship distance
 // Criteria 1, 3 and 4 depend on the change mechanism too, not only the corpus.
 
-import { newGame, begin, startTiles, endEra, defaultOrders } from '../../src/lib/sim/engine';
+import { newGame, begin, startTiles, endEra, defaultOrders, sameSet } from '../../src/lib/sim/engine';
 import { DEFAULT_LENS, NEAR, type Lens } from '../../src/lib/sim/lens';
 import { isActive } from '../../src/lib/sim/predicates';
 import { bandSimilarity, partTable } from '../../src/lib/sim/similarity';
@@ -48,7 +48,7 @@ function kinDistance(a: Culture, b: Culture, all: Culture[]): number {
 
 // Dormant parts are left out wherever a band's values are compared.
 const sameShare = (a: CultureTraits, b: CultureTraits) =>
-	mean(a.flatMap((s, si) => s.flatMap((v, fi) => (isActive(a, si, fi) && isActive(b, si, fi) ? [v === b[si][fi] ? 1 : 0] : []))));
+	mean(a.flatMap((s, si) => s.flatMap((v, fi) => (isActive(a, si, fi) && isActive(b, si, fi) ? [sameSet(v, b[si][fi]) ? 1 : 0] : []))));
 
 function runs() {
 	return Array.from({ length: SEEDS }, (_, i) => {
@@ -99,7 +99,7 @@ function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 		states.flatMap((st) =>
 			parts.flatMap((p) => {
 				const live = st.cultures.filter((c) => c.alive && isActive(c.traits, p.si, p.fi));
-				return live.length ? [new Set(live.map((c) => c.traits[p.si][p.fi])).size / p.values.length] : [];
+				return live.length ? [new Set(live.flatMap((c) => c.traits[p.si][p.fi])).size / p.values.length] : [];
 			})
 		)
 	);

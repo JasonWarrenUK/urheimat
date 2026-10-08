@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Culture, GameState, Orders } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
-	import { contact } from '$lib/sim/engine';
+	import { contact, sameSet } from '$lib/sim/engine';
 	import { game } from '$lib/game-store.svelte';
 
 	interface Props {
@@ -24,7 +24,7 @@
 		nb.forEach((k) => {
 			SLOTS.forEach((sl, si) => {
 				const parts = sl.features
-					.filter((_f, fi) => player.traits[si][fi] === gameState.ancestral[si][fi] && k.traits[si][fi] !== gameState.ancestral[si][fi])
+					.filter((_f, fi) => sameSet(player.traits[si][fi], gameState.ancestral[si][fi]) && !sameSet(k.traits[si][fi], gameState.ancestral[si][fi]))
 					.map((f) => f.label);
 				if (parts.length) out.push({ kin: k, slotIndex: si, parts });
 			});

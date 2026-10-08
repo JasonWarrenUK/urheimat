@@ -128,9 +128,14 @@ export function tables(lens: Lens = DEFAULT_LENS): PartTable[][] {
 export const partTable = (si: number, fi: number, lens: Lens = DEFAULT_LENS): PartTable => tables(lens)[si][fi];
 export const isPartTagged = (si: number, fi: number): boolean => partTable(si, fi) !== null;
 
-export function similarity(si: number, fi: number, a: number, b: number, lens: Lens = DEFAULT_LENS): number | null {
+// Closeness of two held sets of one part, 0 to 1000. Single values read one table cell; sets
+// average each member's best match in the other set, both ways (meanBest). Two empty sets are alike.
+export function similarity(si: number, fi: number, a: readonly number[], b: readonly number[], lens: Lens = DEFAULT_LENS): number | null {
 	const t = partTable(si, fi, lens);
-	return t ? t[a][b] : null;
+	if (!t) return null;
+	if (!a.length || !b.length) return a.length === b.length ? 1000 : 0;
+	const best = [...a.map((x) => Math.max(...b.map((y) => t[x][y]))), ...b.map((y) => Math.max(...a.map((x) => t[x][y])))];
+	return Math.round(best.reduce((x, y) => x + y, 0) / best.length);
 }
 
 // Two bands' likeness from 0 to 1: each custom counts equally, its tagged parts live in both bands

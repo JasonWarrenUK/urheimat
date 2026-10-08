@@ -2,7 +2,7 @@
 	import type { GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
 	import { endEra, freeLand, strainCount } from '$lib/sim/engine';
-	import { activeCount } from '$lib/sim/predicates';
+	import { heldCount } from '$lib/sim/predicates';
 	import { game, type Tab as TabType } from '$lib/game-store.svelte';
 	import WorldMap from './WorldMap.svelte';
 	import TerrainLegend from './TerrainLegend.svelte';
@@ -115,7 +115,7 @@
 	</div>
 	<div>
 		<b>{player.alive ? strainCount(gameState, player) : '—'}</b>
-		<span>of {activeCount(player.traits)} parts straining against the {terrain}</span>
+		<span>of {heldCount(player.traits)} values straining against the {terrain}</span>
 	</div>
 	<div>
 		<b>{aliveCount}</b>
