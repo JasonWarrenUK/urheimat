@@ -88,4 +88,4 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - New verbs: `feed`, `appease`, `thank`, `petition`, `renew`; `bind` is reused. Objects: `gods`, `ancestors`, `land`, `living`. Targets: `plenty`, `renewal`, `guardianship`. Funeral's and substance's verbs are struck.
 - All six offerings, both shares, five manners and four occasions carry `about` tags and a grid; the grids are in `slots.ts`.
 - Parked idea: the reading targets (plenty, renewal, guardianship) could inform terrain affinity. Today an affinity records only what the land does to a value; deriving it from meaning tags would be a separate decision.
-- A fifth occasion, the first harvest, was requested after the grids were approved; its affinities and grid are still to be agreed.
+- A fifth occasion, `first-harvest`, was added after the grids were approved: river and forest favour it, desert and steppe resist it; about grain, growth, plenty, first; thank(land to plenty), renew(land to renewal), petition(gods to plenty).

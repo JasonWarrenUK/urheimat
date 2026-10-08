@@ -307,6 +307,10 @@ export const SLOTS: SlotDef[] = [
 					N('first-catch', 'the first catch', { coast: 'favours', marsh: 'favours', river: 'favours', steppe: 'resists', desert: 'resists', mountain: 'resists' }, {
 						about: ['water', 'first', 'wild'],
 						readings: [...R('thank', 'land', 'plenty'), ...R('petition', 'gods', 'plenty'), ...R('appease', 'gods', null)]
+					}),
+					N('first-harvest', 'the first harvest', { river: 'favours', forest: 'favours', desert: 'resists', steppe: 'resists' }, {
+						about: ['grain', 'growth', 'plenty', 'first'],
+						readings: [...R('thank', 'land', 'plenty'), ...R('renew', 'land', 'renewal'), ...R('petition', 'gods', 'plenty')]
 					})
 				]
 			}
