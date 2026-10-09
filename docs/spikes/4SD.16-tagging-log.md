@@ -152,3 +152,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Span is `count` (`one`, `three`) and `unit` (`meals`, `nights`, `open`); `open` carries no readings and so takes no count, the way funeral's "left as they are" ends a chain.
 - New noun `stranger`. Grids and affinities as approved.
 - `bar` resists steppe, desert and coast: open, travelled land where a refused traveller may die. Jason asked what the record shows for strangers against biome; no direct cross-cultural test was found, and the best-supported mechanism is risk buffering (Pisor and Gurven 2016), which this follows. Marsh and mountain favouring `bar` is inherited authoring with no evidence either way.
+
+## Round 10: justice
+
+- Contract: for a band that has this custom, every value assumes a killing among them is answered by a rule; it assumes nothing about how guilt is found, what the remedy is, who answers for it, or whether the killer is made clean.
+- `remedy` bundled three axes. It splits into `finding` (`ordeal/water`, `assembly`, plus `oath`, which ties to the oath custom) and `remedy` (`price`, `exile`, plus `feud`).
+- `payer` becomes `answerer` (`killer`, `kin`). The chief answering for a killer belongs to killings between bands; parked until a cross-band relationship system exists.
+- `cleansing` is a set, size [0, 2] (`fire`, `water`, `silence`); empty is never clean again.
+- New verb `atone`; new nouns `killer`, `guilt`. Grids and affinities as approved.

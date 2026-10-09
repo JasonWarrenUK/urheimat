@@ -1300,34 +1300,50 @@ export const SLOTS: SlotDef[] = [
 		id: 'justice',
 		domain: 'Law',
 		name: 'Justice for a killing',
+		// Contract: for a band that has this custom, every value assumes a killing among them is
+		// answered by a rule; it assumes nothing about how guilt is found, what the remedy is, who
+		// answers for it, or whether the killer is made clean. A chief answering for a killer belongs
+		// to killings between bands, which wait for a cross-band relationship system.
 		features: [
+			{
+				id: 'finding',
+				label: 'guilt found by',
+				values: [
+					N('ordeal/water', 'ordeal by water', { marsh: 'strong', river: 'favours', coast: 'favours', desert: 'excludes' }, { about: ['water', 'chance', 'cleansing'], readings: [...R('judge', 'killer', 'justice'), ...R('appease', 'gods', null)] }),
+					N('assembly', "the assembly's judgement", { forest: 'favours', coast: 'favours' }, { about: ['belonging', 'custom', 'justice'], readings: [...R('judge', 'killer', 'justice'), ...R('bind', 'living', 'custom')] }),
+					N('oath', 'sworn oath', undefined, { about: ['trust', 'gods', 'voice'], readings: [...R('judge', 'killer', 'justice'), ...R('bind', 'killer', 'gods')] })
+				]
+			},
 			{
 				id: 'remedy',
 				label: 'remedy',
 				values: [
-					V('Blood-price', { steppe: 3, forest: 1.5 }),
-					V('Ordeal by water', { river: 1.5, marsh: 3, coast: 1.5 }),
-					V('Exile', { mountain: 3, desert: 1.5 }),
-					V("The assembly's judgement", { forest: 1.5, coast: 1.5 })
+					N('price', 'blood-price', { steppe: 'strong', forest: 'favours' }, { about: ['wealth', 'thrift', 'kinship'], readings: [...R('atone', 'killer', 'living'), ...R('bind', 'killer', 'living')] }),
+					N('exile', 'exile', { mountain: 'strong', desert: 'favours' }, { about: ['boundary', 'abandonment', 'distance'], readings: [...R('atone', 'killer', 'living'), ...R('guard', 'living', null)] }),
+					N('feud', 'feud', { steppe: 'favours', mountain: 'favours' }, { about: ['violence', 'kinship', 'blood'], readings: [...R('atone', 'killer', 'dead'), ...R('appease', 'dead', null), ...R('guard', 'living', null)] })
 				]
 			},
 			{
-				id: 'payer',
-				label: 'who answers',
-				values: [V('the killer alone'), V("the killer's kin"), V("the killer's chief")]
+				id: 'answerer',
+				label: 'answered by',
+				values: [
+					N('killer', 'the killer alone', undefined, { about: ['identity', 'guilt'], readings: R('atone', 'killer', 'living') }),
+					N('kin', "the killer's kin", undefined, { about: ['kinship', 'lineage', 'belonging'], readings: [...R('atone', 'killer', 'living'), ...R('bind', 'living', 'kinship')] })
+				]
 			},
 			{
 				id: 'cleansing',
-				label: 'cleansing',
+				label: 'made clean by',
+				// An empty set is a killer never clean again.
+				size: [0, 2],
 				values: [
-					V('purified by fire', { mountain: 1.5, desert: 1.5, steppe: 1.5 }),
-					V('purified by water', { river: 1.5, coast: 1.5, marsh: 1.5 }),
-					V("purified by a year's silence"),
-					V('never clean again')
+					N('fire', 'fire', { mountain: 'favours', desert: 'favours', steppe: 'favours' }, { about: ['fire', 'purity', 'cleansing'], readings: [...R('cleanse', 'killer', null), ...R('appease', 'gods', null)] }),
+					N('water', 'water', { river: 'favours', coast: 'favours', marsh: 'favours' }, { about: ['water', 'purity', 'cleansing'], readings: [...R('cleanse', 'killer', null), ...R('appease', 'gods', null)] }),
+					N('silence', "a year's silence", undefined, { about: ['stillness', 'patience', 'shame'], readings: [...R('cleanse', 'killer', null), ...R('atone', 'killer', 'living')] })
 				]
 			}
 		],
-		render: (n) => `${n[0]}, answered by ${n[1]}, ${n[2]}`
+		render: (n) => `Guilt found by ${n[0]}; ${n[1]}, answered by ${n[2]}; ${n[3] ? `made clean by ${n[3]}` : 'never clean again'}`
 	},
 	{
 		id: 'oath',
