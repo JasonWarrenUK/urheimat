@@ -143,3 +143,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - `what` (`lineages`, `deeds`, `boundaries`, `dead`) and `when` (`funerals`, `midwinter`, `assembly`) are sets, size [1, 4] and [1, 3]: a people keeps several matters on several occasions.
 - Engine: `retention` read the keeper's display text; it now reads the held `medium` by tag (+1 when about `stone`, +0.5 when about `voice`). No display-text matches remain in the engine.
 - New noun `voice`. Grids and affinities as approved.
+
+## Round 9: guest
+
+- Contract: for a band that has this custom, every value assumes a stranger who arrives is dealt with by a rule; it assumes nothing about whether they are taken in, what token passes, or for how long.
+- The render breach is gone. `rule` splits into `stance` (`welcome`, `bar`) and `basis` (`sacred`, `gift`, `hostage`). Everything past the stance applies only when the held stance carries a `shelter` reading (new verb), so nothing passes and no span runs for a stranger turned away; `bar` has no shelter reading.
+- Tokens are two parts, `gift/stranger` and `gift/host`, each a set of size [0, 1] over the same four kinds (`mineral/salt`, `food/grain`, `wealth/metal`, `drink/water`): asymmetric exchange, a one-way gift, or none.
+- Span is `count` (`one`, `three`) and `unit` (`meals`, `nights`, `open`); `open` carries no readings and so takes no count, the way funeral's "left as they are" ends a chain.
+- New noun `stranger`. Grids and affinities as approved.

@@ -174,7 +174,9 @@ export const NOUNS = [
 	// who rules
 	'chance',
 	// how the past is kept
-	'voice'
+	'voice',
+	// the stranger at the door
+	'stranger'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -223,7 +225,9 @@ export const VERBS = [
 	// what a founding deed did for the people
 	'found',
 	'win',
-	'defy'
+	'defy',
+	// a stranger taken in
+	'shelter'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];

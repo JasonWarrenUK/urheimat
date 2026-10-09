@@ -1,4 +1,4 @@
-import type { AffLevel, Affinity, FeatureDef, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
 import type { Noun, Verb } from './vocabulary';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
@@ -89,6 +89,16 @@ const companions = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, applies: applies.length ? applies : undefined };
 		})
 	).flat();
+
+// The stranger at the door: everything past the stance applies only when the stance shelters.
+const SHELTERED: Predicate = { part: 'stance', has: { verb: 'shelter' } };
+// What may pass between stranger and host, either way.
+const TOKENS: TraitValue[] = [
+	N('mineral/salt', 'salt', undefined, { about: ['salt', 'permanence', 'trust'], readings: R('bind', 'stranger', 'living') }),
+	N('food/grain', 'bread', undefined, { about: ['grain', 'nourishment', 'hearth'], readings: [...R('provide', 'stranger', 'nourishment'), ...R('bind', 'stranger', 'living')] }),
+	N('wealth/metal', 'a ring', undefined, { about: ['wealth', 'permanence', 'hierarchy'], readings: [...R('bind', 'stranger', 'living'), ...R('provide', 'stranger', 'wealth')] }),
+	N('drink/water', 'water', { desert: 'strong', steppe: 'favours' }, { about: ['water', 'cleansing', 'nourishment'], readings: [...R('provide', 'stranger', 'nourishment'), ...R('cleanse', 'stranger', null)] })
+];
 
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
@@ -1209,32 +1219,54 @@ export const SLOTS: SlotDef[] = [
 		id: 'guest',
 		domain: 'Kinship',
 		name: 'The stranger at the door',
+		// Contract: for a band that has this custom, every value assumes a stranger who arrives is dealt
+		// with by a rule; it assumes nothing about whether they are taken in, what token passes, or for
+		// how long. Everything past the stance applies only when the stance shelters: nothing passes
+		// and no span runs for a stranger turned away.
 		features: [
 			{
-				id: 'rule',
-				label: 'rule',
+				id: 'stance',
+				label: 'stance',
 				values: [
-					V('Sacred guest-right', { steppe: 3, desert: 3 }),
-					V('Feast-gift rivalry', { coast: 3, forest: 1.5, river: 1.5 }),
-					V('Exchange of hostages', { mountain: 1.5 }),
-					V('Strangers barred', { marsh: 3, mountain: 1.5 })
+					N('welcome', 'Strangers taken in', undefined, { about: ['sanctuary', 'threshold', 'trust'], readings: [...R('shelter', 'stranger', null), ...R('guard', 'stranger', null), ...R('bind', 'stranger', 'living')] }),
+					N('bar', 'Strangers barred', { marsh: 'strong', mountain: 'favours' }, { about: ['boundary', 'fear', 'enclosure'], readings: R('guard', 'living', null) })
 				]
 			},
 			{
-				id: 'token',
-				label: 'token',
-				values: [V('salt'), V('bread'), V('a ring'), V('water', { desert: 3, steppe: 1.5 })]
+				id: 'basis',
+				label: 'by',
+				applies: SHELTERED,
+				values: [
+					N('sacred', 'sacred guest-right', { steppe: 'strong', desert: 'strong' }, { about: ['sanctuary', 'mediation', 'gods'], readings: [...R('honour', 'gods', null), ...R('bind', 'stranger', 'gods')] }),
+					N('gift', 'feast-gift rivalry', { coast: 'strong', forest: 'favours', river: 'favours' }, { about: ['wealth', 'festivity', 'hierarchy'], readings: [...R('provide', 'stranger', 'plenty'), ...R('bind', 'stranger', 'living')] }),
+					N('hostage', 'exchange of hostages', { mountain: 'favours' }, { about: ['trust', 'kinship', 'boundary'], readings: [...R('bind', 'stranger', 'living'), ...R('guard', 'living', null)] })
+				]
+			},
+			{ id: 'gift/stranger', label: 'the stranger brings', applies: SHELTERED, size: [0, 1], values: TOKENS },
+			{ id: 'gift/host', label: 'the host gives', applies: SHELTERED, size: [0, 1], values: TOKENS },
+			{
+				id: 'unit',
+				label: 'shelter for',
+				applies: SHELTERED,
+				values: [
+					N('meals', 'meals', undefined, { about: ['nourishment', 'thrift'], readings: R('shelter', 'stranger', null) }),
+					N('nights', 'nights', undefined, { about: ['rest', 'hearth'], readings: R('shelter', 'stranger', null) }),
+					// No readings by design: an open stay takes no number.
+					N('open', 'as long as they choose', undefined, { about: ['freedom', 'trust'] })
+				]
 			},
 			{
-				id: 'span',
-				label: 'duration',
-				values: [V('three nights'), V('as long as the guest chooses'), V('one meal')]
+				id: 'count',
+				label: 'how many',
+				applies: [SHELTERED, { part: 'unit', has: 'anyReading' }],
+				values: [N('one', 'one', undefined, { about: ['thrift', 'boundary'] }), N('three', 'three', undefined, { about: ['custom', 'boundary'] })]
 			}
 		],
-		render: (n) =>
-			n[0] === 'Strangers barred'
-				? `Strangers barred unless they bring ${n[1]}; then shelter for ${n[2]}`
-				: `${n[0]}: ${n[1]} shared, shelter for ${n[2]}`
+		render: (n) => {
+			if (!n[1]) return n[0];
+			const gifts = [n[2] && `the stranger brings ${n[2]}`, n[3] && `the host gives ${n[3]}`].filter(Boolean).join(', ');
+			return `${n[0]} by ${n[1]}${gifts ? `; ${gifts}` : ''}; shelter for ${n[5] ? `${n[5]} ` : ''}${n[4]}`;
+		}
 	},
 	{
 		id: 'marriage',
