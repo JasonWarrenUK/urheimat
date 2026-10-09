@@ -179,7 +179,9 @@ export const NOUNS = [
 	'stranger',
 	// justice for a killing
 	'killer',
-	'guilt'
+	'guilt',
+	// the oath
+	'breaker'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

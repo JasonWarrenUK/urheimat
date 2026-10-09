@@ -160,3 +160,10 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - `payer` becomes `answerer` (`killer`, `kin`). The chief answering for a killer belongs to killings between bands; parked until a cross-band relationship system exists.
 - `cleansing` is a set, size [0, 2] (`fire`, `water`, `silence`); empty is never clean again.
 - New verb `atone`; new nouns `killer`, `guilt`. Grids and affinities as approved.
+
+## Round 11: oath
+
+- Contract: for a band that has this custom, every value assumes a promise is bound by something beyond the one who makes it; it assumes nothing about what it is sworn on, who witnesses it, or what a breach brings.
+- `on` stays single-valued (`fire`, `water`, `bones`, `weapons`). `witness` is a set, size [1, 3] (`assembly`, `chief`, `gods`); the gods alone is a set of one.
+- `breach` separates the consequence from who imposes it: `penalty`, a set of size [1, 2] (`outlawry`, `death`, `fine`, `curse`), and `imposer` (`assembly`, `chief`, `gods`, `poets`).
+- New noun `breaker`. Grids and affinities as approved.

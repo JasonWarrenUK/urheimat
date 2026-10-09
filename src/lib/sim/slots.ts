@@ -1349,34 +1349,53 @@ export const SLOTS: SlotDef[] = [
 		id: 'oath',
 		domain: 'Law',
 		name: 'The oath',
+		// Contract: for a band that has this custom, every value assumes a promise is bound by something
+		// beyond the one who makes it; it assumes nothing about what it is sworn on, who witnesses it,
+		// or what a breach brings.
 		features: [
 			{
 				id: 'on',
 				label: 'sworn on',
 				values: [
-					V('Fire', { mountain: 1.5, desert: 1.5, steppe: 1.5 }),
-					V('Water', { river: 3, coast: 1.5, marsh: 1.5 }),
-					V("The ancestors' bones", { forest: 1.5, mountain: 1.5 }),
-					V('Weapons', ST)
+					N('fire', 'fire', { mountain: 'favours', desert: 'favours', steppe: 'favours' }, { about: ['fire', 'purity', 'light'], readings: [...R('bind', 'living', 'gods'), ...R('honour', 'gods', null)] }),
+					N('water', 'water', { river: 'strong', coast: 'favours', marsh: 'favours' }, { about: ['water', 'cleansing', 'depth'], readings: [...R('bind', 'living', 'gods'), ...R('honour', 'gods', null)] }),
+					N('bones', "the ancestors' bones", { forest: 'favours', mountain: 'favours' }, { about: ['ancestors', 'bone', 'memory'], readings: [...R('bind', 'living', 'ancestors'), ...R('honour', 'ancestors', null)] }),
+					N('weapons', 'weapons', { steppe: 'strong' }, { about: ['violence', 'strength', 'authority'], readings: [...R('bind', 'living', 'custom'), ...R('guard', 'living', null)] })
 				]
 			},
 			{
 				id: 'witness',
-				label: 'witness',
-				values: [V('before the assembly'), V('before the chief'), V('before the god alone')]
+				label: 'before',
+				size: [1, 3],
+				values: [
+					N('assembly', 'the assembly', undefined, { about: ['belonging', 'custom'], readings: R('bind', 'living', 'custom') }),
+					N('chief', 'the chief', undefined, { about: ['authority', 'chief/self'], readings: R('bind', 'living', 'chief/self') }),
+					N('gods', 'the gods', undefined, { about: ['gods', 'mediation'], readings: R('bind', 'living', 'gods') })
+				]
 			},
 			{
-				id: 'breach',
-				label: 'breach',
+				id: 'penalty',
+				label: 'a breaker suffers',
+				size: [1, 2],
 				values: [
-					V('the breaker outlawed'),
-					V('the breaker struck by the god'),
-					V('the breaker fined'),
-					V('the breaker cursed by the poets')
+					N('outlawry', 'outlawry', undefined, { about: ['abandonment', 'boundary', 'distance'], readings: [...R('judge', 'breaker', 'justice'), ...R('guard', 'living', null)] }),
+					N('death', 'death', undefined, { about: ['ending', 'violence', 'fear'], readings: R('judge', 'breaker', 'justice') }),
+					N('fine', 'a fine', undefined, { about: ['wealth', 'thrift'], readings: R('atone', 'breaker', 'living') }),
+					N('curse', 'a curse', undefined, { about: ['shame', 'voice', 'memory'], readings: R('judge', 'breaker', 'shame') })
+				]
+			},
+			{
+				id: 'imposer',
+				label: 'imposed by',
+				values: [
+					N('assembly', 'the assembly', undefined, { about: ['belonging', 'custom', 'justice'], readings: R('judge', 'breaker', 'justice') }),
+					N('chief', 'the chief', undefined, { about: ['authority', 'chief/self'], readings: R('judge', 'breaker', 'justice') }),
+					N('gods', 'the gods', undefined, { about: ['gods', 'fear', 'mediation'], readings: [...R('judge', 'breaker', 'justice'), ...R('appease', 'gods', null)] }),
+					N('poets', 'the poets', undefined, { about: ['voice', 'memory', 'shame'], readings: R('judge', 'breaker', 'shame') })
 				]
 			}
 		],
-		render: (n) => `${n[0]}, ${n[1]}; ${n[2]}`
+		render: (n) => `Sworn on ${n[0]} before ${n[1]}; a breaker suffers ${n[2]}, imposed by ${n[3]}`
 	},
 	{
 		id: 'memory',
