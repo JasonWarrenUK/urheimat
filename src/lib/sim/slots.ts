@@ -1229,7 +1229,7 @@ export const SLOTS: SlotDef[] = [
 				label: 'stance',
 				values: [
 					N('welcome', 'Strangers taken in', undefined, { about: ['sanctuary', 'threshold', 'trust'], readings: [...R('shelter', 'stranger', null), ...R('guard', 'stranger', null), ...R('bind', 'stranger', 'living')] }),
-					N('bar', 'Strangers barred', { marsh: 'strong', mountain: 'favours' }, { about: ['boundary', 'fear', 'enclosure'], readings: R('guard', 'living', null) })
+					N('bar', 'Strangers barred', { marsh: 'strong', mountain: 'favours', steppe: 'resists', desert: 'resists', coast: 'resists' }, { about: ['boundary', 'fear', 'enclosure'], readings: R('guard', 'living', null) })
 				]
 			},
 			{

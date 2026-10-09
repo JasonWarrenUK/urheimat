@@ -151,3 +151,4 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Tokens are two parts, `gift/stranger` and `gift/host`, each a set of size [0, 1] over the same four kinds (`mineral/salt`, `food/grain`, `wealth/metal`, `drink/water`): asymmetric exchange, a one-way gift, or none.
 - Span is `count` (`one`, `three`) and `unit` (`meals`, `nights`, `open`); `open` carries no readings and so takes no count, the way funeral's "left as they are" ends a chain.
 - New noun `stranger`. Grids and affinities as approved.
+- `bar` resists steppe, desert and coast: open, travelled land where a refused traveller may die. Jason asked what the record shows for strangers against biome; no direct cross-cultural test was found, and the best-supported mechanism is risk buffering (Pisor and Gurven 2016), which this follows. Marsh and mountain favouring `bar` is inherited authoring with no evidence either way.
