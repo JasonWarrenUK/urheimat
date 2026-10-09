@@ -75,6 +75,21 @@ const ADDRESS: Reading[] = [...R('address', 'power/greatest', 'female', 'male')]
 // reckoning at the threshold, or a sorting by manner of death; a band holding neither is unjudged.
 const JUDGE: Reading[] = R('judge', 'spirit', null, 'death');
 
+// The founding figure may be spoken of as female or male; a band may hold either, both or neither.
+const HERO_SEX: Reading[] = R('address', 'hero', 'female', 'male');
+
+// Up to `count` companions, each a set-valued helper with the parts that go with it. The first
+// helper may be empty (a hero alone); a later companion applies only after the one before.
+const companions = (count: number, axes: FeatureDef[]): FeatureDef[] =>
+	Array.from({ length: count }, (_, i) =>
+		axes.map((a) => {
+			const own = a.applies === undefined ? [] : Array.isArray(a.applies) ? a.applies : [a.applies];
+			const before = i > 0 && a.size ? [{ part: a.id, stage: 'previous' as const, has: 'anyMember' as const }] : [];
+			const applies = [...before, ...own];
+			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, applies: applies.length ? applies : undefined };
+		})
+	).flat();
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -194,37 +209,94 @@ export const SLOTS: SlotDef[] = [
 		id: 'hero',
 		domain: 'Cosmology',
 		name: 'The founding tale',
+		// Contract: for a band that has this custom, every value assumes the people tell of one founding
+		// figure whose deed made them a people; it assumes nothing about who the figure was, what the
+		// deed was, or who helped. The hero's sex is a belief (address readings on every birth). Up to
+		// two companions, each a helper with its own aid; an empty first helper is a hero alone.
 		features: [
 			{
-				id: 'kind',
-				label: 'the hero',
-				values: [V('A twin pair'), V('An orphan'), V("A king's youngest son"), V('A woman')]
+				id: 'number',
+				label: 'number',
+				values: [
+					N('one', 'One founder', undefined, { about: ['identity', 'authority'], readings: R('found', 'living', null) }),
+					N('twins', 'A twin pair', undefined, { about: ['kinship', 'division', 'equality'], readings: [...R('found', 'living', null), ...R('bind', 'living', 'kinship')] }),
+					N('company', 'A company', undefined, { about: ['belonging', 'equality', 'kinship'], readings: [...R('found', 'living', null), ...R('bind', 'living', 'belonging')] })
+				]
 			},
 			{
-				id: 'deed',
+				id: 'birth',
+				label: 'birth',
+				values: [
+					N('orphan', 'an orphan', undefined, { about: ['abandonment', 'origin', 'wild'], readings: [...HERO_SEX, ...R('found', 'living', null), ...R('defy', 'gods', null)] }),
+					N('youngest', "a ruler's youngest", undefined, { about: ['lineage', 'hierarchy', 'trust'], readings: [...HERO_SEX, ...R('found', 'living', null), ...R('win', 'land', 'living')] }),
+					N('lowborn', 'of no house', undefined, { about: ['plainness', 'labour', 'equality'], readings: [...HERO_SEX, ...R('found', 'living', null), ...R('defy', 'hierarchy', null)] })
+				]
+			},
+			{
+				id: 'act',
 				label: 'deed',
 				values: [
-					V('slew the serpent that held the waters', { river: 3, mountain: 1.5 }),
-					V('raided the cattle of the gods', { steppe: 3, desert: 1.5 }),
-					V('built the first house', { river: 1.5, forest: 1.5, coast: 1.5 }),
-					V('returned from the drowned lands', { coast: 3, marsh: 1.5 }),
-					V('cut the first furrow', { river: 3, forest: 1.5 }),
-					V('stole fire from the heights', { mountain: 3, forest: 1.5 })
+					N('slew', 'slew', undefined, { about: ['violence', 'strength', 'ending'], readings: [...R('defy', 'gods', null), ...R('guard', 'living', null)] }),
+					N('raided', 'raided', undefined, { about: ['chase', 'theft', 'wealth'], readings: [...R('defy', 'gods', null), ...R('win', 'wealth', 'living')] }),
+					N('built', 'built', undefined, { about: ['craft', 'permanence', 'hearth'], readings: [...R('found', 'living', 'land'), ...R('create', 'hearth', null)] }),
+					N('returned', 'returned from', undefined, { about: ['passage', 'memory', 'loss'], readings: [...R('return', 'living', null), ...R('found', 'living', 'land')] }),
+					N('cut', 'cut', undefined, { about: ['labour', 'earth', 'growth'], readings: [...R('create', 'grain', null), ...R('found', 'living', 'land')] }),
+					N('stole', 'stole', undefined, { about: ['theft', 'haste', 'light'], readings: [...R('defy', 'gods', null), ...R('win', 'light', 'living')] })
 				]
 			},
 			{
-				id: 'companion',
-				label: 'helper',
+				id: 'object',
+				label: 'object',
 				values: [
-					V('nursed by wolves', { forest: 3, mountain: 1.5 }),
-					V('guided by a horse', { steppe: 3 }),
-					V('carried by a boat', { coast: 3, river: 1.5 }),
-					V('helped by a bee', { forest: 1.5, river: 1.5, marsh: 1.5 }),
-					V('alone', { desert: 3, mountain: 1.5 })
+					N('monster', 'the serpent', { river: 'favours', marsh: 'favours' }, { about: ['violence', 'water', 'boundary', 'fear'], readings: [...R('guard', 'living', null), ...R('defy', 'gods', null)] }),
+					N('herds', 'the cattle of the gods', { steppe: 'favours' }, { about: ['herds', 'wealth'], readings: R('provide', 'living', 'plenty') }),
+					N('dwelling', 'the first house', undefined, { about: ['hearth', 'enclosure', 'permanence'], readings: [...R('guard', 'living', null), ...R('found', 'living', 'land')] }),
+					N('homeland/lost', 'the drowned lands', { coast: 'favours' }, { about: ['sea', 'loss', 'memory'], readings: [...R('return', 'living', null), ...R('found', 'living', 'land')] }),
+					N('field', 'the first furrow', { river: 'favours' }, { about: ['earth', 'grain', 'labour'], readings: [...R('create', 'grain', null), ...R('provide', 'living', 'plenty')] }),
+					N('fire', 'fire from the heights', { mountain: 'favours' }, { about: ['fire', 'light', 'warmth'], readings: [...R('create', 'hearth', null), ...R('provide', 'living', 'warmth')] })
 				]
-			}
+			},
+			{
+				id: 'stake',
+				label: 'and so won',
+				values: [
+					N('waters', 'the waters', { river: 'strong', mountain: 'favours', desert: 'resists' }, { about: ['water', 'plenty', 'renewal'], readings: [...R('win', 'water', 'living'), ...R('provide', 'living', 'plenty')] }),
+					N('herds', 'the herds', { steppe: 'strong', desert: 'favours', marsh: 'resists' }, { about: ['herds', 'wealth'], readings: R('win', 'herds', 'living') }),
+					N('shelter', 'shelter', { river: 'favours', forest: 'favours', coast: 'favours', steppe: 'resists' }, { about: ['enclosure', 'hearth', 'guardianship'], readings: [...R('found', 'living', 'land'), ...R('guard', 'living', null)] }),
+					N('homeland', 'a homeland', { coast: 'strong', marsh: 'favours', desert: 'excludes', mountain: 'resists' }, { about: ['land', 'origin', 'memory'], readings: [...R('found', 'living', 'land'), ...R('return', 'living', null)] }),
+					N('grain', 'grain', { river: 'strong', forest: 'favours', desert: 'resists', mountain: 'resists' }, { about: ['grain', 'growth', 'labour'], readings: [...R('win', 'grain', 'living'), ...R('create', 'grain', null)] }),
+					N('fire', 'fire', { mountain: 'strong', forest: 'favours', marsh: 'resists' }, { about: ['fire', 'light', 'warmth'], readings: [...R('win', 'fire', 'living'), ...R('create', 'hearth', null)] })
+				]
+			},
+			...companions(2, [
+				{
+					id: 'helper',
+					label: 'helped by',
+					size: [0, 1],
+					values: [
+						N('wild', 'wolves', { forest: 'strong', mountain: 'favours', desert: 'resists' }, { about: ['wild', 'strength', 'kinship'], readings: [...R('guard', 'hero', null), ...R('bind', 'hero', 'wild')] }),
+						N('mount', 'a horse', { steppe: 'strong', forest: 'resists', marsh: 'resists' }, { about: ['herds', 'speed', 'guidance'], readings: [...R('guard', 'hero', null), ...R('convey', 'hero', 'land')] }),
+						N('vessel', 'a boat', { coast: 'strong', river: 'favours', desert: 'excludes', mountain: 'resists' }, { about: ['water', 'passage', 'craft'], readings: [...R('convey', 'hero', 'land'), ...R('guard', 'hero', null)] }),
+						N('creature', 'a bee', { forest: 'favours', river: 'favours', marsh: 'favours' }, { about: ['smallness', 'sweetness', 'guidance'], readings: [...R('guard', 'hero', null), ...R('provide', 'hero', 'plenty')] })
+					]
+				},
+				{
+					id: 'aid',
+					label: 'who',
+					applies: { part: 'helper', stage: 'same', has: 'anyMember' },
+					values: [
+						N('nursed', 'nursed them', undefined, { about: ['nourishment', 'kinship', 'youth'], readings: [...R('guard', 'hero', null), ...R('provide', 'hero', 'nourishment')] }),
+						N('guided', 'guided them', undefined, { about: ['guidance', 'passage'], readings: R('convey', 'hero', 'land') }),
+						N('carried', 'carried them', undefined, { about: ['passage', 'distance'], readings: R('convey', 'hero', 'land') }),
+						N('helped', 'helped them', undefined, { about: ['trust', 'smallness'], readings: [...R('provide', 'hero', 'plenty'), ...R('guard', 'hero', null)] })
+					]
+				}
+			])
 		],
-		render: (n) => `${n[0]} who ${n[1]}, ${n[2]}`
+		render: (n) => {
+			const who = [n[5] && `${n[5]} ${n[6]}`, n[7] && `${n[7]} ${n[8]}`].filter(Boolean).join(' and ');
+			return `${n[0]}, ${n[1]}, ${n[2]} ${n[3]} and so won ${n[4]}${who ? `; ${who}` : ''}`;
+		}
 	},
 	{
 		id: 'cult',

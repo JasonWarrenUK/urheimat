@@ -120,3 +120,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Judgement is a reading on every act that has readings: `judge(spirit)` is a reckoning at the threshold, `judge(spirit to death)` a sorting by manner of death; holding neither is unjudged, so no absence value.
 - Passage (ferried, on horseback, led by a hound, on foot) is dropped: mythic detail with no practice behind it and nouns that would be instances. 4SD.10 may bring it back as a reading family if a verb for it appears.
 - Engine: `retention` found the rule and memory customs by hard-coded index; it now finds them by id.
+
+## Round 6: hero
+
+- Contract: for a band that has this custom, every value assumes the people tell of one founding figure whose deed made them a people; it assumes nothing about who the figure was, what the deed was, or who helped. Kept as an independent custom: one of its functions is to be set down in writing by some cultures, which lets the scholars compare tales (writing is a later mechanism).
+- `kind` splits three ways: `number` (`one`, `twins`, `company`), `birth` (`orphan`, `youngest`, `lowborn`) and the hero's sex as address readings on every birth value, as on highGod.
+- `deed` splits into `act` (slew, raided, built, returned, cut, stole), `object` (monster, herds, dwelling, homeland/lost, field, fire) and `stake` (waters, herds, shelter, homeland, grain, fire), Jason's `<slew> <serpent> <held-waters>`. Odd combinations are allowed by contract and left to the lens; `herds` and `fire` sit in both object and stake, the cost of three axes.
+- `companion` becomes up to two companions, each a `helper` set (size [0, 1]: wild, mount, vessel, creature) with its own `aid` (nursed, guided, carried, helped) applying only when that helper is held; the second applies only after the first. An empty first helper is a hero alone; the old `alone` affinity (desert, mountain) is lost like `unwed`.
+- New verbs `found`, `win`, `defy`; new nouns `hero`, `loss`, `theft`, `guidance`. Grids and affinities as approved.

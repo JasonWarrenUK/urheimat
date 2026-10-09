@@ -165,7 +165,12 @@ export const NOUNS = [
 	'death',
 	'justice',
 	'female',
-	'male'
+	'male',
+	// the founding tale
+	'hero',
+	'loss',
+	'theft',
+	'guidance'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -210,7 +215,11 @@ export const VERBS = [
 	'create',
 	'guard',
 	'judge',
-	'address'
+	'address',
+	// what a founding deed did for the people
+	'found',
+	'win',
+	'defy'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
