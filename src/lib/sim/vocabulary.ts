@@ -170,7 +170,9 @@ export const NOUNS = [
 	'hero',
 	'loss',
 	'theft',
-	'guidance'
+	'guidance',
+	// who rules
+	'chance'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

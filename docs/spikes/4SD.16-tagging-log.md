@@ -128,3 +128,10 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - `deed` splits into `act` (slew, raided, built, returned, cut, stole), `object` (monster, herds, dwelling, homeland/lost, field, fire) and `stake` (waters, herds, shelter, homeland, grain, fire), Jason's `<slew> <serpent> <held-waters>`. Odd combinations are allowed by contract and left to the lens; `herds` and `fire` sit in both object and stake, the cost of three axes.
 - `companion` becomes up to two companions, each a `helper` set (size [0, 1]: wild, mount, vessel, creature) with its own `aid` (nursed, guided, carried, helped) applying only when that helper is held; the second applies only after the first. An empty first helper is a hero alone; the old `alone` affinity (desert, mountain) is lost like `unwed`.
 - New verbs `found`, `win`, `defy`; new nouns `hero`, `loss`, `theft`, `guidance`. Grids and affinities as approved.
+
+## Round 7: rule
+
+- Contract: for a band that has this custom, every value assumes someone holds authority over the band; it assumes nothing about who, how they are chosen, how long they hold it, or what sacred duty goes with it.
+- `ruler` splits into `seat` (`one`, `council`) and `source` of authority (`sacred`, `war`, `age`, `wealth`, `law`); the five old values become combinations. `tenure` splits into `tenure` (`life`, `until-defeated`, `yearly`) and `chosen` (`birth`, `election`, `lot`). `duty` keeps its four values with ids `fire`, `ancestors`, `herds`, `waters`. New noun `chance`.
+- Engine: `retention` matched the ruler's display text; it now reads the held `source` by tag (+1.5 when about `justice`, +1 when about `mediation`) through a new helper `heldAbout`. The memory custom's matches wait for its round.
+- Test maintenance: the funeral-stage test asserted the recovery never shows more stages than the truth; a wrongly recovered act can imply a later stage, so it now asserts that rendered stages equal the stages live in the recovery and that no run of lost parts appears.

@@ -112,6 +112,10 @@ export const activeIn = (slot: SlotDef, fv: TraitValues): number[] => fv.flatMap
 // once per member, an empty set not at all.
 export const heldCount = (traits: CultureTraits): number => activeParts(traits).reduce((n, [si, fi]) => n + traits[si][fi].length, 0);
 
+// Whether some held value of part `fi` in custom `si` is about `noun`.
+export const heldAbout = (traits: CultureTraits, si: number, fi: number, noun: Noun): boolean =>
+	traits[si][fi].some((vi) => SLOTS[si].features[fi].values[vi].about?.includes(noun) ?? false);
+
 // ---------- shadows ----------
 
 const partNamed = (f: FeatureDef, name: string): boolean => f.id === name || f.id.endsWith(`.${name}`);

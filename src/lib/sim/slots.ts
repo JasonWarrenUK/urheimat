@@ -1123,35 +1123,59 @@ export const SLOTS: SlotDef[] = [
 		id: 'rule',
 		domain: 'Kinship',
 		name: 'Who rules',
+		// Contract: for a band that has this custom, every value assumes someone holds authority over
+		// the band; it assumes nothing about who, how they are chosen, how long they hold it, or what
+		// sacred duty goes with it.
 		features: [
 			{
-				id: 'ruler',
-				label: 'ruler',
+				id: 'seat',
+				label: 'seat',
 				values: [
-					V('A sacral king', { river: 3, desert: 1.5 }),
-					V('An elected war-chief', ST),
-					V('A council of elders', { forest: 3, marsh: 1.5 }),
-					V('The ship-lords', { coast: 3 }),
-					V('A priest-judge', { mountain: 1.5, desert: 1.5 })
+					N('one', 'One ruler', undefined, { about: ['authority', 'identity', 'hierarchy'], readings: [...R('rule', 'living', null), ...R('judge', 'living', 'justice')] }),
+					N('council', 'A council', undefined, { about: ['belonging', 'custom', 'equality'], readings: [...R('rule', 'living', null), ...R('judge', 'living', 'justice'), ...R('bind', 'living', 'custom')] })
+				]
+			},
+			{
+				id: 'source',
+				label: 'by right of',
+				values: [
+					N('sacred', 'sanctity', { river: 'favours', desert: 'favours' }, { about: ['mediation', 'sanctuary', 'authority'], readings: [...R('rule', 'living', null), ...R('commune', 'spirit', 'gods'), ...R('honour', 'gods', null)] }),
+					N('war', 'war', { steppe: 'strong' }, { about: ['violence', 'strength', 'guardianship'], readings: [...R('rule', 'living', null), ...R('guard', 'living', null), ...R('win', 'land', 'living')] }),
+					N('age', 'age', { forest: 'strong', marsh: 'favours' }, { about: ['age', 'memory', 'custom'], readings: [...R('rule', 'living', null), ...R('judge', 'living', 'justice'), ...R('guard', 'custom', null)] }),
+					N('wealth', 'wealth', { coast: 'strong' }, { about: ['wealth', 'hierarchy', 'craft'], readings: [...R('rule', 'living', null), ...R('provide', 'living', 'plenty')] }),
+					N('law', 'law', { mountain: 'favours', desert: 'favours' }, { about: ['justice', 'custom', 'mediation'], readings: [...R('rule', 'living', null), ...R('judge', 'living', 'justice'), ...R('guard', 'custom', null)] })
 				]
 			},
 			{
 				id: 'tenure',
 				label: 'tenure',
-				values: [V('for life'), V('until defeated'), V('chosen each year'), V('chosen by lot')]
+				values: [
+					N('life', 'for life', undefined, { about: ['permanence', 'continuity'], readings: R('bind', 'living', 'continuity') }),
+					N('until-defeated', 'until defeated', undefined, { about: ['violence', 'strength', 'endurance'], readings: R('guard', 'living', null) }),
+					N('yearly', 'for a year', undefined, { about: ['cycle', 'renewal', 'equality'], readings: R('renew', 'living', 'renewal') })
+				]
+			},
+			{
+				id: 'chosen',
+				label: 'chosen by',
+				values: [
+					N('birth', 'birth', undefined, { about: ['lineage', 'continuity', 'hierarchy'], readings: R('bind', 'living', 'lineage') }),
+					N('election', 'election', undefined, { about: ['equality', 'trust', 'belonging'], readings: R('bind', 'living', 'trust') }),
+					N('lot', 'lot', undefined, { about: ['chance', 'equality', 'gods'], readings: R('bind', 'living', 'gods') })
+				]
 			},
 			{
 				id: 'duty',
 				label: 'sacred duty',
 				values: [
-					V('keeps the fire'),
-					V('speaks with the ancestors'),
-					V('wards the herds', { steppe: 1.5, desert: 1.5 }),
-					V('reads the waters', { coast: 1.5, river: 1.5, marsh: 1.5 })
+					N('fire', 'keeps the fire', undefined, { about: ['fire', 'hearth', 'guardianship'], readings: [...R('guard', 'fire', null), ...R('honour', 'gods', null)] }),
+					N('ancestors', 'speaks with the ancestors', undefined, { about: ['ancestors', 'memory', 'mediation'], readings: [...R('commune', 'spirit', 'ancestors'), ...R('honour', 'ancestors', null)] }),
+					N('herds', 'wards the herds', { steppe: 'favours', desert: 'favours' }, { about: ['herds', 'wealth', 'guardianship'], readings: [...R('guard', 'herds', null), ...R('provide', 'living', 'plenty')] }),
+					N('waters', 'reads the waters', { coast: 'favours', river: 'favours', marsh: 'favours' }, { about: ['water', 'cycle', 'plenty'], readings: [...R('provide', 'living', 'plenty'), ...R('honour', 'gods', null)] })
 				]
 			}
 		],
-		render: (n) => `${n[0]}, ${n[1]}, who ${n[2]}`
+		render: (n) => `${n[0]} by right of ${n[1]}, ${n[2]}, chosen by ${n[3]}, who ${n[4]}`
 	},
 	{
 		id: 'youth',

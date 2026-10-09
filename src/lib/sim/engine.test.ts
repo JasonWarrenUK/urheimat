@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/engine';
 import { begin, defaultOrders, endEra, newGame, reconstruct, render, startTiles } from './engine';
-import { activeCount } from './predicates';
+import { activeCount, activeIn } from './predicates';
 import { SLOTS } from './slots';
 
 describe('engine', () => {
@@ -50,7 +50,10 @@ describe('engine', () => {
 		begin(state, tiles[0].x, tiles[0].y);
 		for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultOrders());
 		const entry = reconstruct(state).entries[funeral];
-		expect(stages(render(funeral, entry.recFv))).toBeLessThanOrEqual(stages(render(funeral, state.ancestral[funeral])));
+		// A wrongly recovered act can imply a later stage the truth lacked; that stage shows as lost,
+		// never as a run of lost parts, and a stage dormant in the recovery is dropped outright.
+		const liveStages = new Set(activeIn(SLOTS[funeral], entry.recFv as number[][]).map((fi) => SLOTS[funeral].features[fi].stage)).size;
+		expect(stages(render(funeral, entry.recFv))).toBe(liveStages);
 		expect(render(funeral, entry.recFv)).not.toContain('… …');
 	});
 });

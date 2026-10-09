@@ -12,7 +12,7 @@ import type {
 	Rng,
 	Terrain
 } from '$lib/types';
-import { heldCount, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { heldAbout, heldCount, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
 import { partTable } from './similarity';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -300,13 +300,14 @@ export function begin(st: GameState, px: number, py: number): GameState {
 
 // ---------- the era ----------
 const RULE = SLOTS.findIndex((s) => s.id === 'rule'),
+	SOURCE = SLOTS[RULE].features.findIndex((f) => f.id === 'source'),
 	MEMORY = SLOTS.findIndex((s) => s.id === 'memory');
 function retention(_st: GameState, c: Culture): number {
 	let rt = 5 * c.conserv;
-	const ruler = vname(RULE, 0, c.traits[RULE][0][0]),
-		keeper = vname(MEMORY, 0, c.traits[MEMORY][0][0]);
-	if (ruler === 'A priest-judge') rt += 1.5;
-	if (ruler === 'A sacral king') rt += 1;
+	// Rule by law and sacred rule keep custom; so do the memory custom's stones and singers.
+	const keeper = vname(MEMORY, 0, c.traits[MEMORY][0][0]);
+	if (heldAbout(c.traits, RULE, SOURCE, 'justice')) rt += 1.5;
+	if (heldAbout(c.traits, RULE, SOURCE, 'mediation')) rt += 1;
 	if (keeper === 'Carved stones') rt += 1;
 	if (keeper === 'Poets of praise and blame' || keeper === 'Sung genealogies') rt += 0.5;
 	if (c.migrated) rt -= 2;
