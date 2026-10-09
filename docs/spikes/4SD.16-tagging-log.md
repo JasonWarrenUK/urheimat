@@ -135,3 +135,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - `ruler` splits into `seat` (`one`, `council`) and `source` of authority (`sacred`, `war`, `age`, `wealth`, `law`); the five old values become combinations. `tenure` splits into `tenure` (`life`, `until-defeated`, `yearly`) and `chosen` (`birth`, `election`, `lot`). `duty` keeps its four values with ids `fire`, `ancestors`, `herds`, `waters`. New noun `chance`.
 - Engine: `retention` matched the ruler's display text; it now reads the held `source` by tag (+1.5 when about `justice`, +1 when about `mediation`) through a new helper `heldAbout`. The memory custom's matches wait for its round.
 - Test maintenance: the funeral-stage test asserted the recovery never shows more stages than the truth; a wrongly recovered act can imply a later stage, so it now asserts that rendered stages equal the stages live in the recovery and that no run of lost parts appears.
+
+## Round 8: memory
+
+- Contract: for a band that has this custom, every value assumes the past is kept deliberately by someone; it assumes nothing about the medium, the matter kept, or the occasion.
+- `keeper` becomes `medium` (`voice/verse`, `voice/song`, `stone`, `dance`); the matter it bundled (sung genealogies) stays in `what`. Carved stone is where writing attaches later (6SL.5).
+- `what` (`lineages`, `deeds`, `boundaries`, `dead`) and `when` (`funerals`, `midwinter`, `assembly`) are sets, size [1, 4] and [1, 3]: a people keeps several matters on several occasions.
+- Engine: `retention` read the keeper's display text; it now reads the held `medium` by tag (+1 when about `stone`, +0.5 when about `voice`). No display-text matches remain in the engine.
+- New noun `voice`. Grids and affinities as approved.

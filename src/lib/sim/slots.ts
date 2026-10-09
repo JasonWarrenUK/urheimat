@@ -1334,31 +1334,40 @@ export const SLOTS: SlotDef[] = [
 		id: 'memory',
 		domain: 'Law',
 		name: 'How the past is kept',
+		// Contract: for a band that has this custom, every value assumes the past is kept deliberately
+		// by someone; it assumes nothing about the medium, the matter kept, or the occasion. A people
+		// keeps several matters on several occasions, so both are sets.
 		features: [
 			{
-				id: 'keeper',
-				label: 'keepers',
+				id: 'medium',
+				label: 'medium',
 				values: [
-					V('Poets of praise and blame', { steppe: 1.5, forest: 1.5 }),
-					V('Carved stones', { mountain: 3, desert: 1.5 }),
-					V('Sung genealogies', { coast: 1.5, river: 1.5 }),
-					V('Masked dancers', { marsh: 3, forest: 1.5 })
+					N('voice/verse', 'Poets of praise and blame', { steppe: 'favours', forest: 'favours' }, { about: ['voice', 'memory', 'authority'], readings: [...R('hold', 'memory', null), ...R('judge', 'living', 'justice'), ...R('honour', 'ancestors', null)] }),
+					N('voice/song', 'Singers', { coast: 'favours', river: 'favours' }, { about: ['voice', 'memory', 'kinship'], readings: [...R('hold', 'memory', null), ...R('bind', 'living', 'kinship'), ...R('honour', 'ancestors', null)] }),
+					N('stone', 'Carved stones', { mountain: 'strong', desert: 'favours' }, { about: ['stone', 'permanence', 'memory', 'visibility'], readings: [...R('hold', 'memory', null), ...R('mark', 'land', null), ...R('honour', 'ancestors', null)] }),
+					N('dance', 'Masked dancers', { marsh: 'strong', forest: 'favours' }, { about: ['festivity', 'memory', 'presence'], readings: [...R('hold', 'memory', null), ...R('commune', 'spirit', 'ancestors'), ...R('honour', 'ancestors', null)] })
 				]
 			},
 			{
 				id: 'what',
 				label: 'matter',
+				size: [1, 4],
 				values: [
-					V('the lineages of chiefs'),
-					V('the deeds of heroes'),
-					V('the boundaries of the land', { river: 1.5, coast: 1.5 }),
-					V('the names of the dead')
+					N('lineages', 'the lineages of chiefs', undefined, { about: ['lineage', 'kinship', 'hierarchy'], readings: [...R('hold', 'memory', null), ...R('bind', 'living', 'lineage')] }),
+					N('deeds', 'the deeds of heroes', undefined, { about: ['hero', 'origin', 'identity'], readings: [...R('hold', 'memory', null), ...R('honour', 'hero', null)] }),
+					N('boundaries', 'the boundaries of the land', { river: 'favours', coast: 'favours' }, { about: ['land', 'boundary', 'custom'], readings: [...R('hold', 'memory', null), ...R('mark', 'land', null), ...R('guard', 'land', null)] }),
+					N('dead', 'the names of the dead', undefined, { about: ['dead', 'memory', 'continuity'], readings: [...R('hold', 'memory', null), ...R('honour', 'ancestors', null), ...R('commune', 'spirit', 'ancestors')] })
 				]
 			},
 			{
 				id: 'when',
 				label: 'occasion',
-				values: [V('at funerals'), V('at midwinter'), V('at the assembly')]
+				size: [1, 3],
+				values: [
+					N('funerals', 'at funerals', undefined, { about: ['dead', 'ending', 'memory'], readings: R('honour', 'ancestors', null) }),
+					N('midwinter', 'at midwinter', undefined, { about: ['cold', 'darkness', 'renewal'], readings: [...R('honour', 'ancestors', null), ...R('renew', 'memory', 'renewal')] }),
+					N('assembly', 'at the assembly', undefined, { about: ['belonging', 'custom', 'justice'], readings: [...R('bind', 'living', 'custom'), ...R('judge', 'living', 'justice')] })
+				]
 			}
 		],
 		render: (n) => `${n[0]}, keeping ${n[1]}, ${n[2]}`

@@ -301,15 +301,15 @@ export function begin(st: GameState, px: number, py: number): GameState {
 // ---------- the era ----------
 const RULE = SLOTS.findIndex((s) => s.id === 'rule'),
 	SOURCE = SLOTS[RULE].features.findIndex((f) => f.id === 'source'),
-	MEMORY = SLOTS.findIndex((s) => s.id === 'memory');
+	MEMORY = SLOTS.findIndex((s) => s.id === 'memory'),
+	MEDIUM = SLOTS[MEMORY].features.findIndex((f) => f.id === 'medium');
 function retention(_st: GameState, c: Culture): number {
 	let rt = 5 * c.conserv;
-	// Rule by law and sacred rule keep custom; so do the memory custom's stones and singers.
-	const keeper = vname(MEMORY, 0, c.traits[MEMORY][0][0]);
+	// Rule by law and sacred rule keep custom; so do a stone record and a spoken one.
 	if (heldAbout(c.traits, RULE, SOURCE, 'justice')) rt += 1.5;
 	if (heldAbout(c.traits, RULE, SOURCE, 'mediation')) rt += 1;
-	if (keeper === 'Carved stones') rt += 1;
-	if (keeper === 'Poets of praise and blame' || keeper === 'Sung genealogies') rt += 0.5;
+	if (heldAbout(c.traits, MEMORY, MEDIUM, 'stone')) rt += 1;
+	if (heldAbout(c.traits, MEMORY, MEDIUM, 'voice')) rt += 0.5;
 	if (c.migrated) rt -= 2;
 	return Math.max(2, rt);
 }
