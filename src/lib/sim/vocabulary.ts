@@ -14,6 +14,7 @@ export const NOUNS = [
 	'beyond/sky',
 	'beyond/stars',
 	'beyond/otherworld',
+	'beyond/below',
 	'ancestors',
 	'gods',
 	// what it is about

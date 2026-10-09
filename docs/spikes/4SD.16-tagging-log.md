@@ -112,3 +112,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - `consort` is set-valued, size [0, 2]: an empty set is unwed, and two consorts are expressible. The old `unwed` value favoured desert and mountain; an empty set carries no affinity, so that pull waits for the pressure system. Parked for 6SL.3: weighing absence.
 - Domain gains five values that the record shows as greatest powers: `moon`, `beasts` (master of animals), `river`, `wind`, `death`. Their grids and affinities are in `slots.ts` as approved.
 - New verbs `rule`, `create`, `guard`, `judge`, `address`; new nouns `storm`, `sun`, `sea`, `death`, `justice`, `female`, `male`.
+
+## Round 5: afterlife, dissolved
+
+- Where the dead go is belief with no practice behind it, and funeral's readings already carried it. Jason chose to dissolve the custom rather than keep it as a shadow of funeral or as an independent custom. The corpus's customs are authored categories; this one described nothing a trace could find.
+- Destinations become funeral reading targets. New noun `beyond/below` (beneath the mountain, down into the sea) on inter, sink and the enclosed places (cave, bog, open water); rebirth is `return(spirit to living)` on inter, sink and scatter; the winds and the river crossing were already `beyond/sky` and `beyond/otherworld`.
+- Judgement is a reading on every act that has readings: `judge(spirit)` is a reckoning at the threshold, `judge(spirit to death)` a sorting by manner of death; holding neither is unjudged, so no absence value.
+- Passage (ferried, on horseback, led by a hound, on foot) is dropped: mythic detail with no practice behind it and nouns that would be instances. 4SD.10 may bring it back as a reading family if a verb for it appears.
+- Engine: `retention` found the rule and memory customs by hard-coded index; it now finds them by id.

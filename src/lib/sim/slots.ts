@@ -71,6 +71,10 @@ const HONOUR: Reading[] = [...R('honour', 'power/greatest', null), ...R('honour'
 // The greatest power may be spoken of as female or male; a band may hold either, both or neither.
 const ADDRESS: Reading[] = [...R('address', 'power/greatest', 'female', 'male')];
 
+// Where the dead go was a custom of its own; it is belief, so it lives on the acts as readings. A
+// reckoning at the threshold, or a sorting by manner of death; a band holding neither is unjudged.
+const JUDGE: Reading[] = R('judge', 'spirit', null, 'death');
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -221,41 +225,6 @@ export const SLOTS: SlotDef[] = [
 			}
 		],
 		render: (n) => `${n[0]} who ${n[1]}, ${n[2]}`
-	},
-	{
-		id: 'afterlife',
-		domain: 'Cosmology',
-		name: 'Where the dead go',
-		features: [
-			{
-				id: 'dest',
-				label: 'destination',
-				values: [
-					V('the pasture of the ancestors', { steppe: 3, desert: 1.5 }),
-					V('beneath the mountain', { mountain: 3, desert: 1.5 }),
-					V('down into the sea', { coast: 3 }),
-					V('across the river', { river: 3, coast: 1.5 }),
-					V('the winds', { desert: 3, steppe: 1.5 }),
-					V('the grandchildren, to be born again', { forest: 1.5, river: 1.5, marsh: 1.5 })
-				]
-			},
-			{
-				id: 'passage',
-				label: 'passage',
-				values: [
-					V('ferried', { river: 1.5, coast: 1.5, marsh: 1.5 }),
-					V('on horseback', { steppe: 3, desert: 1.5 }),
-					V('led by a hound', { forest: 3, mountain: 1.5 }),
-					V('on their own feet', { mountain: 1.5, desert: 1.5 })
-				]
-			},
-			{
-				id: 'judge',
-				label: 'judgement',
-				values: [V('judged at a gate'), V('unjudged'), V('sorted by manner of death')]
-			}
-		],
-		render: (n) => `To ${n[0]}, ${n[1]}, ${n[2]}`
 	},
 	{
 		id: 'cult',
@@ -485,6 +454,7 @@ export const SLOTS: SlotDef[] = [
 							about: ['fire', 'warmth', 'light', 'smoke', 'ash', 'haste', 'purity'],
 							material: [T('body', 'ash'), T('bone', 'ash'), T('parts', 'ash')],
 							readings: [
+								...JUDGE,
 								...R('destroy', 'body', null),
 								...R('destroy', 'spirit', null),
 								...R('destroy', 'memory', null),
@@ -507,6 +477,7 @@ export const SLOTS: SlotDef[] = [
 							about: ['sky', 'birds', 'wind', 'bone', 'patience', 'openness'],
 							material: [T('body', 'bone'), T('parts', 'bone')],
 							readings: [
+								...JUDGE,
 								...R('destroy', 'body', null),
 								...R('sanctify', 'body', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
 								...R('sanctify', 'spirit', null, 'beyond/sky', 'beyond/otherworld', 'ancestors', 'gods'),
@@ -526,6 +497,7 @@ export const SLOTS: SlotDef[] = [
 							about: ['permanence', 'dryness', 'salt', 'smoke', 'presence', 'wholeness'],
 							material: [T('body', 'body')],
 							readings: [
+								...JUDGE,
 								...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
 								...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors'),
 								...R('sanctify', 'memory', null),
@@ -540,6 +512,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['earth', 'darkness', 'depth', 'decay', 'rest', 'boundary'],
 						material: PASS,
 						readings: [
+							...JUDGE,
 							...R('destroy', 'body', null),
 							...R('destroy', 'spirit', null),
 							...R('destroy', 'memory', null),
@@ -547,8 +520,9 @@ export const SLOTS: SlotDef[] = [
 							...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
 							...R('sanctify', 'memory', null),
 							...R('release', 'body', 'beyond/otherworld', 'ancestors', 'gods'),
-							...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
+							...R('release', 'spirit', null, 'beyond/otherworld', 'beyond/below', 'ancestors', 'gods'),
 							...R('release', 'memory', null),
+							...R('return', 'spirit', 'living'),
 							...R('transform', 'body', null, 'ancestors', 'gods'),
 							...R('transform', 'spirit', null, 'ancestors', 'gods')
 						]
@@ -561,14 +535,16 @@ export const SLOTS: SlotDef[] = [
 							about: ['water', 'depth', 'passage', 'cleansing', 'cold', 'hiddenness'],
 							material: [T('any', 'nothing')],
 							readings: [
+								...JUDGE,
 								...R('destroy', 'body', null),
 								...R('destroy', 'spirit', null),
 								...R('destroy', 'memory', null),
 								...R('sanctify', 'body', null, 'beyond/otherworld', 'ancestors', 'gods'),
 								...R('sanctify', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
 								...R('release', 'body', 'beyond/otherworld', 'ancestors', 'gods'),
-								...R('release', 'spirit', null, 'beyond/otherworld', 'ancestors', 'gods'),
+								...R('release', 'spirit', null, 'beyond/otherworld', 'beyond/below', 'ancestors', 'gods'),
 								...R('release', 'memory', null),
+								...R('return', 'spirit', 'living'),
 								...R('transform', 'body', null, 'ancestors', 'gods'),
 								...R('transform', 'spirit', null, 'ancestors', 'gods')
 							]
@@ -578,6 +554,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['wind', 'sky', 'dispersal', 'lightness', 'freedom'],
 						material: [T('ash', 'nothing'), T('dust', 'nothing'), T('bone', 'bone')],
 						readings: [
+							...JUDGE,
 							...when(R('destroy', 'body', null), 'ash', 'dust'), // bones scattered are bones still
 							...R('destroy', 'spirit', null),
 							...R('destroy', 'memory', null),
@@ -586,6 +563,7 @@ export const SLOTS: SlotDef[] = [
 							...R('release', 'body', 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
 							...R('release', 'spirit', null, 'beyond/sky', 'beyond/stars', 'beyond/otherworld', 'ancestors', 'gods'),
 							...R('release', 'memory', null),
+							...R('return', 'spirit', 'living'),
 							...R('transform', 'body', null, 'beyond/sky', 'beyond/stars', 'ancestors'),
 							...R('transform', 'spirit', null, 'beyond/sky', 'beyond/stars', 'ancestors')
 						]
@@ -594,6 +572,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['presence', 'permanence', 'hearth', 'guardianship', 'nearness'],
 						material: PASS,
 						readings: [
+							...JUDGE,
 							...R('sanctify', 'body', null, 'ancestors', 'gods'),
 							...R('sanctify', 'spirit', null, 'ancestors'),
 							...R('sanctify', 'memory', null),
@@ -606,6 +585,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['violence', 'division', 'fear', 'labour'],
 						material: [T('body', 'parts')],
 						readings: [
+							...JUDGE,
 							...R('destroy', 'body', null),
 							...R('destroy', 'spirit', null),
 							...R('destroy', 'memory', null),
@@ -618,6 +598,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['violence', 'fear', 'guardianship', 'identity'],
 						material: [T('body', 'body')],
 						readings: [
+							...JUDGE,
 							...R('destroy', 'spirit', null),
 							...R('destroy', 'memory', null),
 							...R('sanctify', 'body', null, 'ancestors', 'gods'),
@@ -630,6 +611,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['bone', 'cleansing', 'labour', 'intimacy', 'permanence'],
 						material: [T('body', 'bone'), T('parts', 'bone')],
 						readings: [
+							...JUDGE,
 							...R('destroy', 'body', null),
 							...R('sanctify', 'body', null, 'ancestors', 'gods'),
 							...R('sanctify', 'spirit', null),
@@ -641,6 +623,7 @@ export const SLOTS: SlotDef[] = [
 						about: ['dust', 'labour', 'intimacy', 'completion'],
 						material: [T('bone', 'dust')],
 						readings: [
+							...JUDGE,
 							...R('destroy', 'body', null),
 							...R('destroy', 'spirit', null),
 							...R('destroy', 'memory', null),
@@ -703,7 +686,7 @@ export const SLOTS: SlotDef[] = [
 							...R('hide', 'remains', null, 'living'),
 							...R('hold', 'remains', null, 'ancestors'),
 							...R('offer', 'remains', 'gods', 'earth'),
-							...R('return', 'remains', 'earth')
+							...R('return', 'remains', 'earth', 'beyond/below')
 						]
 					}),
 					N('water/edge', "at the water's edge", { coast: 'strong', river: 'strong', marsh: 'favours', desert: 'resists' }, {
@@ -721,12 +704,12 @@ export const SLOTS: SlotDef[] = [
 							...R('hide', 'remains', null, 'living'),
 							...R('hold', 'remains', null),
 							...R('offer', 'remains', 'gods', 'earth', 'water'),
-							...R('return', 'remains', 'earth', 'water')
+							...R('return', 'remains', 'earth', 'water', 'beyond/below')
 						]
 					}),
 					N('water/open', 'in open water', { coast: 'strong', river: 'favours', marsh: 'favours', steppe: 'resists', mountain: 'resists', desert: 'excludes' }, {
 						about: ['water', 'depth', 'passage', 'distance', 'cold', 'freedom'],
-						readings: [...R('hide', 'remains', null), ...R('offer', 'remains', 'gods', 'water'), ...R('return', 'remains', 'ancestors', 'water')]
+						readings: [...R('hide', 'remains', null), ...R('offer', 'remains', 'gods', 'water'), ...R('return', 'remains', 'ancestors', 'water', 'beyond/below')]
 					})
 				]
 			},

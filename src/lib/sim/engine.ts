@@ -299,10 +299,12 @@ export function begin(st: GameState, px: number, py: number): GameState {
 }
 
 // ---------- the era ----------
+const RULE = SLOTS.findIndex((s) => s.id === 'rule'),
+	MEMORY = SLOTS.findIndex((s) => s.id === 'memory');
 function retention(_st: GameState, c: Culture): number {
 	let rt = 5 * c.conserv;
-	const ruler = vname(9, 0, c.traits[9][0][0]),
-		keeper = vname(15, 0, c.traits[15][0][0]);
+	const ruler = vname(RULE, 0, c.traits[RULE][0][0]),
+		keeper = vname(MEMORY, 0, c.traits[MEMORY][0][0]);
 	if (ruler === 'A priest-judge') rt += 1.5;
 	if (ruler === 'A sacral king') rt += 1;
 	if (keeper === 'Carved stones') rt += 1;

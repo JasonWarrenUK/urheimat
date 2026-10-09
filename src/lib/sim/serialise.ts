@@ -2,7 +2,8 @@ import type { Culture, GameState, SerializedCulture, SerializedGameState } from 
 import { rngFrom } from './engine';
 
 // 2: Treatment of the dead rebuilt as three stages of six parts (was three parts).
-// 3: Every part holds a set of value indices (was one index), so a saved run's traits gain a level.
+// 3: Every part holds a set of value indices (was one index), so a saved run's traits gain a level;
+//    where the dead go is no longer a custom (it lives on the funeral acts as readings).
 export const SCHEMA_VERSION = 3;
 
 export function serialiseState(st: GameState): SerializedGameState {
