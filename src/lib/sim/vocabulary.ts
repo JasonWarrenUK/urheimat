@@ -181,7 +181,10 @@ export const NOUNS = [
 	'killer',
 	'guilt',
 	// the oath
-	'breaker'
+	'breaker',
+	// the expressions of sex a culture recognises
+	'sex/both',
+	'sex/neither'
 ] as const satisfies readonly string[];
 
 export const VERBS = [

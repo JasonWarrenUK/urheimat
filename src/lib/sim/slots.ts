@@ -5,14 +5,6 @@ export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', '
 
 export const AFF_WEIGHT: Record<AffLevel, number> = { strong: 3, favours: 1.5, allows: 1, resists: 0.5, excludes: 0 };
 
-// Legacy tables: numbers, and every terrain left out strains. Converted so the meaning is unchanged;
-// the tagging task restates each one in named levels as it revisits the value.
-type LegacyAff = Partial<Record<Terrain, number>>;
-const legacyLevel = (n: number): AffLevel => (n >= 3 ? 'strong' : n >= 1.5 ? 'favours' : 'excludes');
-const legacyAff = (a: LegacyAff): Affinity => Object.fromEntries(LAND.map((t) => [t, a[t] ? legacyLevel(a[t]) : 'excludes']));
-const V = (name: string, aff?: LegacyAff, tags?: ValueTags): TraitValue => ({ name, aff: aff && legacyAff(aff), ...tags });
-const ST: LegacyAff = { steppe: 3 };
-
 // A value with an id naming its concept, named affinity levels and tags. The name is provisional
 // display text; rendering transforms it downstream.
 const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags): TraitValue => ({ id, name, aff, ...tags });
@@ -84,11 +76,12 @@ const HERO_SEX: Reading[] = R('address', 'hero', 'female', 'male');
 const each = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 	Array.from({ length: count }, (_, i) =>
 		axes.map((a) => {
+			const lead = a === axes[0];
 			const own = a.applies === undefined ? [] : Array.isArray(a.applies) ? a.applies : [a.applies];
-			const before = i > 0 && a.size ? [{ part: a.id, stage: 'previous' as const, has: 'anyMember' as const }] : [];
+			const before = i > 0 && lead ? [{ part: a.id, stage: 'previous' as const, has: 'anyMember' as const }] : [];
 			const applies = [...before, ...own];
-			const size = a.size && i > 0 ? ([0, a.size[1]] as const) : a.size;
-			const distinct = a.size ? (true as const) : undefined;
+			const size = lead && a.size && i > 0 ? ([0, a.size[1]] as const) : a.size;
+			const distinct = lead && a.size ? (true as const) : undefined;
 			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, size, distinct, applies: applies.length ? applies : undefined };
 		})
 	).flat();
@@ -121,9 +114,9 @@ export const RICHNESS: Record<Terrain, number> = {
 	mountain: -0.3
 };
 
-// A custom is a small structure: each slot has features, each feature a set of values.
-// A value's affinity: 3 = the terrain strongly favours it, 1.5 = favours, 0 = strains.
-// A value with no affinity table is neutral: no terrain pulls on it and none strains against it.
+// A custom is a small structure: each slot has features, each feature a set of values. Every value
+// has an id, named affinity levels (a terrain left out allows) and tags; a value with no affinity
+// table is neutral: no terrain pulls on it and none strains against it.
 export const SLOTS: SlotDef[] = [
 	{
 		id: 'highGod',
@@ -1079,35 +1072,79 @@ export const SLOTS: SlotDef[] = [
 		id: 'place',
 		domain: 'Rite',
 		name: 'The holy place',
+		// Contract: for a band that has this custom, every value assumes the band keeps one place set
+		// apart for its powers; it assumes nothing about where, what stands there, or who may enter.
+		// The sites are deictic rules (the nearest spring, the hill above the seat) for the engine to
+		// resolve against the land round the seat; only the altar is built. Funeral's orientation
+		// holy-place points here; a band without this custom is custom-level absence (4SD.11).
 		features: [
 			{
 				id: 'site',
 				label: 'site',
 				values: [
-					V('An open-air fire altar', { steppe: 3, desert: 1.5 }),
-					V('A grove', { forest: 3 }),
-					V('A hilltop', { mountain: 3 }),
-					V('A spring', { river: 1.5, marsh: 1.5, forest: 1.5 }),
-					V('A headland', { coast: 3 })
+					N('altar', 'An open-air fire altar', { steppe: 'strong', desert: 'favours' }, { about: ['fire', 'openness', 'craft'], readings: [...R('sanctify', 'land', null), ...R('honour', 'gods', null), ...R('commune', 'spirit', 'gods')] }),
+					N('grove', 'A grove', { forest: 'strong' }, { about: ['trees', 'shade', 'sanctuary', 'hiddenness'], readings: [...R('sanctify', 'land', null), ...R('commune', 'spirit', 'gods', 'ancestors')] }),
+					N('hilltop', 'A hilltop', { mountain: 'strong' }, { about: ['height', 'sky', 'openness', 'visibility'], readings: [...R('sanctify', 'land', null), ...R('commune', 'spirit', 'gods', 'beyond/sky')] }),
+					N('spring', 'A spring', { river: 'favours', marsh: 'favours', forest: 'favours' }, { about: ['water', 'cleansing', 'growth'], readings: [...R('sanctify', 'land', null), ...R('cleanse', 'spirit', null), ...R('commune', 'spirit', 'gods')] }),
+					N('headland', 'A headland', { coast: 'strong' }, { about: ['sea', 'distance', 'boundary', 'visibility'], readings: [...R('sanctify', 'land', null), ...R('mark', 'land', null), ...R('commune', 'spirit', 'gods', 'beyond/otherworld')] })
 				]
 			},
 			{
 				id: 'image',
-				label: 'image',
+				label: 'with',
+				// An empty set is no image. The old no-image value favoured desert, steppe and marsh; an
+				// empty set carries no affinity (parked with the other absence pulls).
+				size: [0, 1],
 				values: [
-					V('an unshaped stone', { mountain: 1.5, desert: 1.5, steppe: 1.5 }),
-					V('a carved post', { forest: 1.5, river: 1.5, coast: 1.5 }),
-					V('no image', { desert: 1.5, steppe: 1.5, marsh: 1.5 }),
-					V('a painted hide', { steppe: 1.5, forest: 1.5 })
+					N('stone', 'an unshaped stone', { mountain: 'favours', desert: 'favours', steppe: 'favours' }, { about: ['stone', 'permanence', 'plainness'], readings: [...R('mark', 'land', null), ...R('honour', 'gods', null)] }),
+					N('post', 'a carved post', { forest: 'favours', river: 'favours', coast: 'favours' }, { about: ['craft', 'trees', 'visibility'], readings: [...R('mark', 'land', null), ...R('honour', 'gods', null)] }),
+					N('hide', 'a painted hide', { steppe: 'favours', forest: 'favours' }, { about: ['craft', 'visibility', 'herds'], readings: [...R('mark', 'land', null), ...R('honour', 'gods', null)] })
 				]
 			},
 			{
-				id: 'access',
-				label: 'access',
-				values: [V('open to all'), V('men only'), V('priests only'), V('women only')]
+				id: 'access/sex',
+				label: 'open to',
+				// Empty is no restriction by sex.
+				size: [0, 2],
+				values: [N('male', 'men', undefined, { about: ['male', 'sanctuary'] }), N('female', 'women', undefined, { about: ['female', 'sanctuary'] })]
+			},
+			{
+				id: 'access/role',
+				label: 'open to',
+				size: [1, 5],
+				values: [
+					N('chief', 'the chief', undefined, { about: ['chief/self', 'sanctuary'] }),
+					N('chief/family', "the chief's family", undefined, { about: ['chief/family', 'sanctuary'] }),
+					N('priest', 'the priest or shaman', undefined, { about: ['priest/self', 'sanctuary'] }),
+					N('priest/family', "the priest or shaman's family", undefined, { about: ['priest/family', 'sanctuary'] }),
+					N('tribe/rest', 'the rest of the tribe', undefined, { about: ['tribe/rest', 'sanctuary'] })
+				]
 			}
 		],
-		render: (n) => `${n[0]} with ${n[1]}, ${n[2]}`
+		render: (n) => `${n[0]}${n[1] ? ` with ${n[1]}` : ''}, open to ${n[3]}${n[2] ? ` (${n[2]})` : ''}`
+	},
+	{
+		id: 'gender',
+		domain: 'Kinship',
+		name: 'The kinds of people',
+		// Contract: for a band that has this custom, every value assumes the people sort themselves by
+		// sex in some way; it assumes nothing about which expressions are recognised. Every other custom
+		// that names a sex draws on these four nouns; keeping them consistent with what a band
+		// recognises is a cross-custom constraint for 6SL.5. How gender is assigned waits for 4SD.10.
+		features: [
+			{
+				id: 'kinds',
+				label: 'recognised',
+				size: [1, 4],
+				values: [
+					N('male', 'men', undefined, { about: ['male'] }),
+					N('female', 'women', undefined, { about: ['female'] }),
+					N('both', 'those who are both', undefined, { about: ['sex/both'] }),
+					N('neither', 'those who are neither', undefined, { about: ['sex/neither'] })
+				]
+			}
+		],
+		render: (n) => `Recognised: ${n[0]}`
 	},
 	{
 		id: 'livelihood',
@@ -1256,29 +1293,57 @@ export const SLOTS: SlotDef[] = [
 		id: 'youth',
 		domain: 'Kinship',
 		name: 'How the young are made adult',
-		features: [
+		// Contract: for a band that has this custom, every value assumes the young pass into adulthood
+		// by a rite; it assumes nothing about the trial, when, or the mark it leaves. Up to two rites,
+		// each for a set of the kinds of people: one rite for {men} is one sex only, one for {men, women}
+		// is shared, two rites are different rites.
+		features: each(2, [
+			{
+				id: 'for',
+				label: 'for',
+				size: [1, 4],
+				values: [
+					N('male', 'men', undefined, { about: ['male', 'youth'] }),
+					N('female', 'women', undefined, { about: ['female', 'youth'] }),
+					N('both', 'those who are both', undefined, { about: ['sex/both', 'youth'] }),
+					N('neither', 'those who are neither', undefined, { about: ['sex/neither', 'youth'] })
+				]
+			},
 			{
 				id: 'rite',
 				label: 'rite',
+				applies: { part: 'for', stage: 'same', has: 'anyMember' },
 				values: [
-					V('Wolf-bands raiding abroad', { steppe: 3, forest: 1.5 }),
-					V('Apprenticed to a craft', { river: 3, coast: 1.5 }),
-					V('A vision-fast', { mountain: 3, desert: 1.5 }),
-					V('Early marriage', { marsh: 1.5, river: 1.5 })
+					N('raid', 'wolf-bands raiding abroad', { steppe: 'strong', forest: 'favours' }, { about: ['violence', 'wild', 'strength', 'youth'], readings: [...R('win', 'wealth', 'living'), ...R('guard', 'living', null), ...R('bind', 'living', 'belonging')] }),
+					N('craft', 'apprenticed to a craft', { river: 'strong', coast: 'favours' }, { about: ['craft', 'labour', 'patience'], readings: [...R('provide', 'living', 'plenty'), ...R('bind', 'living', 'custom')] }),
+					N('fast', 'a vision-fast', { mountain: 'strong', desert: 'favours' }, { about: ['vision', 'patience', 'hiddenness'], readings: [...R('commune', 'spirit', 'gods', 'beyond/otherworld'), ...R('inspire', 'spirit', null)] }),
+					N('wed', 'early marriage', { marsh: 'favours', river: 'favours' }, { about: ['kinship', 'continuity', 'youth'], readings: R('bind', 'living', 'kinship') })
 				]
 			},
 			{
 				id: 'age',
-				label: 'age',
-				values: [V('at twelve'), V('at first beard or blood'), V('at sixteen')]
+				label: 'at',
+				applies: { part: 'for', stage: 'same', has: 'anyMember' },
+				values: [
+					N('fixed/twelve', 'twelve', undefined, { about: ['youth', 'custom'] }),
+					N('fixed/sixteen', 'sixteen', undefined, { about: ['youth', 'strength', 'custom'] }),
+					N('sign', 'first beard or blood', undefined, { about: ['renewal', 'growth', 'blood'] })
+				]
 			},
 			{
 				id: 'mark',
-				label: 'mark',
-				values: [V('then scarred'), V('then tattooed'), V('then given a new name'), V('then shorn')]
+				label: 'then',
+				applies: { part: 'for', stage: 'same', has: 'anyMember' },
+				size: [1, 2],
+				values: [
+					N('scar', 'scarred', undefined, { about: ['marking', 'skin', 'permanence'], readings: R('bind', 'living', 'belonging') }),
+					N('tattoo', 'tattooed', undefined, { about: ['marking', 'skin', 'identity', 'craft'], readings: R('bind', 'living', 'identity') }),
+					N('name', 'given a new name', undefined, { about: ['identity', 'voice', 'renewal'], readings: R('bind', 'living', 'identity') }),
+					N('shorn', 'shorn', undefined, { about: ['marking', 'renewal', 'plainness'], readings: R('bind', 'living', 'belonging') })
+				]
 			}
-		],
-		render: (n) => `${n[0]}, ${n[1]}, ${n[2]}`
+		]),
+		render: (n) => [0, 4].map((k) => n[k] && `${n[k]}: ${n[k + 1]}, at ${n[k + 2]}, then ${n[k + 3]}`).filter(Boolean).join('; ')
 	},
 	{
 		id: 'guest',
