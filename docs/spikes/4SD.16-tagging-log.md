@@ -177,3 +177,11 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Descent's affinities stay as a documented terrain proxy for livelihood; 6SL.3 should pull descent and residence from livelihood's tags and retire them. Warfare (internal versus external) is band state for the cross-band relationship system; `rule/source: war` and `justice/remedy: feud` are the interim tag signals.
 - Engine: a custom may declare `strain: 'food'`. Food strain is hunger and feeds prosperity; custom strain no longer does, and becomes pressure for 6SL.3 to carry. Livelihood is the first food custom.
 - Engine: a later member of a sequence never repeats what an earlier one holds (no band fed by hoe crops twice), and later sequence stages start at size 0.
+
+## Round 13: marriage
+
+- Contract: for a band that has this custom, every value assumes a union between households is made by a rule; it assumes nothing about what passes between them, who may be taken, or how many.
+- `payment` becomes two one-sided gift sets, `gift/groom` and `gift/bride`, each size [0, 1] over `herds`, `land`, `labour`, `kin`; both empty is a union with no payment.
+- Who may be taken is two nested rules: `people` (`own`, `other`) always applies; `band` (`own`, `kin`, `any`) applies only when the people is own. `degree` (`cousin`, `distant`) is orthogonal: a cousin may be inside or outside the band. These are deictic: the engine resolves them against the band tree (kin distance in splits; `band/kin` means within a threshold, placeholder 2) and against which bands are in contact. A rule with no one in reach is custom strain, pressure for 6SL.3. `people/other` is unsatisfiable until 4SD.6.
+- `form` becomes `count` (`one`, `many`) and `plural` (`wives`, `husbands`), the plural applying only when the count is many.
+- Test maintenance: the funeral-stage test now asserts the number of lost marks equals the number of live parts the scholars lost, instead of forbidding two adjacent marks, which a sink act with lost place and vessel produces legitimately.

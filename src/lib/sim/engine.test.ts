@@ -50,10 +50,13 @@ describe('engine', () => {
 		begin(state, tiles[0].x, tiles[0].y);
 		for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultOrders());
 		const entry = reconstruct(state).entries[funeral];
-		// A wrongly recovered act can imply a later stage the truth lacked; that stage shows as lost,
-		// never as a run of lost parts, and a stage dormant in the recovery is dropped outright.
-		const liveStages = new Set(activeIn(SLOTS[funeral], entry.recFv as number[][]).map((fi) => SLOTS[funeral].features[fi].stage)).size;
+		// A wrongly recovered act can imply a later stage the truth lacked; that stage shows as lost.
+		// A stage dormant in the recovery is dropped outright, and a lost mark appears exactly once per
+		// live part the scholars could not recover: never for a dormant one.
+		const live = activeIn(SLOTS[funeral], entry.recFv as number[][]);
+		const liveStages = new Set(live.map((fi) => SLOTS[funeral].features[fi].stage)).size;
+		const lost = live.filter((fi) => entry.recFv[fi] === null).length;
 		expect(stages(render(funeral, entry.recFv))).toBe(liveStages);
-		expect(render(funeral, entry.recFv)).not.toContain('… …');
+		expect((render(funeral, entry.recFv).match(/…/g) ?? []).length).toBe(lost);
 	});
 });

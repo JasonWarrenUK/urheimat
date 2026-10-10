@@ -103,6 +103,14 @@ const TOKENS: TraitValue[] = [
 	N('drink/water', 'water', { desert: 'strong', steppe: 'favours' }, { about: ['water', 'cleansing', 'nourishment'], readings: [...R('provide', 'stranger', 'nourishment'), ...R('cleanse', 'stranger', null)] })
 ];
 
+// What one side of a marriage may give the other.
+const DOWRY: TraitValue[] = [
+	N('herds', 'herds', { steppe: 'strong' }, { about: ['herds', 'wealth', 'hierarchy'], readings: [...R('bind', 'living', 'kinship'), ...R('provide', 'living', 'wealth')] }),
+	N('land', 'land', { river: 'strong' }, { about: ['land', 'permanence', 'continuity'], readings: [...R('bind', 'living', 'kinship'), ...R('provide', 'living', 'continuity')] }),
+	N('labour', 'labour', { coast: 'favours', mountain: 'favours', desert: 'favours' }, { about: ['labour', 'patience', 'trust'], readings: [...R('bind', 'living', 'kinship'), ...R('provide', 'living', 'nourishment')] }),
+	N('kin', 'a sister or daughter', { forest: 'favours', marsh: 'favours' }, { about: ['kinship', 'equality', 'belonging'], readings: R('bind', 'living', 'kinship') })
+];
+
 export const RICHNESS: Record<Terrain, number> = {
 	coast: 0.3,
 	marsh: -0.2,
@@ -1329,29 +1337,63 @@ export const SLOTS: SlotDef[] = [
 		id: 'marriage',
 		domain: 'Kinship',
 		name: 'Marriage',
+		// Contract: for a band that has this custom, every value assumes a union between households is
+		// made by a rule; it assumes nothing about what passes between them, who may be taken, or how
+		// many. Who may be taken is deictic: the engine resolves it against the band tree (kin distance
+		// in splits, with a threshold for `band/kin`) and against which bands are in contact; a rule
+		// with no one in reach is pressure for 6SL.3.
 		features: [
+			{ id: 'gift/groom', label: "the groom's side gives", size: [0, 1], values: DOWRY },
+			{ id: 'gift/bride', label: "the bride's side gives", size: [0, 1], values: DOWRY },
 			{
-				id: 'payment',
-				label: 'payment',
+				id: 'people',
+				label: 'taken from',
 				values: [
-					V('Bride-price in cattle', ST),
-					V('Dowry in land', { river: 3 }),
-					V('Exchange of sisters', { forest: 1.5, marsh: 1.5 }),
-					V('Bride-service', { coast: 1.5, mountain: 1.5, desert: 1.5 })
+					N('own', 'this people', undefined, { about: ['belonging', 'kinship'], readings: R('bind', 'living', 'belonging') }),
+					N('other', 'another people', undefined, { about: ['distance', 'stranger', 'wealth'], readings: R('bind', 'living', 'stranger') })
 				]
 			},
 			{
-				id: 'partner',
-				label: 'partner',
-				values: [V('from another clan'), V('within the clan'), V('from another people'), V('a cousin')]
+				id: 'band',
+				label: 'from',
+				applies: { part: 'people', has: { target: 'belonging' } },
+				values: [
+					N('own', 'within the band', undefined, { about: ['belonging', 'kinship', 'nearness'], readings: R('bind', 'living', 'kinship') }),
+					N('kin', 'a kindred band', undefined, { about: ['kinship', 'lineage', 'trust'], readings: R('bind', 'living', 'lineage') }),
+					N('any', 'any band', undefined, { about: ['distance', 'belonging', 'trust'], readings: R('bind', 'living', 'belonging') })
+				]
 			},
 			{
-				id: 'form',
-				label: 'form',
-				values: [V('one spouse'), V('many wives'), V('brothers sharing a wife', { mountain: 1.5, desert: 1.5 })]
+				id: 'degree',
+				label: 'degree',
+				values: [
+					N('cousin', 'a cousin', undefined, { about: ['kinship', 'nearness', 'lineage'], readings: R('bind', 'living', 'lineage') }),
+					N('distant', 'no close kin', undefined, { about: ['distance', 'boundary', 'trust'], readings: R('bind', 'living', 'belonging') })
+				]
+			},
+			{
+				id: 'count',
+				label: 'spouses',
+				values: [
+					// No readings by design: one spouse takes no plural.
+					N('one', 'one spouse', undefined, { about: ['equality', 'intimacy'] }),
+					N('many', 'many', undefined, { about: ['hierarchy', 'wealth', 'plenty'], readings: R('bind', 'living', 'kinship') })
+				]
+			},
+			{
+				id: 'plural',
+				label: 'many',
+				applies: { part: 'count', has: 'anyReading' },
+				values: [
+					N('wives', 'wives', undefined, { about: ['female', 'wealth', 'hierarchy'], readings: R('provide', 'living', 'continuity') }),
+					N('husbands', 'husbands, brothers sharing a wife', { mountain: 'favours', desert: 'favours' }, { about: ['male', 'thrift', 'kinship'], readings: R('guard', 'hearth', null) })
+				]
 			}
 		],
-		render: (n) => `${n[0]}, ${n[1]}, ${n[2]}`
+		render: (n) => {
+			const gifts = [n[0] && `the groom's side gives ${n[0]}`, n[1] && `the bride's side gives ${n[1]}`].filter(Boolean).join(', ');
+			return `Taken from ${n[2]}${n[3] ? `, ${n[3]}` : ''}, ${n[4]}; ${n[6] ? `many ${n[6]}` : n[5]}${gifts ? `; ${gifts}` : ''}`;
+		}
 	},
 	{
 		id: 'justice',
