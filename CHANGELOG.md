@@ -7,6 +7,31 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 Nothing user-facing yet.
 
+## [0.4.0] - 2026-10-10
+
+### Breaking
+
+- Runs saved under the previous schema no longer load; start a new game after updating. The save schema is now version 3: a culture's traits hold a list of values per part rather than one.
+- Where the dead go is no longer a custom of its own; its destinations, judgement and rebirth live as readings on the funeral acts. The sacred drink is now the sacred substance. Every custom after the founding tale sits at a new position, so anything that addressed a custom by number must address it by id.
+- Only strain in how a band is fed moves prosperity now; strain in belief customs is recorded and costs nothing until the situation system carries it.
+
+### Added
+
+- Every custom in the corpus is described: ids, land affinities in named levels, what each value is about and a full grid of what a people may believe it does. Sixteen customs joined the funeral; 94 parts in all.
+- A part can hold a set of values: a rite names who takes part round by round, the greatest power may have two consorts or none, and a killer may be cleansed by fire and water or never at all. An empty set is how a custom says nothing, so there are no "none" values left.
+- A custom can shadow another: sacrifice hides behind the sacred substance when the feast is the meal, and the daily cult hides behind the greatest power while its figure is read as that power. Either custom moving away from the match brings the hidden one back.
+- Two new customs: how a band is fed (up to three sources, each worked by someone) and the kinds of people a band recognises. Descent, residence and the rites of passage draw on them.
+- The greatest power gains five domains (moon, master of beasts, river, wind, death); the sacred substance gains fungus and meat; sacrifice gains a share axis and the first harvest; the founding tale, who rules, the oath, the stranger at the door, marriage and justice are each split where a value bundled two ideas.
+- A reading can depend on who else takes part: binding the takers to the chief means nothing if the chief drinks alone.
+- The default lens is chosen rather than guessed: `corpus-fit --web` measures each part's values as a web, and the near-neighbour rule is the part's spanning tree plus every pair scoring at least 600, which gives one connected web in every part.
+- A tagging log, `docs/spikes/4SD.16-tagging-log.md`, recording every decision and the historical sources consulted.
+
+### Fixed
+
+- The game header shows strain in how the band is fed (the number that moves prosperity) and says how many customs strain too.
+- The stranger at the door no longer needs a special case in its rendering: nothing passes and no span runs for a stranger turned away.
+- Custom retention bonuses are read from tags rather than display names, so renaming a value cannot silently drop them.
+
 ## [0.3.0] - 2026-10-07
 
 ### Breaking
@@ -60,7 +85,8 @@ Nothing user-facing yet.
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/JasonWarrenUK/urheimat/releases/tag/v0.1.0
