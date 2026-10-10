@@ -27,3 +27,7 @@ Decisions made with Jason while building the world step, leaders and the situati
 - Teach is gone (4c) and the player cannot order a split; daughter bands still arise for AI bands, and 6SL.10 brings them back as outcomes for the player.
 - Cultures no longer carry a held set, and saves no longer need a Set-free shape beyond the rng state.
 - The play-styles evidence script keeps two policies, staying put and always moving; the hold, reform, teach and consolidate policies went with the menu.
+
+## Smoke test
+
+- Played in a browser: intro, start picker, the step screen with no menu, one step (year 0 to 25, the leader aged 28 to 53, chronicle dated by year), no console errors beyond the favicon. The livelihood custom was moved beside the other non-rite customs so the customs tab's domain headings do not split Kinship in two.
