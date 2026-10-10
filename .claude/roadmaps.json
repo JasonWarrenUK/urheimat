@@ -533,7 +533,8 @@
 							"6SL.5"
 						],
 						"notes": "Authored with cooldowns and once flags doing 6SL.8's job of capping situations per step until weather lands. Writing's first grade belongs to 4SD.12; pressure and bite-back storylets to the second batch. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decision 3a).",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-10"
 					},
 					{
 						"id": "6SL.13",
