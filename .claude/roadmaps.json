@@ -179,7 +179,7 @@
 						"dependsOn": [
 							"2DS.1"
 						],
-						"notes": "The player's line still descends from one stock; the second exists to contaminate the record and to make a mistaken origin possible (spike decision 2i).",
+						"notes": "The player's line still descends from one stock; the second exists to contaminate the record and to make a mistaken origin possible (spike decision 2i). From 4SD.16: marriage/people: other (a partner from another founding stock) becomes satisfiable here.",
 						"assignee": "Jason"
 					},
 					{
@@ -220,7 +220,7 @@
 							"2DS.1",
 							"4SD.16"
 						],
-						"notes": "Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values).",
+						"notes": "Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values). From 4SD.16: how gender is assigned (birth, rite, choice); the hero's passage as a reading family; a grain kind for substance so a harvest feast can shadow it.",
 						"assignee": "Jason"
 					},
 					{
@@ -285,7 +285,8 @@
 							"4SD.4"
 						],
 						"notes": "One custom per round, top-down: contract, ids, contract check, then full reading grids per value with cells struck deliberately. Carries the sacred-substance decisions (contract B: a sacred substance taken in the rite; custom id substance), holy-place as a cross-custom reading (needs a predicate for when that custom is absent), the guest render branch becoming a predicate, restating legacy affinity tables in named levels, and the lens sweep via scripts/evidence/corpus-fit.ts, from which Jason picks the default lens values. Decided in the 4SD.4 pilot.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-10"
 					},
 					{
 						"id": "4SD.17",
@@ -425,8 +426,11 @@
 						"dependsOn": [
 							"6SL.2"
 						],
-						"notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m). From the 4SD.4 pilot: similarity is judged through a lens per cause of change (scarcity keeps the reason and swaps the material; upheaval the reverse), defined here; and two pulls that affinity tables never encode, memory of past landscapes and settledness, using band history.",
-						"assignee": "Jason"
+						"notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m). From the 4SD.4 pilot: similarity is judged through a lens per cause of change (scarcity keeps the reason and swaps the material; upheaval the reverse), defined here; and two pulls that affinity tables never encode, memory of past landscapes and settledness, using band history. From 4SD.16: define how a set-valued part changes (drift and reform skip sets until then); weigh absence, since an empty set (unwed consort, no image, never clean) carries no affinity; pull descent and residence from livelihood's tags and retire their terrain proxy; custom strain is pressure here (only food strain feeds prosperity now); a marriage rule with no qualifying band in reach is pressure; the band/kin threshold (placeholder 2 splits) is set here.",
+						"assignee": "Jason",
+						"softDependsOn": [
+							"6SL.17"
+						]
 					},
 					{
 						"id": "6SL.4",
@@ -435,7 +439,7 @@
 						"dependsOn": [
 							"6SL.3"
 						],
-						"notes": "Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).",
+						"notes": "Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d). From 4SD.16: an answer may add, drop or swap a member of a set-valued part.",
 						"assignee": "Jason"
 					},
 					{
@@ -445,7 +449,7 @@
 						"dependsOn": [
 							"6SL.2"
 						],
-						"notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r). From the 4SD.4 pilot: conditions query tags with scope (a custom that releases from an oath), and a band may lack a custom altogether, modelled as custom-level absence rather than a none value.",
+						"notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r). From the 4SD.4 pilot: conditions query tags with scope (a custom that releases from an oath), and a band may lack a custom altogether, modelled as custom-level absence rather than a none value. From 4SD.16: the sex nouns other customs use (youth's rites, place's access, livelihood's labour, marriage's plural, the powers' address readings) must stay consistent with the gender custom's recognised kinds: a cross-custom constraint.",
 						"assignee": "Jason"
 					},
 					{
@@ -559,6 +563,17 @@
 							"6SL.12"
 						],
 						"notes": "The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.17",
+						"description": "Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.1",
+							"4SD.16"
+						],
+						"notes": "From 4SD.16: residence is pulled by whether a band's warfare is internal or external (Ember and Ember 1971); rule/source: war and justice/remedy: feud are the interim tag signals. A chief answering for a killer belongs to killings between bands and was dropped from justice/answerer until this exists. Marriage's partner rules resolve against the band tree and contact here.",
 						"assignee": "Jason"
 					}
 				]
