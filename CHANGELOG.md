@@ -12,6 +12,21 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 - The README is split into what the game is today and what the roadmap says it will become, and says plainly that nothing is saved yet and that signing in stores nothing.
 
+## [0.6.0] - 2026-10-10
+
+### Breaking
+
+- Runs saved under the previous schema no longer load; start a new game after updating. The save schema is now version 5: a band may lack customs, and the run carries its events, its story and the storylets raised for the next step.
+
+### Added
+
+- Storylets. A storylet is data: when it may fire, what it says, the answers it offers and what each answer does. At the end of a step the answers you gave to the last step's situations take effect before the world moves; then every storylet is checked against your band and the ones whose conditions hold become the coming step's situations. Letting a situation lie can have consequences of its own. A storylet may fire once per run, cool down for a number of steps or fire only when another storylet raises it.
+- One condition language, which will also gate writing and territory: a custom holding a value about a tag or carrying a reading, whether the band still keeps a custom, the year, the land, prosperity, the leader's age and generation, contact with neighbours, what happened this step (a succession, a move, a split, a death) and what the engine itself has already raised and been told.
+- Consequences an answer can carry: a chronicle line, a change in prosperity, setting a part of a custom to a value, losing or regaining a custom and raising a storylet next step.
+- A band can lack a custom. Its values stay as a dormant memory, so regaining it restores what the band had; the customs tab shows "No longer kept".
+- Three storylets to begin with: a young leader whose elders mutter, elders who keep the daily rite from the leader, and strangers at the ford for a band that bars them. The corpus proper is a later task.
+- A decisions log for the engine, `docs/spikes/6SL.5-storylet-engine-log.md`.
+
 ## [0.5.0] - 2026-10-10
 
 ### Breaking
@@ -110,7 +125,8 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.2.0...v0.3.0
