@@ -1124,29 +1124,6 @@ export const SLOTS: SlotDef[] = [
 		render: (n) => `${n[0]}${n[1] ? ` with ${n[1]}` : ''}, open to ${n[3]}${n[2] ? ` (${n[2]})` : ''}`
 	},
 	{
-		id: 'gender',
-		domain: 'Kinship',
-		name: 'The kinds of people',
-		// Contract: for a band that has this custom, every value assumes the people sort themselves by
-		// sex in some way; it assumes nothing about which expressions are recognised. Every other custom
-		// that names a sex draws on these four nouns; keeping them consistent with what a band
-		// recognises is a cross-custom constraint for 6SL.5. How gender is assigned waits for 4SD.10.
-		features: [
-			{
-				id: 'kinds',
-				label: 'recognised',
-				size: [1, 4],
-				values: [
-					N('male', 'men', undefined, { about: ['male'] }),
-					N('female', 'women', undefined, { about: ['female'] }),
-					N('both', 'those who are both', undefined, { about: ['sex/both'] }),
-					N('neither', 'those who are neither', undefined, { about: ['sex/neither'] })
-				]
-			}
-		],
-		render: (n) => `Recognised: ${n[0]}`
-	},
-	{
 		id: 'livelihood',
 		domain: 'Land',
 		name: 'How they are fed',
@@ -1181,6 +1158,29 @@ export const SLOTS: SlotDef[] = [
 			}
 		]),
 		render: (n) => [n[0] && `${n[0]} (${n[1]})`, n[2] && `${n[2]} (${n[3]})`, n[4] && `${n[4]} (${n[5]})`].filter(Boolean).join(', ')
+	},
+	{
+		id: 'gender',
+		domain: 'Kinship',
+		name: 'The kinds of people',
+		// Contract: for a band that has this custom, every value assumes the people sort themselves by
+		// sex in some way; it assumes nothing about which expressions are recognised. Every other custom
+		// that names a sex draws on these four nouns; keeping them consistent with what a band
+		// recognises is a cross-custom constraint for 6SL.5. How gender is assigned waits for 4SD.10.
+		features: [
+			{
+				id: 'kinds',
+				label: 'recognised',
+				size: [1, 4],
+				values: [
+					N('male', 'men', undefined, { about: ['male'] }),
+					N('female', 'women', undefined, { about: ['female'] }),
+					N('both', 'those who are both', undefined, { about: ['sex/both'] }),
+					N('neither', 'those who are neither', undefined, { about: ['sex/neither'] })
+				]
+			}
+		],
+		render: (n) => `Recognised: ${n[0]}`
 	},
 	{
 		id: 'descent',

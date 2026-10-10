@@ -6,7 +6,7 @@
 //   4. Kin familiarity: correlation of band likeness with kinship distance
 // Criteria 1, 3 and 4 depend on the change mechanism too, not only the corpus.
 
-import { newGame, begin, startTiles, endEra, defaultOrders, sameSet } from '../../src/lib/sim/engine';
+import { newGame, begin, startTiles, endEra, defaultStep, sameSet } from '../../src/lib/sim/engine';
 import { DEFAULT_LENS, NEAR, type Lens } from '../../src/lib/sim/lens';
 import { isActive } from '../../src/lib/sim/predicates';
 import { bandSimilarity, partTable } from '../../src/lib/sim/similarity';
@@ -55,7 +55,7 @@ function runs() {
 		const st = newGame(i + 1);
 		const t = startTiles(st)[0];
 		begin(st, t.x, t.y);
-		for (let e = 0; e < ERAS; e++) endEra(st, defaultOrders());
+		for (let e = 0; e < ERAS; e++) endEra(st, defaultStep());
 		return st;
 	});
 }

@@ -5,14 +5,15 @@ import type {
 	GameMap,
 	GameState,
 	MapTerrain,
-	Orders,
 	PartValue,
 	Point,
 	ReconstructionResult,
 	Rng,
+	StepInput,
 	Terrain
 } from '$lib/types';
 import { activeParts, heldAbout, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { advance, ageOf, found, split, yearOf } from './family';
 import { partTable } from './similarity';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -243,10 +244,11 @@ function makeCulture(
 		known: clone(st.ancestral),
 		knownEra: 0,
 		migrated: false,
-		held: new Set(),
 		bornEra: st.era,
 		diedEra: null,
-		parent: null
+		parent: null,
+		family: [],
+		leader: -1
 	};
 }
 
@@ -260,7 +262,7 @@ export function newGame(seed: number): GameState {
 		seed,
 		rng: r,
 		era: 0,
-		maxEra: 8,
+		maxEra: 15,
 		cultures: [],
 		log: [],
 		playerId: null,
@@ -269,7 +271,8 @@ export function newGame(seed: number): GameState {
 		map: genMap(r),
 		peopleName: '',
 		homeTerrain: 'steppe',
-		ancestral: []
+		ancestral: [],
+		situations: []
 	};
 	st.peopleName = genName(r, 2);
 	st.homeTerrain = st.map.tiles[st.map.cy][st.map.cx];
@@ -298,6 +301,8 @@ export function begin(st: GameState, px: number, py: number): GameState {
 		st.cultures.push(makeCulture(st, genName(r, 2), t.x, t.y, st.ancestral, false));
 	}
 	st.era = 1;
+	// Every band sets out under a leader of its own, with the family they already have.
+	st.cultures.forEach((c) => found(r, c, 0));
 	st.log.push({
 		era: 0,
 		text: `The ${st.peopleName} of the ${st.homeTerrain} scatter. Six bands set out; yours, the ${p.name}, go to the ${st.map.tiles[py][px]}.`
@@ -383,6 +388,7 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	const t = pick(r, opts);
 	const d = makeCulture(st, genName(r, 2), t.x, t.y, c.traits, false);
 	d.parent = c.id;
+	const founder = split(r, c, d, yearOf(st.era));
 	d.prosperity = 4;
 	d.migrated = true;
 	if (c.isPlayer) d.conserv = 1.2 + r() * 0.3;
@@ -390,7 +396,7 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	d.knownEra = st.era;
 	c.prosperity -= 2;
 	st.cultures.push(d);
-	st.log.push({ era: st.era, text: `A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}.` });
+	st.log.push({ era: st.era, text: `A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}, led by ${founder.name}.` });
 	return d;
 }
 
@@ -414,7 +420,6 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 		.map((k) => ({ k, w: contact(st, c, k) }))
 		.filter((n) => n.w > 0);
 	SLOTS.forEach((slot, si) => {
-		if (c.held.has(si)) return;
 		slot.features.forEach((f, fi) => {
 			if (!isActive(c.traits, si, fi) || isSetPart(si, fi)) return;
 			if (r() > 0.35) return;
@@ -456,58 +461,40 @@ function prosperityStep(st: GameState, c: Culture, consolidations: number): numb
 	return d;
 }
 
-export function defaultOrders(): Orders {
-	return { held: new Set(), reforms: {}, move: null, split: false, consolidate: 0, teach: null };
+export function defaultStep(): StepInput {
+	return { move: null, answers: {} };
 }
 
-export function endEra(st: GameState, orders: Orders): GameState {
-	orders = orders || defaultOrders();
+// One step of 25 years. The player brings a move and their answers (spike 3l, 3o: no menu, no
+// budget); nothing else can be started. Answers have no effect until 6SL.4.
+export function endEra(st: GameState, step: StepInput): GameState {
+	step = step || defaultStep();
 	const p = st.cultures[st.playerId as number];
 	st.cultures.forEach((c) => {
 		c.migrated = false;
-		c.held = new Set();
 	});
-	if (p.alive) {
-		p.held = new Set(orders.held);
-		Object.entries(orders.reforms).forEach(([key, v]) => {
-			const [si, fi] = key.split(':').map(Number);
-			if (!isSetPart(si, fi) && p.traits[si][fi][0] !== v) {
-				st.log.push({
-					era: st.era,
-					text: `You reform ${SLOTS[si].name.toLowerCase()} (${SLOTS[si].features[fi].label}): <em>${vname(si, fi, p.traits[si][fi][0])}</em> gives way to <em>${vname(si, fi, v)}</em>.`
-				});
-				p.traits[si][fi] = [v];
-				p.held.add(si);
-			}
-		});
-		if (orders.move && tryMove(st, p, orders.move.x, orders.move.y))
-			st.log.push({ era: st.era, text: `You lead the ${p.name} to the ${st.map.tiles[p.y][p.x]}.` });
-		if (orders.split) trySplit(st, p, true);
-		if (orders.teach) {
-			const k = st.cultures[orders.teach.kin],
-				si = orders.teach.slot;
-			if (k && k.alive && contact(st, p, k) >= 0.5) {
-				const restored: string[] = [];
-				SLOTS[si].features.forEach((f, fi) => {
-					if (sameSet(p.traits[si][fi], st.ancestral[si][fi]) && !sameSet(k.traits[si][fi], st.ancestral[si][fi])) {
-						k.traits[si][fi] = st.ancestral[si][fi].slice();
-						restored.push(f.label);
-					}
-				});
-				if (restored.length) {
-					k.held.add(si);
-					k.known = clone(k.traits);
-					k.knownEra = st.era;
-					st.log.push({
-						era: st.era,
-						text: `Your elders go among the ${k.name} and restore ${SLOTS[si].name.toLowerCase()} (${restored.join(', ')}): <em>${render(si, k.traits[si])}</em> once more.`
-					});
-				}
-			}
-		}
-	}
+	if (p.alive && step.move && tryMove(st, p, step.move.x, step.move.y))
+		st.log.push({ era: st.era, text: `You lead the ${p.name} to the ${st.map.tiles[p.y][p.x]}.` });
 	st.cultures.filter((c) => c.alive && !c.isPlayer && c.bornEra < st.era).forEach((c) => aiMove(st, c));
 	st.cultures.filter((c) => c.alive && !c.isPlayer && c.bornEra < st.era).forEach((c) => trySplit(st, c, false));
+	// The world moves 25 years: every band's family ages, and a leader who dies is succeeded.
+	const stepStart = yearOf(st.era),
+		stepEnd = yearOf(st.era + 1);
+	st.cultures
+		.filter((c) => c.alive)
+		.forEach((c) => {
+			const events = advance(st.rng, c, stepStart, stepEnd);
+			if (c.isPlayer)
+				events.forEach((e) =>
+					st.log.push({
+						era: st.era,
+						text:
+							e.kind === 'death'
+								? `${e.person.name} dies in year ${e.year}, aged ${ageOf(e.person, e.year)}.`
+								: `${e.person.name}, ${ageOf(e.person, e.year)}, leads the ${c.name}${e.person.parent === null ? ', a kinsman of no tracked line' : ''}.`
+					})
+				);
+		});
 	const snapshot = st.cultures.map((c) => clone(c.traits));
 	st.cultures
 		.filter((c) => c.alive)
@@ -524,7 +511,7 @@ export function endEra(st: GameState, orders: Orders): GameState {
 	st.cultures
 		.filter((c) => c.alive)
 		.forEach((c) => {
-			prosperityStep(st, c, c.isPlayer ? orders.consolidate : 0);
+			prosperityStep(st, c, 0);
 			if (c.prosperity <= 0) {
 				c.alive = false;
 				c.diedEra = st.era;
@@ -542,6 +529,7 @@ export function endEra(st: GameState, orders: Orders): GameState {
 				c.knownEra = st.era;
 			}
 		});
+	st.situations = []; // 6SL.3 and 6SL.5 raise them here
 	st.era++;
 	if (st.era > st.maxEra) st.over = true;
 	return st;
@@ -628,27 +616,6 @@ export function reconstruct(st: GameState): ReconstructionResult {
 		lost: all.filter((e) => e.verdict === 'lost').length
 	};
 	return { entries, total, max: all.length * 2, counts, survivors: alive.length };
-}
-
-// per slot, per feature: the values a player may reform to (terrain-favoured, or practised by a neighbour in contact)
-export function allowedReforms(st: GameState, c: Culture): number[][][] {
-	const t = st.map.tiles[c.y][c.x];
-	const nbs = st.cultures.filter((k) => k.alive && k.id !== c.id && contact(st, c, k) >= 0.5);
-	return SLOTS.map((slot, si) =>
-		slot.features.map((f, fi) =>
-			!isActive(c.traits, si, fi) || isSetPart(si, fi)
-				? []
-				: f.values
-				.map((_, vi) => vi)
-				.filter(
-					(vi) =>
-						vi !== c.traits[si][fi][0] &&
-						isAvailable(c.traits, si, fi, vi) &&
-						!isNeutral(si, fi, vi) &&
-						(!strains(si, fi, vi, t) || nbs.some((k) => k.traits[si][fi][0] === vi))
-				)
-		)
-	);
 }
 
 export { SLOTS, FEATURE_COUNT, LAND };

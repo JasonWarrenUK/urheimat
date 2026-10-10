@@ -1,24 +1,19 @@
-import { SvelteSet } from 'svelte/reactivity';
-import type { GameState, Orders } from '$lib/types';
+import type { GameState, StepInput } from '$lib/types';
 import { begin, newGame } from '$lib/sim/engine';
 
 export type Tab = 'ours' | 'kin' | 'chronicle';
-export type Mode = 'move' | 'teach' | null;
 export type Phase = 'intro' | 'choose-start' | 'playing' | 'ending';
 
-// held must be a SvelteSet: $state's deep proxy does not wrap Set/Map, so a plain
-// Set here would mutate silently and never notify $derived reads like actionsLeft().
-function freshOrders(): Orders {
-	return { held: new SvelteSet<number>(), reforms: {}, move: null, split: false, consolidate: 0, teach: null };
+function freshStep(): StepInput {
+	return { move: null, answers: {} };
 }
 
 class GameStore {
 	state = $state<GameState | null>(null);
 	phase = $state<Phase>('intro');
-	orders = $state<Orders>(freshOrders());
+	step = $state<StepInput>(freshStep());
 	tab = $state<Tab>('ours');
-	mode = $state<Mode>(null);
-	picker = $state<number | null>(null);
+	choosingMove = $state(false);
 	seed = $state(Date.now() % 100000);
 
 	player() {
@@ -26,16 +21,15 @@ class GameStore {
 		return this.state.cultures[this.state.playerId];
 	}
 
-	resetOrders() {
-		this.orders = freshOrders();
-		this.mode = null;
-		this.picker = null;
+	resetStep() {
+		this.step = freshStep();
+		this.choosingMove = false;
 	}
 
 	newGame() {
 		this.state = newGame(this.seed);
 		this.phase = 'intro';
-		this.resetOrders();
+		this.resetStep();
 	}
 
 	reroll() {
@@ -50,28 +44,13 @@ class GameStore {
 	chooseStart(x: number, y: number) {
 		if (!this.state) return;
 		begin(this.state, x, y);
-		this.resetOrders();
+		this.resetStep();
 		this.tab = 'ours';
 		this.phase = 'playing';
 	}
 
 	endEraCheck() {
 		if (this.state?.over) this.phase = 'ending';
-	}
-
-	actionsUsed(): number {
-		return (
-			this.orders.held.size +
-			Object.keys(this.orders.reforms).length +
-			(this.orders.move ? 1 : 0) +
-			(this.orders.split ? 1 : 0) +
-			(this.orders.teach ? 1 : 0) +
-			this.orders.consolidate
-		);
-	}
-
-	actionsLeft(): number {
-		return 3 - this.actionsUsed();
 	}
 }
 

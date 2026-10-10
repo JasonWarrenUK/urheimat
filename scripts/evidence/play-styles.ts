@@ -1,17 +1,14 @@
 // Evidence script for the 2DS.1 gameplay-loop spike (docs/spikes/2DS.1-gameplay-loop.md).
 // Run with: bun run scripts/evidence/play-styles.ts
+// The order menu is gone (6SL.2): a step carries a move and answers, and until 6SL.3 raises
+// situations the only policies worth comparing are staying put and moving on.
 
-import {
-	newGame, begin, startTiles, endEra, defaultOrders, reconstruct, strainedFeatures,
-	freeLand, contact, SLOTS, FEATURE_COUNT, aff, sameSet
-} from '../../src/lib/sim/engine';
+import { newGame, begin, startTiles, endEra, defaultStep, reconstruct, freeLand, SLOTS, FEATURE_COUNT, sameSet } from '../../src/lib/sim/engine';
 
 type St = ReturnType<typeof newGame>;
-type Policy = (st: St, era: number) => ReturnType<typeof defaultOrders>;
+type Policy = (st: St, era: number) => ReturnType<typeof defaultStep>;
 
 const player = (st: St) => st.cultures[st.playerId as number];
-const ancestralSlots = (st: St) =>
-	SLOTS.map((_, si) => si).filter((si) => player(st).traits[si].every((v, fi) => sameSet(v, st.ancestral[si][fi])));
 const freeNeighbours = (st: St) => {
 	const p = player(st), out: { x: number; y: number }[] = [];
 	for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++)
@@ -20,52 +17,11 @@ const freeNeighbours = (st: St) => {
 };
 
 const policies: Record<string, Policy> = {
-	passive: () => defaultOrders(),
-	consolidate3: () => ({ ...defaultOrders(), consolidate: 3 }),
-	hold3: (st) => {
-		// hold still-ancestral customs, those with a straining part first
-		const strained = new Set(strainedFeatures(st, player(st)).map(([si]) => si));
-		const slots = ancestralSlots(st).sort((a, b) => Number(strained.has(b)) - Number(strained.has(a)));
-		return { ...defaultOrders(), held: new Set(slots.slice(0, 3)) };
-	},
-	splitWhenAble: (st) => {
-		const o = defaultOrders();
-		if (player(st).prosperity >= 4 && freeNeighbours(st).length) { o.split = true; o.consolidate = 2; }
-		else o.consolidate = 3;
-		return o;
-	},
-	reformStrain: (st) => {
-		// trade truth for comfort: reform up to 3 straining parts to the most favoured value
-		const p = player(st), t = st.map.tiles[p.y][p.x], o = defaultOrders();
-		strainedFeatures(st, p).slice(0, 3).forEach(([si, fi]) => {
-			let best = -1, bs = 0;
-			SLOTS[si].features[fi].values.forEach((_, vi) => { const a = aff(si, fi, vi, t); if (a > bs) { bs = a; best = vi; } });
-			if (best >= 0) o.reforms[`${si}:${fi}`] = best;
-		});
-		o.consolidate = 3 - Object.keys(o.reforms).length;
-		return o;
-	},
+	passive: () => defaultStep(),
 	migrateAlways: (st, era) => {
-		const o = defaultOrders(), n = freeNeighbours(st);
-		if (n.length) o.move = n[(st.seed + era) % n.length];
-		o.consolidate = 2;
-		return o;
-	},
-	teachElseHold: (st) => {
-		const p = player(st), o = defaultOrders();
-		outer: for (const k of st.cultures) {
-			if (k.isPlayer || !k.alive || contact(st, p, k) < 0.5) continue;
-			for (let si = 0; si < SLOTS.length; si++) {
-				if (SLOTS[si].features.some((_, fi) => sameSet(p.traits[si][fi], st.ancestral[si][fi]) && !sameSet(k.traits[si][fi], st.ancestral[si][fi]))) {
-					o.teach = { kin: k.id, slot: si };
-					break outer;
-				}
-			}
-		}
-		const strained = new Set(strainedFeatures(st, p).map(([si]) => si));
-		const slots = ancestralSlots(st).sort((a, b) => Number(strained.has(b)) - Number(strained.has(a)));
-		o.held = new Set(slots.slice(0, o.teach ? 2 : 3));
-		return o;
+		const s = defaultStep(), n = freeNeighbours(st);
+		if (n.length) s.move = n[(st.seed + era) % n.length];
+		return s;
 	}
 };
 
@@ -80,7 +36,7 @@ for (const [name, policy] of Object.entries(policies)) {
 		const tiles = startTiles(st);
 		const t = tiles[seed % tiles.length];
 		begin(st, t.x, t.y);
-		while (!st.over) endEra(st, player(st).alive ? policy(st, st.era) : defaultOrders());
+		while (!st.over) endEra(st, player(st).alive ? policy(st, st.era) : defaultStep());
 		const res = reconstruct(st);
 		pct.push((100 * res.total) / res.max);
 		correct += res.counts.correct; wrong += res.counts.wrong; lost += res.counts.lost;
