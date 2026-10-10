@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/sets';
 import { newGame, sameCustom, sameSet } from './engine';
+import { similarity } from './similarity';
 import { activeIn, effectiveReadings, isActiveIn, isShadowed } from './predicates';
 import { SLOTS } from './slots';
 
@@ -125,6 +126,27 @@ describe('set-valued parts', () => {
 					: { ...slot, features: slot.features.map((f, fi) => (fi !== figure ? f : { ...f, values: f.values.map((v) => ({ ...v, readings: v.readings?.filter((r) => r.object !== 'power/greatest') })) })) }
 			);
 			expect(isShadowed(newGame(1).ancestral, cult, ownOnly)).toBe(false);
+		});
+	});
+
+	describe('similarity between held sets', () => {
+		const si = SLOTS.findIndex((s) => s.id === 'substance');
+		const fi = SLOTS[si].features.findIndex((f) => f.id === 's1.taker');
+		const vi = (id: string) => SLOTS[si].features[fi].values.findIndex((v) => v.id === id);
+		it('is whole for the same set in any order, and nothing against an empty set', () => {
+			expect(similarity(si, fi, [vi('chief'), vi('gods')], [vi('gods'), vi('chief')])).toBe(1000);
+			expect(similarity(si, fi, [], [])).toBe(1000);
+			expect(similarity(si, fi, [vi('chief')], [])).toBe(0);
+		});
+		it('credits each member its best match in the other set, both ways', () => {
+			const chief = [vi('chief')];
+			const chiefAndFamily = [vi('chief'), vi('chief/family')];
+			const single = similarity(si, fi, chief, [vi('chief/family')])!;
+			const pair = similarity(si, fi, chief, chiefAndFamily)!;
+			// chief→chief (1000), chief→chief (1000), family→chief (single): the mean of the three.
+			expect(pair).toBe(Math.round((1000 + 1000 + single) / 3));
+			expect(pair).toBeGreaterThan(single);
+			expect(pair).toBeLessThan(1000);
 		});
 	});
 });
