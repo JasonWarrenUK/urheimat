@@ -120,14 +120,15 @@ export const heldAbout = (traits: CultureTraits, si: number, fi: number, noun: N
 
 const partNamed = (f: FeatureDef, name: string): boolean => f.id === name || f.id.endsWith(`.${name}`);
 
-// Whether a condition holds in one custom's current values.
+// Whether a condition holds in one custom's current values. Readings are read through
+// effectiveReadings, so a shadow rule and a predicate never disagree about an `others` reading.
 function tagHolds(slot: SlotDef, fv: Held, tag: PartTag): boolean {
-	return slot.features.some(
-		(f, fi) =>
-			partNamed(f, tag.part) &&
-			isActiveIn(slot, fv, fi) &&
-			(fv[fi] ?? []).some((vi) => {
-				const { about = [], readings = [] } = f.values[vi];
+	return slot.features.some((f, fi) => {
+		if (!partNamed(f, tag.part) || !isActiveIn(slot, fv, fi)) return false;
+		const effective = effectiveReadings(slot, fv, fi);
+		return (fv[fi] ?? []).some((vi) => {
+				const about = f.values[vi].about ?? [];
+				const readings = (f.values[vi].readings ?? []).filter((r) => effective.includes(r));
 				const want = tag.has;
 				return (
 					(tag.about === undefined || about.includes(tag.about)) &&
@@ -137,8 +138,8 @@ function tagHolds(slot: SlotDef, fv: Held, tag: PartTag): boolean {
 							(r) => (want.verb === undefined || r.verb === want.verb) && (want.object === undefined || r.object === want.object) && (want.target === undefined || r.target === want.target)
 						))
 				);
-			})
-	);
+			});
+	});
 }
 
 // Whether custom `si` is currently a shadow of another: some rule has every `when` tag holding in its
