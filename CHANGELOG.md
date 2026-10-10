@@ -12,6 +12,26 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 - The README is split into what the game is today and what the roadmap says it will become, and says plainly that nothing is saved yet and that signing in stores nothing.
 
+## [0.5.0] - 2026-10-10
+
+### Breaking
+
+- Runs saved under the previous schema no longer load; start a new game after updating. The save schema is now version 4: every band carries its leading family and leader, and a run is fifteen steps.
+- The order menu and the action budget are gone. A step takes a move and an answer per situation; hold, reform, teach, consolidate and the daughter-band order no longer exist, and the reform picker and teach picker with them.
+
+### Added
+
+- The world moves in fixed 25-year steps, and a run is fifteen of them. The header shows the year and the step; the chronicle is dated by year.
+- Every band is led by a person from a family whose lives are drawn at birth: a child at 18, more with halving odds while under 45, death between 36 and 75. When a leader dies the band's own descent custom decides who follows (the leader's children or a sibling's; eldest or youngest first), with a kinsman of no tracked line as the fallback. A daughter band is founded by a child of the leader who is not the heir. The header names your leader with their age and generation since the scattering, and the chronicle records your band's deaths and successions.
+- The step screen: one button lets twenty-five years pass, migrate is the one act you can start yourself, and a place for situations and their answers stands ready with "let it lie" always offered. Nothing raises a situation yet; that is the pressure and storylet work on the roadmap.
+- A log of the decisions behind the step and the leaders, `docs/spikes/6SL.1-2-world-step-log.md`.
+
+### Changed
+
+- The README is in two halves, what the game is today and what it is going to be, with the redesign marked as intent; the first half describes the step, the leaders and the missing menu.
+- The intro states the facts of the run (fifteen steps, no actions); its rewrite is still to come.
+- The site has a favicon.
+
 ## [0.4.0] - 2026-10-10
 
 ### Breaking
@@ -90,7 +110,8 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.1.0...v0.2.0
