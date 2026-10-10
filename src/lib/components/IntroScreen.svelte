@@ -32,8 +32,8 @@
 		counts against you.
 	</p>
 	<p>
-		You lead one band through eight eras with three actions each. Hold what your kin will lose, adapt what you must to survive, teach neighbours
-		what they have forgotten, send out daughters to be witnesses, and stay alive: a dead people testifies to nothing.
+		You guide one band through fifteen steps of twenty-five years. There is no menu of actions: each step brings what the land, your neighbours
+		and your own people put to you, and you answer as a leader would. Stay alive: a dead people testifies to nothing.
 	</p>
 </div>
 <h2>What the {gameState.peopleName} know to be true</h2>

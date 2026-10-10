@@ -2,13 +2,12 @@
 	import type { GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
 	import { endEra, foodHeldCount, foodStrainCount, freeLand, strainCount } from '$lib/sim/engine';
-	import { ageOf, leaderOf, yearOf } from '$lib/sim/family';
+	import { ageOf, leaderOf, yearOf, YEARS_PER_STEP } from '$lib/sim/family';
 	import { game, type Tab as TabType } from '$lib/game-store.svelte';
 	import WorldMap from './WorldMap.svelte';
 	import TerrainLegend from './TerrainLegend.svelte';
 	import TraitRow from './TraitRow.svelte';
 	import KinCard from './KinCard.svelte';
-	import TeachPicker from './TeachPicker.svelte';
 
 	interface Props {
 		gameState: GameState;
@@ -20,12 +19,12 @@
 	const terrain = $derived(gameState.map.tiles[player.y][player.x]);
 	const leader = $derived(leaderOf(player));
 	const year = $derived(yearOf(gameState.era));
+	const ordinal = $derived(['th', 'st', 'nd', 'rd'][leader.generation % 10 < 4 && Math.floor(leader.generation / 10) !== 1 ? leader.generation % 10 : 0]);
 	const aliveCount = $derived(gameState.cultures.filter((c) => c.alive).length);
 	const kinList = $derived(gameState.cultures.filter((c) => !c.isPlayer));
-	const actionsLeft = $derived(game.actionsLeft());
 
 	const moveTiles = $derived.by(() => {
-		if (game.mode !== 'move') return [];
+		if (!game.choosingMove) return [];
 		const out = [];
 		for (let dy = -1; dy <= 1; dy++)
 			for (let dx = -1; dx <= 1; dx++) {
@@ -34,80 +33,50 @@
 		return out;
 	});
 
-	const orderSummary = $derived.by(() => {
+	const stepSummary = $derived.by(() => {
 		if (!player.alive) return 'Your people are gone. The kin go on without you.';
-		const o: string[] = [];
-		game.orders.held.forEach((si) => o.push(`hold ${SLOTS[si].name.toLowerCase()}`));
-		Object.entries(game.orders.reforms).forEach(([key, v]) => {
-			const [si, fi] = key.split(':').map(Number);
-			o.push(`reform ${SLOTS[si].name.toLowerCase()} (${SLOTS[si].features[fi].label}) to ${SLOTS[si].features[fi].values[v].name}`);
-		});
-		if (game.orders.move) o.push(`migrate to the ${gameState.map.tiles[game.orders.move.y][game.orders.move.x]}`);
-		if (game.orders.split) o.push('send out a daughter band (−2 prosperity)');
-		if (game.orders.teach) o.push(`teach the ${gameState.cultures[game.orders.teach.kin].name} ${SLOTS[game.orders.teach.slot].name.toLowerCase()}`);
-		if (game.orders.consolidate) o.push(`consolidate ×${game.orders.consolidate} (+1.5 prosperity each)`);
-		if (o.length) return 'This era: ' + o.join('; ') + '.';
-		if (game.mode === 'move') return 'Tap a neighbouring tile on the map. Moving costs a point of prosperity and loosens every custom for an era.';
-		if (game.mode === 'teach') return 'Choose below.';
-		return 'No orders yet. A held custom keeps all its parts this era; everything else may drift.';
+		if (game.step.move) return `This step you lead the ${player.name} to the ${gameState.map.tiles[game.step.move.y][game.step.move.x]}.`;
+		if (game.choosingMove) return 'Tap a neighbouring tile on the map. Moving costs a point of prosperity and loosens every custom for a step.';
+		return gameState.situations.length ? 'Answer what has arisen, or let it lie.' : 'Nothing presses on your people this step.';
 	});
 
 	function setTab(t: TabType) {
 		game.tab = t;
-		game.mode = null;
+		game.choosingMove = false;
 	}
 
-	function endTheEra() {
-		endEra(gameState, game.orders);
-		game.resetOrders();
+	function takeStep() {
+		endEra(gameState, game.step);
+		game.resetStep();
 		game.endEraCheck();
 	}
 
 	function toggleMove() {
-		if (game.orders.move) {
-			game.orders.move = null;
+		if (game.step.move) {
+			game.step.move = null;
 			return;
 		}
-		if (actionsLeft <= 0) return;
-		game.mode = game.mode === 'move' ? null : 'move';
+		game.choosingMove = !game.choosingMove;
 	}
 
 	function pickMoveTile(x: number, y: number) {
-		game.orders.move = { x, y };
-		game.mode = null;
+		game.step.move = { x, y };
+		game.choosingMove = false;
 	}
 
-	function toggleSplit() {
-		if (game.orders.split) {
-			game.orders.split = false;
-		} else {
-			if (actionsLeft <= 0 || player.prosperity < 4) return;
-			game.orders.split = true;
-		}
-	}
-
-	function consolidate() {
-		if (actionsLeft <= 0) return;
-		game.orders.consolidate++;
-	}
-
-	function toggleTeach() {
-		if (game.orders.teach) {
-			game.orders.teach = null;
-			return;
-		}
-		if (actionsLeft <= 0) return;
-		game.mode = game.mode === 'teach' ? null : 'teach';
+	function answer(situation: string, id: string | null) {
+		if (id === null) delete game.step.answers[situation];
+		else game.step.answers[situation] = id;
 	}
 </script>
 
 <div class="row between">
 	<h1 style="font-size:28px;margin:0">Urheimat</h1>
 	<span class="muted">Year {year}, step {gameState.era} of {gameState.maxEra}</span>
-	<span class="muted">Led by {leader.name}, {ageOf(leader, year)}, of the {leader.generation}{leader.generation === 1 ? 'st' : leader.generation === 2 ? 'nd' : leader.generation === 3 ? 'rd' : 'th'} generation since the scattering</span>
+	<span class="muted">Led by {leader.name}, {ageOf(leader, year)}, of the {leader.generation}{ordinal} generation since the scattering</span>
 </div>
 
-<WorldMap {gameState} selecting={moveTiles} moveTarget={game.orders.move} onPick={game.mode === 'move' ? pickMoveTile : undefined} />
+<WorldMap {gameState} selecting={moveTiles} moveTarget={game.step.move} onPick={game.choosingMove ? pickMoveTile : undefined} />
 <TerrainLegend />
 
 <div class="status">
@@ -138,7 +107,7 @@
 			{#if si === 0 || SLOTS[si].domain !== SLOTS[si - 1].domain}
 				<div class="domain">{SLOTS[si].domain}</div>
 			{/if}
-			<TraitRow {gameState} {player} slotIndex={si} {terrain} orders={game.orders} />
+			<TraitRow {gameState} {player} slotIndex={si} {terrain} />
 		{/each}
 	{:else if game.tab === 'kin'}
 		<p class="small muted">You know what a people keeps only while you are in contact with them. Out of touch, your knowledge goes stale.</p>
@@ -148,27 +117,33 @@
 	{:else}
 		<div class="log">
 			{#each [...gameState.log].reverse() as l, i (i)}
-				<p><span class="faint">{l.era === 0 ? '' : 'Era ' + l.era + '. '}</span>{@html l.text}</p>
+				<p><span class="faint">{l.era === 0 ? '' : 'Year ' + yearOf(l.era) + '. '}</span>{@html l.text}</p>
 			{/each}
 		</div>
 	{/if}
 </div>
 
 <div class="actions">
-	<div class="orders">{orderSummary}</div>
-	<div>
-		{#if game.mode === 'teach'}
-			<TeachPicker {gameState} {player} orders={game.orders} />
-		{/if}
-	</div>
+	<div class="orders">{stepSummary}</div>
+	{#if player.alive && gameState.situations.length}
+		<div class="situations">
+			{#each gameState.situations as s (s.id)}
+				<div class="situation">
+					<p>{s.text}</p>
+					<div class="row">
+						{#each s.answers as a (a.id)}
+							<button class="tiny" class:on={game.step.answers[s.id] === a.id} onclick={() => answer(s.id, a.id)}>{a.text}</button>
+						{/each}
+						<button class="tiny" class:on={game.step.answers[s.id] === undefined} onclick={() => answer(s.id, null)}>Let it lie</button>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/if}
 	<div class="row">
-		<button class="primary" onclick={endTheEra}>{gameState.playerDead ? 'Let the ages pass' : 'End the era'}</button>
+		<button class="primary" onclick={takeStep}>{gameState.playerDead ? 'Let the ages pass' : `Let ${YEARS_PER_STEP} years pass`}</button>
 		{#if player.alive}
-			<button class:on={game.mode === 'move'} onclick={toggleMove}>Migrate</button>
-			<button class:on={game.orders.split} onclick={toggleSplit}>Daughter band</button>
-			<button class:on={game.orders.teach || game.mode === 'teach'} onclick={toggleTeach}>Teach</button>
-			<button onclick={consolidate}>Consolidate</button>
+			<button class:on={game.choosingMove || !!game.step.move} onclick={toggleMove}>{game.step.move ? 'Stay instead' : 'Migrate'}</button>
 		{/if}
-		<span class="faint small">{player.alive ? `${actionsLeft} action${actionsLeft === 1 ? '' : 's'} left` : ''}</span>
 	</div>
 </div>

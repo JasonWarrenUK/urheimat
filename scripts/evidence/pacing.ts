@@ -1,7 +1,7 @@
 // Evidence script for the 2DS.1 gameplay-loop spike (docs/spikes/2DS.1-gameplay-loop.md).
 // Run with: bun run scripts/evidence/pacing.ts
 
-import { newGame, begin, startTiles, endEra, defaultOrders, strainCount, FEATURE_COUNT } from '../../src/lib/sim/engine';
+import { newGame, begin, startTiles, endEra, defaultStep, strainCount, FEATURE_COUNT } from '../../src/lib/sim/engine';
 
 // Passive play, 400 seeds: what changes era by era with no orders at all.
 const SEEDS = 400, ERAS = 8;
@@ -18,7 +18,7 @@ for (let seed = 1; seed <= SEEDS; seed++) {
 	const truth = key(st.ancestral.flat());
 	for (let era = 1; era <= ERAS; era++) {
 		const before = key(p.traits.flat()), nBefore = st.cultures.length, aliveBefore = st.cultures.filter((c) => c.alive).length;
-		endEra(st, defaultOrders());
+		endEra(st, defaultStep());
 		splits[era] += st.cultures.length - nBefore;
 		deaths[era] += aliveBefore + (st.cultures.length - nBefore) - st.cultures.filter((c) => c.alive).length;
 		alive[era] += st.cultures.filter((c) => c.alive).length;

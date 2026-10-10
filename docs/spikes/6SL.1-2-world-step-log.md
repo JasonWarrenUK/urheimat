@@ -17,3 +17,13 @@ Decisions made with Jason while building the world step, leaders and the situati
 - A daughter band is founded by an adult child of the leader who is not the heir, taking their own descendants with them; failing one, a kinsman. Which branch the player follows is 6SL.10.
 - Shown now: a header line naming the player's leader, their age and generation since the scattering; chronicle lines for the player's band's deaths and successions. Display proper is 2DS.2 and 6SL.15.
 - Save schema 4.
+
+## 6SL.2: the shell
+
+- The order menu and the action budget are gone: no hold, reform, teach, consolidate or daughter-band order, no reform picker, no actions counter. A step carries a move (spike 4i: the one act a band may start unprompted) and an answer per situation, by id; nothing else can be started and there is no budget (3l, 3o).
+- The player's band keeps random drift until 6SL.3 replaces it with pressures and answers, so customs still move during a run.
+- The situation shape is defined now and left empty: a `Situation` has an id, a text and `Answer`s (id and text, no effect yet; 6SL.4 defines effects); `GameState.situations` holds the current step's, cleared at each step, and the screen renders "let it lie" for each (3m). 6SL.3 and 6SL.5 fill it.
+- The step control reads "Let 25 years pass"; the chronicle is dated by year. The intro's facts are corrected (fifteen steps of twenty-five years, no actions); its rewrite is 6SL.14.
+- Teach is gone (4c) and the player cannot order a split; daughter bands still arise for AI bands, and 6SL.10 brings them back as outcomes for the player.
+- Cultures no longer carry a held set, and saves no longer need a Set-free shape beyond the rng state.
+- The play-styles evidence script keeps two policies, staying put and always moving; the hold, reform, teach and consolidate policies went with the menu.

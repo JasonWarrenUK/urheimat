@@ -208,11 +208,6 @@ button.tiny {
 	display: flex;
 	gap: 4px;
 }
-.trait.held {
-	background: linear-gradient(90deg, var(--color-surface-raised), transparent);
-	padding-left: 6px;
-	margin-left: -6px;
-}
 .kin {
 	padding: 10px 0;
 	border-bottom: 1px solid var(--color-line);
