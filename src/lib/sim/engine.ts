@@ -12,7 +12,7 @@ import type {
 	Rng,
 	Terrain
 } from '$lib/types';
-import { heldAbout, heldCount, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { activeParts, heldAbout, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
 import { partTable } from './similarity';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -192,6 +192,13 @@ function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
 				return open[vi] && a > 0 ? a * a : 0;
 			});
 			if (!w.some((x) => x > 0)) w = open.some(Boolean) ? open.map((o) => (o ? 1 : 0)) : w.map(() => 1);
+			// A later member of a sequence (s2.source after s1.source) never repeats what an earlier one holds.
+			if (f.stage !== undefined && f.size) {
+				const axis = f.id.replace(/^s\d+\./, '');
+				s.features.forEach((g, gi) => {
+					if (gi < fi && g.stage !== undefined && g.id.replace(/^s\d+\./, '') === axis) (fv[gi] ?? []).forEach((vi) => (w[vi] = 0));
+				});
+			}
 			// A set part draws its size from its range, then that many distinct members. Only set parts
 			// spend the extra draw, so ordinary parts keep their old random sequence.
 			let n = 1;
@@ -326,6 +333,10 @@ export function strainedFeatures(st: GameState, c: Culture): [number, number][] 
 	return out;
 }
 export const strainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).length;
+// Strain in the customs that feed the band: a resisted herd is hunger, not discomfort.
+const isFood = (si: number): boolean => SLOTS[si].strain === 'food';
+export const foodStrainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).filter(([si]) => isFood(si)).length;
+const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) ? c.traits[si][fi].length : 0), 0);
 
 function tryMove(st: GameState, c: Culture, x: number, y: number): boolean {
 	if (!freeLand(st, x, y) || dist(c, { x, y }) !== 1) return false;
@@ -436,7 +447,9 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 
 function prosperityStep(st: GameState, c: Culture, consolidations: number): number {
 	const t = st.map.tiles[c.y][c.x];
-	let d = 1.1 - 5.0 * (strainCount(st, c) / heldCount(c.traits)) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
+	// Only food strain feeds prosperity; custom strain is pressure, which 6SL.3 will carry.
+	const fed = foodHeldCount(c);
+	let d = 1.1 - 5.0 * (fed ? foodStrainCount(st, c) / fed : 0) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
 	if (c.migrated) d -= 1;
 	d = Math.max(-2, Math.min(2.5, d));
 	c.prosperity = Math.max(0, Math.min(10, c.prosperity + d));

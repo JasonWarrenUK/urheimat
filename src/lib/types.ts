@@ -85,6 +85,9 @@ export interface SlotDef {
 	name: string;
 	features: FeatureDef[];
 	shadows?: ShadowRule[];
+	// What straining against the land costs. Food strain is hunger and hits prosperity directly;
+	// custom strain (the default) is pressure, which the situation system will carry.
+	strain?: 'food' | 'custom';
 	render: (values: string[]) => string;
 }
 
