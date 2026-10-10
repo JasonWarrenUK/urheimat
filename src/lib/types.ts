@@ -137,6 +137,7 @@ export interface Culture {
 	parent: number | null;
 	family: Person[];
 	leader: number; // a Person id in family
+	absent: string[]; // custom ids the band lacks; their traits stay as a dormant memory
 }
 
 export interface GameMap {
@@ -170,6 +171,9 @@ export interface GameState {
 	homeTerrain: MapTerrain;
 	ancestral: CultureTraits;
 	situations: Situation[]; // put to the player this step
+	events: StepEvent[]; // what happened to the player's band in the last step
+	story: StoryRecord[]; // every storylet that fired, in order
+	raised: string[]; // storylets to fire next step whatever their conditions
 }
 
 // What the player brings to a step: a move (the one act a band may start unprompted, spike 4i) and
@@ -181,16 +185,69 @@ export interface StepInput {
 
 // A situation put to the player in a step, and the answers written for it. Pressures (6SL.3) and
 // storylets (6SL.5) raise them; "let it lie" is always offered (spike 3m) and is rendered, not stored.
-// An answer carries no effect yet: 6SL.4 defines effects.
 export interface Answer {
 	id: string;
 	text: string;
 }
 
 export interface Situation {
-	id: string;
+	id: string; // unique within the step
+	storylet: string; // which storylet raised it
 	text: string;
 	answers: Answer[];
+}
+
+// ---------- the prerequisite structure (6SL.5) ----------
+// One condition language gates storylets, writing and territory alike (spike 3r). Every condition is
+// evaluated against the player's band at the end of a step; a storylet fires when all of its hold.
+export type Condition =
+	| { custom: string; about: Noun; part?: string } // some held value is about the noun
+	| { custom: string; has: { verb?: Verb; object?: Noun; target?: Noun } } // some held value carries the reading
+	| { custom: string; present: boolean } // the band holds, or lacks, the custom
+	| { year: [from: number, to: number] }
+	| { seat: Terrain[] }
+	| { prosperity: { below?: number; above?: number } }
+	| { leader: { age?: [lo: number, hi: number]; generation?: [lo: number, hi: number] } }
+	| { contact: 'some' | 'none' }
+	| { event: StepEvent } // happened to the band this step
+	| { fired: string; within?: number } // a storylet fired, within so many steps
+	| { answered: { storylet: string; answer: string }; within?: number }
+	| { unrecognised: true } // a custom names a kind of person the gender custom does not recognise
+	| { not: Condition };
+
+export type StepEvent = 'succession' | 'move' | 'split' | 'death';
+
+// What an answer does. 6SL.4 extends this.
+export type Consequence =
+	| { log: string }
+	| { prosperity: number }
+	| { set: { custom: string; part: string; value: string | string[] } } // by value id
+	| { lose: string }
+	| { gain: string }
+	| { raise: string }; // a storylet fires next step whatever its conditions
+
+export interface StoryAnswer {
+	id: string;
+	text: string;
+	then: Consequence[];
+}
+
+export interface Storylet {
+	id: string;
+	text: string; // {leader} names the band's leader
+	when: Condition[];
+	raisedOnly?: boolean; // never fires on its own conditions; only when a consequence raises it
+	once?: boolean;
+	cooldown?: number; // steps before it may fire again
+	answers: StoryAnswer[];
+	lie?: Consequence[]; // what letting it lie does
+}
+
+// What the engine remembers of storylets: when each fired and how it was answered (null = let lie).
+export interface StoryRecord {
+	storylet: string;
+	step: number;
+	answer: string | null;
 }
 
 export type Confidence = 'secure' | 'suspect' | null;

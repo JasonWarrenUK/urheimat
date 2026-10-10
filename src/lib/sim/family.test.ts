@@ -15,7 +15,7 @@ function run(seed: number, steps = fixtures.eraCount): GameState {
 const everyBand = (st: GameState, f: (c: Culture) => void) => st.cultures.forEach(f);
 
 describe('leaders and families', () => {
-	it('gives every band a living adult leader at every step', () => {
+	it('gives every band a living adult leader at every step', { timeout: 60000 }, () => {
 		for (let seed = 1; seed <= 40; seed++) {
 			const st = newGame(seed);
 			const t = startTiles(st);

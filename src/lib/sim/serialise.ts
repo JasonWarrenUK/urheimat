@@ -6,7 +6,8 @@ import { rngFrom } from './engine';
 //    where the dead go is no longer a custom (it lives on the funeral acts as readings).
 // 4: Every band has a leading family and a leader; a run is 15 steps of 25 years; the order menu
 //    is gone, so a culture no longer carries a held set and the state carries its situations.
-export const SCHEMA_VERSION = 4;
+// 5: Storylets: a culture may lack customs (absent), and the state carries events, story and raised.
+export const SCHEMA_VERSION = 5;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, ...rest } = st;

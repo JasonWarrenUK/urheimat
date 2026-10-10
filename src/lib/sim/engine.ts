@@ -15,6 +15,7 @@ import type {
 import { activeParts, heldAbout, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
 import { advance, ageOf, found, split, yearOf } from './family';
 import { partTable } from './similarity';
+import { answer, fire } from './storylets';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
 export function rngFrom(seed: number, state?: number): Rng {
@@ -248,7 +249,8 @@ function makeCulture(
 		diedEra: null,
 		parent: null,
 		family: [],
-		leader: -1
+		leader: -1,
+		absent: []
 	};
 }
 
@@ -272,7 +274,10 @@ export function newGame(seed: number): GameState {
 		peopleName: '',
 		homeTerrain: 'steppe',
 		ancestral: [],
-		situations: []
+		situations: [],
+		events: [],
+		story: [],
+		raised: []
 	};
 	st.peopleName = genName(r, 2);
 	st.homeTerrain = st.map.tiles[st.map.cy][st.map.cx];
@@ -332,7 +337,7 @@ export function strainedFeatures(st: GameState, c: Culture): [number, number][] 
 	const out: [number, number][] = [];
 	c.traits.forEach((fv, si) =>
 		fv.forEach((v, fi) => {
-			if (isActive(c.traits, si, fi)) v.forEach((vi) => strains(si, fi, vi, t) && out.push([si, fi]));
+			if (!c.absent.includes(SLOTS[si].id) && isActive(c.traits, si, fi)) v.forEach((vi) => strains(si, fi, vi, t) && out.push([si, fi]));
 		})
 	);
 	return out;
@@ -341,7 +346,7 @@ export const strainCount = (st: GameState, c: Culture): number => strainedFeatur
 // Strain in the customs that feed the band: a resisted herd is hunger, not discomfort.
 const isFood = (si: number): boolean => SLOTS[si].strain === 'food';
 export const foodStrainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).filter(([si]) => isFood(si)).length;
-export const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) ? c.traits[si][fi].length : 0), 0);
+export const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) && !c.absent.includes(SLOTS[si].id) ? c.traits[si][fi].length : 0), 0);
 
 function tryMove(st: GameState, c: Culture, x: number, y: number): boolean {
 	if (!freeLand(st, x, y) || dist(c, { x, y }) !== 1) return false;
@@ -420,6 +425,7 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 		.map((k) => ({ k, w: contact(st, c, k) }))
 		.filter((n) => n.w > 0);
 	SLOTS.forEach((slot, si) => {
+		if (c.absent.includes(slot.id)) return;
 		slot.features.forEach((f, fi) => {
 			if (!isActive(c.traits, si, fi) || isSetPart(si, fi)) return;
 			if (r() > 0.35) return;
@@ -473,10 +479,17 @@ export function endEra(st: GameState, step: StepInput): GameState {
 	st.cultures.forEach((c) => {
 		c.migrated = false;
 	});
-	if (p.alive && step.move && tryMove(st, p, step.move.x, step.move.y))
+	// Last step's situations are answered (or let lie) before the world moves.
+	if (p.alive) answer(st, p, step);
+	st.situations = [];
+	st.events = [];
+	if (p.alive && step.move && tryMove(st, p, step.move.x, step.move.y)) {
 		st.log.push({ era: st.era, text: `You lead the ${p.name} to the ${st.map.tiles[p.y][p.x]}.` });
+		st.events.push('move');
+	}
 	st.cultures.filter((c) => c.alive && !c.isPlayer && c.bornEra < st.era).forEach((c) => aiMove(st, c));
 	st.cultures.filter((c) => c.alive && !c.isPlayer && c.bornEra < st.era).forEach((c) => trySplit(st, c, false));
+	if (st.cultures.some((c) => c.parent === p.id && c.bornEra === st.era)) st.events.push('split');
 	// The world moves 25 years: every band's family ages, and a leader who dies is succeeded.
 	const stepStart = yearOf(st.era),
 		stepEnd = yearOf(st.era + 1);
@@ -484,6 +497,7 @@ export function endEra(st: GameState, step: StepInput): GameState {
 		.filter((c) => c.alive)
 		.forEach((c) => {
 			const events = advance(st.rng, c, stepStart, stepEnd);
+			if (c.isPlayer) events.forEach((e) => st.events.push(e.kind));
 			if (c.isPlayer)
 				events.forEach((e) =>
 					st.log.push({
@@ -529,7 +543,8 @@ export function endEra(st: GameState, step: StepInput): GameState {
 				c.knownEra = st.era;
 			}
 		});
-	st.situations = []; // 6SL.3 and 6SL.5 raise them here
+	// The coming step's situations: storylets whose conditions hold now (6SL.3 adds pressures).
+	st.situations = p.alive ? fire(st, p) : [];
 	st.era++;
 	if (st.era > st.maxEra) st.over = true;
 	return st;
