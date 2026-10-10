@@ -129,7 +129,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).
 - [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(blocked: depends on 6SL.3)_
   - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).
-- [ ] **6SL.12**: Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing _(depends on 6SL.5)_
+- [ ] **6SL.12**: Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run _(depends on 6SL.5)_
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
 - [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 4SD.12)_
   - Note: The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).
@@ -140,6 +140,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [ ] **6SL.16**: Family opinion as a storylet trigger _(blocked: depends on 6SL.12)_
 
 - [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(depends on 6SL.1, 4SD.16)_
+
+- [ ] **6SL.18**: Storylet corpus, second batch: storylets that answer layer 1 pressures, and reform bite-back (a reform provoking its own situation next step) _(blocked: depends on 6SL.3, 6SL.4, 6SL.12)_
   - Note: The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).
 
 ---
@@ -194,7 +196,7 @@ graph LR
 	M5["M5: Reconstruction"]:::mile
 	6SL.9["6SL.9: Band memory: what the people remember of…"]
 	4SD.8["4SD.8: Taboo and deliberate archaism: sanctify…"]
-	6SL.12["6SL.12: Storylet corpus, first batch: enough au…"]
+	6SL.12["6SL.12: Storylet corpus, first batch: pressure-…"]
 	6SL.13["6SL.13: Run ending: history arrives once writte…"]
 	6SL.14["6SL.14: Intro and framing rewrite: no scholars,…"]
 	6SL.15["6SL.15: Derive the new displayed states: recogn…"]
@@ -212,6 +214,7 @@ graph LR
 	6SL.8["6SL.8: Weather and lulls: situation count by pr…"]
 	6SL.10["6SL.10: Daughter band as an outcome of pressure…"]
 	6SL.11["6SL.11: Moves: forced by events, or player-star…"]
+	6SL.18["6SL.18: Storylet corpus, second batch: storylet…"]
 	M6["M6: The situation loop"]:::mile
 	1FN.1 --> 1FN.2
 	1FN.2 --> M1
@@ -285,6 +288,7 @@ graph LR
 	6SL.9 --> M6
 	4SD.8 --> M4
 	6SL.12 --> 6SL.16
+	6SL.12 --> 6SL.18
 	6SL.13 --> M6
 	6SL.14 --> M6
 	6SL.15 --> M6
@@ -297,9 +301,10 @@ graph LR
 	6SL.3 --> 6SL.7
 	6SL.3 --> 6SL.8
 	6SL.3 --> 6SL.11
+	6SL.3 --> 6SL.18
 	4SD.2 --> 2DS.2
 	4SD.2 --> M4
-	6SL.4 --> M6
+	6SL.4 --> 6SL.18
 	6SL.6 --> 2DS.2
 	6SL.6 --> 4SD.5
 	6SL.6 --> 6SL.10
@@ -309,7 +314,8 @@ graph LR
 	6SL.8 --> 6SL.10
 	6SL.10 --> M6
 	6SL.11 --> M6
+	6SL.18 --> M6
 	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.12,6SL.14,6SL.17,6SL.3,6SL.9 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.16,6SL.4,6SL.6,6SL.7,6SL.8 blocked
+	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.16,6SL.18,6SL.4,6SL.6,6SL.7,6SL.8 blocked
 	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.2,6SL.5 done
 ```

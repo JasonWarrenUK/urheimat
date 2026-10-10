@@ -241,7 +241,7 @@
 							"6SL.5",
 							"4SD.11"
 						],
-						"notes": "A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).",
+						"notes": "A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j). From the 6SL.12 split: the storylets for writing's first grade are authored here, with the custom.",
 						"assignee": "Jason"
 					},
 					{
@@ -527,12 +527,12 @@
 					},
 					{
 						"id": "6SL.12",
-						"description": "Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing",
+						"description": "Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run",
 						"status": "todo",
 						"dependsOn": [
 							"6SL.5"
 						],
-						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).",
+						"notes": "Authored with cooldowns and once flags doing 6SL.8's job of capping situations per step until weather lands. Writing's first grade belongs to 4SD.12; pressure and bite-back storylets to the second batch. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decision 3a).",
 						"assignee": "Jason"
 					},
 					{
@@ -585,6 +585,18 @@
 							"4SD.16"
 						],
 						"notes": "From 4SD.16: residence is pulled by whether a band's warfare is internal or external (Ember and Ember 1971); rule/source: war and justice/remedy: feud are the interim tag signals. A chief answering for a killer belongs to killings between bands and was dropped from justice/answerer until this exists. Marriage's partner rules resolve against the band tree and contact here.",
+						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.18",
+						"description": "Storylet corpus, second batch: storylets that answer layer 1 pressures, and reform bite-back (a reform provoking its own situation next step)",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.3",
+							"6SL.4",
+							"6SL.12"
+						],
+						"notes": "Split out of 6SL.12 because bite-back needs 6SL.4's reform effects and pressure storylets need 6SL.3; the first batch is pressure-agnostic. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 4b).",
 						"assignee": "Jason"
 					}
 				]
