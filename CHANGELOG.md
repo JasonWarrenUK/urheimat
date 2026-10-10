@@ -1,11 +1,16 @@
-<!-- doc-changelog: generated 2026-10-07. Delete this line once you hand-edit this file. -->
 # Changelog
 
 All notable changes to Urheimat are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) while it stays on 0.x.
 
 ## [Unreleased]
 
-Nothing user-facing yet.
+### Added
+
+- A favicon: one root branching into three, in the game's colours, as SVG with an `.ico` fallback and an Apple touch icon. The browser tab no longer shows the Svelte logo.
+
+### Changed
+
+- The README is split into what the game is today and what the roadmap says it will become, and says plainly that nothing is saved yet and that signing in stores nothing.
 
 ## [0.4.0] - 2026-10-10
 
