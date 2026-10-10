@@ -193,3 +193,9 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - Youth contract: for a band that has this custom, every value assumes the young pass into adulthood by a rite; it assumes nothing about the trial, when, or the mark it leaves. Up to two rites with `each`, each `for` a set of kinds (one rite for men only; one for men and women shared; two different rites), with `rite` (`raid`, `craft`, `fast`, `wed`), `age` (`fixed/twelve`, `fixed/sixteen`, `sign`) and a `mark` set [1, 2] (`scar`, `tattoo`, `name`, `shorn`).
 - `each` now lowers the minimum size and enforces distinctness only on the lead part of later stages; the parts that go with it keep their own ranges.
 - The legacy affinity helpers are gone: every value in the corpus carries an id, named levels and tags.
+
+## The lens
+
+- Jason's objective for the default lens: within each part, one web of connections (every value reachable, no orphans) that still keeps values far apart (few edges, long chains), not a clique. `corpus-fit --web` scores candidates on exactly that: share of parts that form one web, orphans, edge density and mean path length.
+- Thresholds alone never give one web without flooding it; a spanning tree does, with the fewest edges. Pick: keep `meanBest` with the existing weights (about 0.3, material 0.2, readings 0.5), and define a near neighbour as the part's maximum spanning tree plus every pair scoring at least 600. On the tagged corpus that is one web in every part, no orphans, 48% edge density and a mean path of 1.81 steps; the `max` combine gave 68% density and 1.43.
+- `NEAR` is read only by the evidence script; the engine's drift and band similarity use the continuous table, so the combine is what changes play and the edge rule defines near credit for 5RC.8.

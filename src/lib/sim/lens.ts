@@ -33,7 +33,8 @@ export type Lens = {
 	[K in keyof Tags]: Tags[K] extends readonly (infer E)[] ? ([E] extends [string] ? SetLens : EntriesLens<E>) : never;
 };
 
-// Placeholder values, to be replaced by Jason's picks once the corpus is tagged and corpus-fit has run.
+// Jason's pick after the 4SD.16 sweep (docs/spikes/4SD.16-tagging-log.md): meanBest with these
+// weights gave the sparsest fully connected web of values per part.
 export const DEFAULT_LENS: Lens = {
 	about: { weight: 0.3, rule: 'jaccard', opposite: 0.25 },
 	material: {
@@ -55,5 +56,7 @@ export const DEFAULT_LENS: Lens = {
 	}
 };
 
-// Above this (out of 1000) two values count as near neighbours.
-export const NEAR = 500;
+// What counts as a near neighbour, for the evidence script and for near credit (5RC.8): within a
+// part, the maximum spanning tree of the similarity table (the fewest edges that connect every
+// value) plus every pair scoring at least NEAR. Chosen in 4SD.16 as one web with the longest chains.
+export const NEAR = 600;

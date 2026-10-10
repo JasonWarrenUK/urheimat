@@ -60,6 +60,33 @@ function runs() {
 	});
 }
 
+// ---------- the web ----------
+// Jason's objective for the default lens: within each part, one web of connections (every value
+// reachable from every other, no orphans) that still keeps values far apart (few edges, long
+// chains), rather than a clique. Each candidate is a lens and a rule for drawing edges from its
+// table; the metrics are per part, averaged over parts with three or more values.
+type EdgeRule = (t: number[][]) => boolean[][];
+const above = (near: number): EdgeRule => (t) => t.map((row, a) => row.map((s, b) => a !== b && s >= near));
+// Each value links to its k closest; a link either way counts.
+const knn = (k: number): EdgeRule => (t) => {
+	const n = t.length, e = t.map(() => t.map(() => false));
+	t.forEach((row, a) => {
+		const order = row.map((s, b) => [s, b] as const).filter(([, b]) => b !== a).sort((x, y) => y[0] - x[0]).slice(0, k);
+		order.forEach(([, b]) => { e[a][b] = true; e[b][a] = true; });
+	});
+	return e;
+};
+// A maximum spanning tree (the fewest edges that connect everything), plus every pair above `near`.
+const treePlus = (near: number): EdgeRule => (t) => {
+	const n = t.length, e = above(near)(t), inTree = [0];
+	while (inTree.length < n) {
+		let best: [number, number, number] = [-1, -1, -1];
+		inTree.forEach((a) => t[a].forEach((s, b) => { if (!inTree.includes(b) && s > best[2]) best = [a, b, s]; }));
+		e[best[0]][best[1]] = true; e[best[1]][best[0]] = true; inTree.push(best[1]);
+	}
+	return e;
+};
+
 function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 	console.log(`\n== ${label} ==`);
 	const tagged = parts.filter((p) => partTable(p.si, p.fi, lens));
@@ -86,12 +113,12 @@ function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 	const neighbours = tagged.flatMap((p) => {
 		const t = partTable(p.si, p.fi, lens)!;
 		return p.values.map((v, a) => {
-			const n = t[a].filter((s, b) => b !== a && s >= NEAR).length;
+			const n = treePlus(NEAR)(t)[a].filter(Boolean).length;
 			if (!n) orphans.push(`${p.name}: ${v.name}`);
 			return n;
 		});
 	});
-	console.log(`2 Density: ${neighbours.length ? mean(neighbours).toFixed(2) : 'n/a'} near neighbours per tagged value (near ≥ ${NEAR}); ${orphans.length} orphans`);
+	console.log(`2 Density: ${neighbours.length ? mean(neighbours).toFixed(2) : 'n/a'} near neighbours per tagged value (spanning tree plus pairs ≥ ${NEAR}); ${orphans.length} orphans`);
 	orphans.forEach((o) => console.log(`    orphan  ${o}`));
 
 	// 3. Spread
@@ -145,32 +172,6 @@ if (process.argv.includes('--sweep')) {
 	variants.forEach(([label, lens]) => report(lens, label, states));
 }
 
-// ---------- the web ----------
-// Jason's objective for the default lens: within each part, one web of connections (every value
-// reachable from every other, no orphans) that still keeps values far apart (few edges, long
-// chains), rather than a clique. Each candidate is a lens and a rule for drawing edges from its
-// table; the metrics are per part, averaged over parts with three or more values.
-type EdgeRule = (t: number[][]) => boolean[][];
-const above = (near: number): EdgeRule => (t) => t.map((row, a) => row.map((s, b) => a !== b && s >= near));
-// Each value links to its k closest; a link either way counts.
-const knn = (k: number): EdgeRule => (t) => {
-	const n = t.length, e = t.map(() => t.map(() => false));
-	t.forEach((row, a) => {
-		const order = row.map((s, b) => [s, b] as const).filter(([, b]) => b !== a).sort((x, y) => y[0] - x[0]).slice(0, k);
-		order.forEach(([, b]) => { e[a][b] = true; e[b][a] = true; });
-	});
-	return e;
-};
-// A maximum spanning tree (the fewest edges that connect everything), plus every pair above `near`.
-const treePlus = (near: number): EdgeRule => (t) => {
-	const n = t.length, e = above(near)(t), inTree = [0];
-	while (inTree.length < n) {
-		let best: [number, number, number] = [-1, -1, -1];
-		inTree.forEach((a) => t[a].forEach((s, b) => { if (!inTree.includes(b) && s > best[2]) best = [a, b, s]; }));
-		e[best[0]][best[1]] = true; e[best[1]][best[0]] = true; inTree.push(best[1]);
-	}
-	return e;
-};
 function webMetrics(e: boolean[][]) {
 	const n = e.length;
 	const comp = Array(n).fill(-1); let c = 0;
