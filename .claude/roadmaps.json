@@ -409,7 +409,8 @@
 							"2DS.1"
 						],
 						"notes": "Succession passes to the nearest adult descendant; the age range guarantees one exists. A more robust descent and inheritance system is a later phase. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3b, 3c, 3q).",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-10"
 					},
 					{
 						"id": "6SL.2",
@@ -419,7 +420,8 @@
 							"2DS.1"
 						],
 						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-10"
 					},
 					{
 						"id": "6SL.3",
