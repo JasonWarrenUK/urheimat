@@ -4,14 +4,15 @@ A solo strategy game about the drift of culture and the limits of the comparativ
 
 ## Overview
 
-You start as one ancestral culture with sixteen customs (cosmology, rite, kinship, law), each built from several independently-drifting parts. Across eight eras you hold, reform, migrate, split off daughter bands and teach forgotten customs back to your neighbours. At the end, the game runs its own comparative-method reconstruction against every surviving descendant culture and scores how much of the truth would actually have been recoverable, false convergences and all.
+You start as one ancestral culture with seventeen customs (cosmology, rite, kinship, law, land), each built from several parts that the land, your neighbours and your choices pull on. Across eight eras you hold, reform, migrate, split off daughter bands and teach forgotten customs back to your neighbours. At the end, the game runs its own comparative-method reconstruction against every surviving descendant culture and scores how much of the truth would actually have been recoverable, false convergences and all.
 
 The game began as a single self-contained HTML artefact and was ported into a full SvelteKit project; see `docs/adrs/001-initial-tech-stack.md` for the port's rationale.
 
 ## Features
 
 - Deterministic, seeded procedural generation of the map, the ancestral culture and every neighbouring people.
-- Sixteen customs, each with two to three independently-drifting features, pulled by terrain, contact with neighbours and how conservative your rule is.
+- Seventeen customs across 94 parts, every value tagged with what it is about and what a people may believe it does. A part can hold a set of values (who drinks in each round of a rite), a custom can run in stages (a funeral that burns, then buries the ash) and one custom can stand in for another while they describe the same act.
+- Drift pulled by terrain, contact with neighbours and how conservative your rule is, with similarity between values deciding how far a custom moves in one step.
 - A genuine comparative-method scoring pass: secure recoveries, doubtful ones, false reconstructions and unrecoverable losses are all distinguished and explained.
 - Canvas-rendered world map with click-to-select tile interactions for founding a homeland and migrating.
 
@@ -41,8 +42,8 @@ Then open the printed local URL. The simulation itself runs entirely client-side
 
 Copy `.env.example` to `.env`:
 
-- `MONGODB_URI` — MongoDB connection string. `mongodb://localhost:27017` for the local Docker instance, or an Atlas connection string.
-- `MONGODB_DB` — database name (defaults to `urheimat` if unset).
+- `MONGODB_URI`: MongoDB connection string. `mongodb://localhost:27017` for the local Docker instance, or an Atlas connection string.
+- `MONGODB_DB`: database name (defaults to `urheimat` if unset).
 
 Sign-in is via GitHub, through Auth.js. These three are optional: leave them unset and the game plays anonymously with the sign-in control hidden.
 
@@ -55,13 +56,16 @@ Sign-in is via GitHub, through Auth.js. These three are optional: leave them uns
 
 ## Project Structure
 
-- `src/lib/sim/` — the pure simulation engine (`engine.ts`, `slots.ts`) and display constants (`display.ts`). No Svelte or DOM dependency; independently testable.
-- `src/lib/types.ts` — every data shape as an explicit TypeScript interface.
-- `src/lib/game-store.svelte.ts` — the reactive UI-facing game state (Svelte 5 runes).
-- `src/lib/components/` — one component per screen/region (`IntroScreen`, `StartPicker`, `GameScreen`, `ReconstructorNotebook`, `WorldMap`, `TraitRow`, `KinCard`, `TeachPicker`, `TerrainLegend`).
-- `src/routes/` — the game route that dispatches between the four game phases, the `signin`/`signout` form actions and `api/runs`.
+- `src/lib/sim/`: the pure simulation engine. `engine.ts` runs the eras; `slots.ts` is the corpus of customs; `vocabulary.ts` holds the words tags are written in; `predicates.ts` decides which parts apply and which customs shadow others; `similarity.ts` and `lens.ts` score how alike two values are; `serialise.ts` saves and loads runs; `display.ts` holds display constants. No Svelte or DOM dependency; independently testable.
+- `src/lib/types.ts`: every data shape as an explicit TypeScript interface.
+- `src/lib/game-store.svelte.ts`: the reactive UI-facing game state (Svelte 5 runes).
+- `src/lib/components/`: one component per screen/region (`IntroScreen`, `StartPicker`, `GameScreen`, `ReconstructorNotebook`, `WorldMap`, `TraitRow`, `KinCard`, `TeachPicker`, `TerrainLegend`).
+- `src/routes/`: the game route that dispatches between the four game phases, the `signin`/`signout` form actions and `api/runs`.
 - `src/lib/server/`: server-only code, namely the MongoDB connection and access helpers (`db.ts`, `runs.ts`, `scores.ts`), the Auth.js configuration (`auth.ts`) and the ownership guard (`player.ts`).
-- `docs/adrs/` — architecture decision records.
+- `scripts/evidence/`: evidence scripts run with `bun run scripts/evidence/<name>.ts` (`corpus-fit.ts` measures whether the corpus is big enough and compares lens settings with `--sweep` and `--web`; `pacing.ts` and `play-styles.ts` measure game pacing).
+- `docs/adrs/`: architecture decision records.
+- `docs/spikes/`: design spike reports and the corpus tagging log.
+- `docs/roadmaps/`, `docs/reports/`: the phase roadmap and its overview.
 - `docs/setup/`: credential and deployment setup that can't be scripted.
 
 ## Development
@@ -74,7 +78,7 @@ bun run dev         # local dev server
 
 ## Documentation
 
-See `docs/adrs/001-initial-tech-stack.md` for the stack decision and the artefact-to-Svelte port rationale.
+See `docs/adrs/001-initial-tech-stack.md` for the stack decision and the artefact-to-Svelte port rationale, `docs/spikes/` for the design decisions the game now rests on and `CHANGELOG.md` for what changed in each release.
 
 ## License
 
