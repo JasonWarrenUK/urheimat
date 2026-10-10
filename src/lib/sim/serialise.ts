@@ -4,7 +4,8 @@ import { rngFrom } from './engine';
 // 2: Treatment of the dead rebuilt as three stages of six parts (was three parts).
 // 3: Every part holds a set of value indices (was one index), so a saved run's traits gain a level;
 //    where the dead go is no longer a custom (it lives on the funeral acts as readings).
-export const SCHEMA_VERSION = 3;
+// 4: Every band has a leading family and a leader; a run is 15 steps of 25 years.
+export const SCHEMA_VERSION = 4;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, cultures, ...rest } = st;

@@ -13,6 +13,7 @@ import type {
 	Terrain
 } from '$lib/types';
 import { activeParts, heldAbout, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { advance, ageOf, found, split, yearOf } from './family';
 import { partTable } from './similarity';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -246,7 +247,9 @@ function makeCulture(
 		held: new Set(),
 		bornEra: st.era,
 		diedEra: null,
-		parent: null
+		parent: null,
+		family: [],
+		leader: -1
 	};
 }
 
@@ -260,7 +263,7 @@ export function newGame(seed: number): GameState {
 		seed,
 		rng: r,
 		era: 0,
-		maxEra: 8,
+		maxEra: 15,
 		cultures: [],
 		log: [],
 		playerId: null,
@@ -298,6 +301,8 @@ export function begin(st: GameState, px: number, py: number): GameState {
 		st.cultures.push(makeCulture(st, genName(r, 2), t.x, t.y, st.ancestral, false));
 	}
 	st.era = 1;
+	// Every band sets out under a leader of its own, with the family they already have.
+	st.cultures.forEach((c) => found(r, c, 0));
 	st.log.push({
 		era: 0,
 		text: `The ${st.peopleName} of the ${st.homeTerrain} scatter. Six bands set out; yours, the ${p.name}, go to the ${st.map.tiles[py][px]}.`
@@ -383,6 +388,7 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	const t = pick(r, opts);
 	const d = makeCulture(st, genName(r, 2), t.x, t.y, c.traits, false);
 	d.parent = c.id;
+	const founder = split(r, c, d, yearOf(st.era));
 	d.prosperity = 4;
 	d.migrated = true;
 	if (c.isPlayer) d.conserv = 1.2 + r() * 0.3;
@@ -390,7 +396,7 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	d.knownEra = st.era;
 	c.prosperity -= 2;
 	st.cultures.push(d);
-	st.log.push({ era: st.era, text: `A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}.` });
+	st.log.push({ era: st.era, text: `A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}, led by ${founder.name}.` });
 	return d;
 }
 
@@ -508,6 +514,24 @@ export function endEra(st: GameState, orders: Orders): GameState {
 	}
 	st.cultures.filter((c) => c.alive && !c.isPlayer && c.bornEra < st.era).forEach((c) => aiMove(st, c));
 	st.cultures.filter((c) => c.alive && !c.isPlayer && c.bornEra < st.era).forEach((c) => trySplit(st, c, false));
+	// The world moves 25 years: every band's family ages, and a leader who dies is succeeded.
+	const stepStart = yearOf(st.era),
+		stepEnd = yearOf(st.era + 1);
+	st.cultures
+		.filter((c) => c.alive)
+		.forEach((c) => {
+			const events = advance(st.rng, c, stepStart, stepEnd);
+			if (c.isPlayer)
+				events.forEach((e) =>
+					st.log.push({
+						era: st.era,
+						text:
+							e.kind === 'death'
+								? `${e.person.name} dies in year ${e.year}, aged ${ageOf(e.person, e.year)}.`
+								: `${e.person.name}, ${ageOf(e.person, e.year)}, leads the ${c.name}${e.person.parent === null ? ', a kinsman of no tracked line' : ''}.`
+					})
+				);
+		});
 	const snapshot = st.cultures.map((c) => clone(c.traits));
 	st.cultures
 		.filter((c) => c.alive)

@@ -105,6 +105,19 @@ export interface Drive {
 	pref: Terrain;
 }
 
+// One person in a band's leading family. Everything about a life is drawn at birth: `dies` is the
+// year of death, `children` the ages at which their children are born. `parent` is null for a
+// founder or a kinsman taken from outside the tree; `generation` counts from the scattering.
+export interface Person {
+	id: number;
+	name: string;
+	born: number;
+	dies: number;
+	parent: number | null;
+	generation: number;
+	children: number[];
+}
+
 export interface Culture {
 	id: number;
 	name: string;
@@ -123,6 +136,8 @@ export interface Culture {
 	bornEra: number;
 	diedEra: number | null;
 	parent: number | null;
+	family: Person[];
+	leader: number; // a Person id in family
 }
 
 export interface GameMap {
