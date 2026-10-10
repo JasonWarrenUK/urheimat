@@ -2,6 +2,7 @@
 	import type { GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
 	import { endEra, foodHeldCount, foodStrainCount, freeLand, strainCount } from '$lib/sim/engine';
+	import { ageOf, leaderOf, yearOf } from '$lib/sim/family';
 	import { game, type Tab as TabType } from '$lib/game-store.svelte';
 	import WorldMap from './WorldMap.svelte';
 	import TerrainLegend from './TerrainLegend.svelte';
@@ -17,6 +18,8 @@
 
 	const player = $derived(game.player()!);
 	const terrain = $derived(gameState.map.tiles[player.y][player.x]);
+	const leader = $derived(leaderOf(player));
+	const year = $derived(yearOf(gameState.era));
 	const aliveCount = $derived(gameState.cultures.filter((c) => c.alive).length);
 	const kinList = $derived(gameState.cultures.filter((c) => !c.isPlayer));
 	const actionsLeft = $derived(game.actionsLeft());
@@ -100,7 +103,8 @@
 
 <div class="row between">
 	<h1 style="font-size:28px;margin:0">Urheimat</h1>
-	<span class="muted">Era {gameState.era} of {gameState.maxEra}</span>
+	<span class="muted">Year {year}, step {gameState.era} of {gameState.maxEra}</span>
+	<span class="muted">Led by {leader.name}, {ageOf(leader, year)}, of the {leader.generation}{leader.generation === 1 ? 'st' : leader.generation === 2 ? 'nd' : leader.generation === 3 ? 'rd' : 'th'} generation since the scattering</span>
 </div>
 
 <WorldMap {gameState} selecting={moveTiles} moveTarget={game.orders.move} onPick={game.mode === 'move' ? pickMoveTile : undefined} />
