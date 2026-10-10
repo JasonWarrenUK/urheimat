@@ -1,35 +1,69 @@
 # Urheimat
 
-A solo strategy game about the drift of culture and the limits of the comparative method: guide a people through fifteen steps of twenty-five years, then watch future scholars try (and sometimes fail) to reconstruct what you actually believed.
+A solo strategy game about the drift of culture and the limits of the comparative method. Lead a people across the ages, then watch future scholars try, and sometimes fail, to reconstruct what you actually believed.
 
-## Overview
+**Play it now:** https://urheimat.vercel.app/
 
-You start as one ancestral culture with seventeen customs (cosmology, rite, kinship, law, land), each built from several parts that the land, your neighbours and your choices pull on. The world moves in fixed 25-year steps; each band is led by a person from a family whose lives are drawn at birth, and when a leader dies the band's own descent custom decides who follows. There is no menu of actions: a step brings what the land, your neighbours and your own people put to you, and you answer as a leader would (the situations themselves arrive with the pressure and storylet tasks; for now a step carries a move and the world moves on). At the end, the game runs its own comparative-method reconstruction against every surviving descendant culture and scores how much of the truth would actually have been recoverable, false convergences and all.
+This README is in two halves on purpose. [What the game is today](#what-the-game-is-today) describes what you get when you open that link. [What the game is going to be](#what-the-game-is-going-to-be) describes the redesign the roadmap commits to, almost none of which has shipped yet. If a sentence in the second half sounds better than the first, that is the gap between them, not a hidden feature.
 
-The game began as a single self-contained HTML artefact and was ported into a full SvelteKit project; see `docs/adrs/001-initial-tech-stack.md` for the port's rationale.
+## What the game is today
 
-## Features
+The current build is a short run of fifteen steps, each twenty-five years, playable in one sitting. The order menu has gone and the situations that replace it have not yet arrived, so for now it is a world to watch and walk through rather than a game to win.
 
-- Deterministic, seeded procedural generation of the map, the ancestral culture and every neighbouring people.
-- Seventeen customs across 94 parts, every value tagged with what it is about and what a people may believe it does. A part can hold a set of values (who drinks in each round of a rite), a custom can run in stages (a funeral that burns, then buries the ash) and one custom can stand in for another while they describe the same act.
-- Drift pulled by terrain, contact with neighbours and how conservative your rule is, with similarity between values deciding how far a custom moves in one step.
-- A genuine comparative-method scoring pass: secure recoveries, doubtful ones, false reconstructions and unrecoverable losses are all distinguished and explained.
-- Leaders and families: a child at 18, more with halving odds, death between 36 and 75, all seeded, with succession by the band's descent custom and a kinsman as the fallback.
-- Canvas-rendered world map with click-to-select tile interactions for founding a homeland and migrating.
+**Setup.** The game generates a world map, an ancestral people with a name, a home terrain and seventeen customs, and a scattering of neighbouring peoples, all from one seed. The intro shows you everything your people hold to be true. Then your band scatters, and you pick a tile within two days' walk of the homeland to settle on.
 
-## Prerequisites
+**Play.** The world moves in fixed 25-year steps. Each band is led by a person from a family whose lives are drawn at birth: a child at 18, more with halving odds, death between 36 and 75. When a leader dies, the band's own descent custom decides who follows, and a kinsman steps in if no adult descendant is left. The header names your leader, their age and their generation since the scattering.
+
+There is no menu of actions and no budget. A step offers one button that lets twenty-five years pass and one act you can start yourself: **migrate** to a neighbouring tile, which costs prosperity and loosens every custom for a step. The screen has a place for situations and their answers, with "let it lie" always offered, but nothing raises a situation yet; that is the next work on the roadmap.
+
+When you let the years pass, every custom may drift, pulled by the terrain, by contact with neighbours and by how conservative your rule is. Neighbouring peoples drift, move and send out daughter bands of their own, each founded by a child of the leader who is not the heir. The header shows your prosperity, how many of the ways your band is fed strain against the land, and how many peoples are still alive. Three tabs show your customs, what you know of your kin (which goes stale when you lose contact) and a chronicle dated by year, in which your leaders die and their successors take over.
+
+**Ending.** After fifteen steps the game runs a comparative-method reconstruction against every surviving descendant of your people and opens the Reconstructor's notebook. For each part of each custom it reports whether the scholars recovered the truth securely, recovered it doubtfully, reconstructed something false or could not recover it at all, with a note explaining why. You get a score out of a maximum, and can start again with the same people or a new one.
+
+**Under the hood.** The simulation is deterministic from its seed and runs entirely in your browser. Seventeen customs are built from 94 parts, every value tagged with what it is about and what a people may believe it does. A part can hold a set of values, a custom can run in stages (a funeral that burns, then buries the ash) and one custom can stand in for another while they describe the same act. Drift favours values similar to the current one, so Sky becomes Storm more readily than Sea. Only strain in how a band is fed moves prosperity; strain in a belief custom is recorded and costs nothing until the situation system carries it.
+
+**What the game does not do yet.** Be clear about these before you sign in or close the tab:
+
+- **Nothing is saved.** Closing the tab loses the run. There is no save, no resume and no record of finished runs.
+- **Signing in does nothing yet.** The GitHub sign-in button exists on deployments that have OAuth configured, and it does sign you in, but no run or score is written against your account. It is plumbing for the persistence work below.
+- **There is no leaderboard or archive**, and no way to share a result.
+- **The canvas map has no keyboard or screen-reader path.** You need a pointer to found a homeland or migrate.
+
+## What the game is going to be
+
+The design spikes in `docs/spikes/` interrogated the game above and kept little of its loop. The roadmap in `docs/roadmaps/PHASE_1.md` is the plan for building the replacement. The persistence track has its foundations in. The situation loop, which everything else in the redesign waits on, has not started. Treat everything in this section as intent.
+
+**The premise changes.** You will be a spirit bound to one line among a scattering people. The 25-year step and the leaders who are born, lead and die on it have shipped; the rest has not: the spirit remains and remembers everything, while each generation knows only what it lived and what its elders told it.
+
+**The menu goes.** The standing list of orders and the action budget have already gone. What replaces them has not arrived: each turn will raise situations: a custom straining against the land, a stranger at the ford, authored storylets that fire when their prerequisites are met. You answer them through your leaders. Pressure comes and goes like weather, with peaks and lulls. Random drift goes with the menu: every change in any band's customs, yours or a neighbour's, becomes something somebody saw happen.
+
+**Numbers mostly leave the screen.** Prosperity becomes condition, felt as strands (food, numbers, standing) through the situations rather than shown as a figure. Strain stays per custom, with no aggregate count.
+
+**The world gets deeper.** Territory and writing become customs a band can grow into rather than fixed phases: every band starts as a wandering point with a seat tile, settles when it meets the prerequisites, and a settled band reaches writing sooner. Every band keeps dated knowledge of every other, so a people met again after long absence may go unrecognised and a daughter band may be mistaken for its parent. A second, unrelated founding stock seeds the world to contaminate the record. Borrowing flows down a prestige gradient. Each band's history is recorded step by step.
+
+**The ending becomes emergent.** The run ends when written record begins, because that is where prehistory ends. If writing stalls for a long time, a power from beyond the map arrives instead. A player whose band dies or is absorbed, or who chooses to stop, watches a timelapse of the world first.
+
+**The notebook becomes a book, with no score.** The scholars will never meet a band. What they can say of a vanished people comes from material remains, from what literate neighbours wrote of it, from its own writing if it had any and from tales among other peoples. Attestation is derived from that evidence, value by value, never rolled. The notebook becomes two books with a switch on every page: the scholars' book, written by one named scholar from a small cast whose biases tip the close calls, and the true book, an omniscient history that remarks on the scholars' errors. Prose only, no totals. Nothing about the notebook is shown during play; it is a verdict on the whole of history, not a target you are told to play towards.
+
+**Persistence arrives.** Save and resume across sessions and devices, and an unranked archive of finished runs that can rebuild their notebook on demand. This is the one track that does not wait on the redesign.
+
+The dependency order, task status and the reasoning behind each decision live in `docs/roadmaps/PHASE_1.md` and `docs/reports/ROADMAP_OVERVIEW.md`. The spike reports in `docs/spikes/` record why each decision was made.
+
+## Running it locally
+
+### Prerequisites
 
 - [bun](https://bun.sh) 1.x
 - A container runtime for the local MongoDB via `bun run db:up`: [Colima](https://github.com/abiosoft/colima) or Docker Desktop, either of which provides the `docker compose` CLI. Alternatively, skip it and point `MONGODB_URI` at a MongoDB Atlas cluster.
-- GitHub OAuth credentials, to sign in and keep runs (optional; without them the game plays anonymously). See `docs/setup/github-oauth.md`.
+- GitHub OAuth credentials, if you want the sign-in control to appear (optional; without them the game plays anonymously, and today sign-in stores nothing either way). See `docs/setup/github-oauth.md`.
 
-## Installation
+### Installation
 
 ```bash
 bun install
 ```
 
-## Usage
+### Usage
 
 ```bash
 colima start    # if using Colima and the VM isn't already running
@@ -37,9 +71,9 @@ bun run db:up   # start a local MongoDB
 bun run dev
 ```
 
-Then open the printed local URL. The simulation itself runs entirely client-side, so the game is playable without signing in; the server side handles authentication and run storage only. Run `bun run db:down` when you're done with the local database.
+Then open the printed local URL. The simulation itself runs entirely client-side, so the game is playable without signing in or without a database at all; the server side handles authentication and run storage only. Run `bun run db:down` when you're done with the local database.
 
-## Configuration
+### Configuration
 
 Copy `.env.example` to `.env`:
 
@@ -55,12 +89,15 @@ Sign-in is via GitHub, through Auth.js. These three are optional: leave them uns
 
 `bun run test` and `bun run check` both pass with no live database and no auth credentials required.
 
-## Project Structure
+## Project structure
+
+The game began as a single self-contained HTML artefact (`urheimat.html`, kept at the root) and was ported into a full SvelteKit project; see `docs/adrs/001-initial-tech-stack.md` for the port's rationale.
 
 - `src/lib/sim/`: the pure simulation engine. `engine.ts` runs the steps; `family.ts` holds leaders, families and succession; `slots.ts` is the corpus of customs; `vocabulary.ts` holds the words tags are written in; `predicates.ts` decides which parts apply and which customs shadow others; `similarity.ts` and `lens.ts` score how alike two values are; `serialise.ts` saves and loads runs; `display.ts` holds display constants. No Svelte or DOM dependency; independently testable.
 - `src/lib/types.ts`: every data shape as an explicit TypeScript interface.
 - `src/lib/game-store.svelte.ts`: the reactive UI-facing game state (Svelte 5 runes).
 - `src/lib/components/`: one component per screen/region (`IntroScreen`, `StartPicker`, `GameScreen`, `ReconstructorNotebook`, `WorldMap`, `TraitRow`, `KinCard`, `TerrainLegend`).
+- `static/`: the favicon and other files served as-is.
 - `src/routes/`: the game route that dispatches between the four game phases, the `signin`/`signout` form actions and `api/runs`.
 - `src/lib/server/`: server-only code, namely the MongoDB connection and access helpers (`db.ts`, `runs.ts`, `scores.ts`), the Auth.js configuration (`auth.ts`) and the ownership guard (`player.ts`).
 - `scripts/evidence/`: evidence scripts run with `bun run scripts/evidence/<name>.ts` (`corpus-fit.ts` measures whether the corpus is big enough and compares lens settings with `--sweep` and `--web`; `pacing.ts` and `play-styles.ts` measure game pacing).
