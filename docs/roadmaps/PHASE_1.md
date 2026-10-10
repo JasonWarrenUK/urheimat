@@ -67,7 +67,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).
 - [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(depends on 2DS.1, 4SD.16)_
   - Note: Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.
-- [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(blocked: depends on 6SL.5)_
+- [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(depends on 6SL.5)_
   - Note: The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).
 - [ ] **4SD.12**: Writing as a gated custom in grades, from tallies to full record _(blocked: depends on 6SL.5, 4SD.11)_
   - Note: A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).
@@ -115,7 +115,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: "Let it lie" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).
 - [ ] **6SL.4**: Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation _(blocked: depends on 6SL.3)_
   - Note: Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).
-- [ ] **6SL.5**: Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences _(depends on 6SL.2)_
+- [x] **6SL.5**: Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences
   - Note: One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).
 - [ ] **6SL.6**: Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds _(blocked: depends on 6SL.3)_
   - Note: No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).
@@ -129,7 +129,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).
 - [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(blocked: depends on 6SL.3)_
   - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).
-- [ ] **6SL.12**: Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing _(blocked: depends on 6SL.5)_
+- [ ] **6SL.12**: Storylet corpus, first batch: enough authored storylets for a medium run, including reform bite-back and the first grade of writing _(depends on 6SL.5)_
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
 - [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 4SD.12)_
   - Note: The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).
@@ -309,7 +309,7 @@ graph LR
 	6SL.8 --> 6SL.10
 	6SL.10 --> M6
 	6SL.11 --> M6
-	class 3PL.5,4SD.10,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.14,6SL.17,6SL.3,6SL.5,6SL.9 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.15,6SL.16,6SL.4,6SL.6,6SL.7,6SL.8 blocked
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.2 done
+	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.12,6SL.14,6SL.17,6SL.3,6SL.9 todo
+	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.16,6SL.4,6SL.6,6SL.7,6SL.8 blocked
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.2,6SL.5 done
 ```
