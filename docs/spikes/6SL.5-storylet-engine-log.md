@@ -8,3 +8,7 @@ Decisions made with Jason while building the prerequisite structure and the stor
 - Storylets are typed data in `src/lib/sim/storylets.ts`. At the end of a step the engine applies the player's answers to last step's situations (an unanswered one was let lie, and runs the storylet's `lie` consequences if it has any), moves the world, then evaluates every storylet against the player's band and raises each whose conditions hold. `once` fires one time per run; `cooldown` holds a storylet for so many steps; a raised storylet fires next step whatever its conditions.
 - The three samples: `new-leader-doubts` (a succession to a leader under 25; one answer raises `elders-resist`), `elders-resist` (raised only, once; one answer sets the daily cult's officiant), `strangers-at-the-ford` (a band that bars strangers while in contact, cooldown 3; one answer opens the door). Over 30 seeded runs the two self-firing samples raised 118 situations.
 - Save schema 5.
+
+## Smoke test
+
+- Played in a browser: `new-leader-doubts` fired at step 12 after a succession to a leader aged 24, the first answer was taken, and the chronicle carried its consequence ("The elders keep the old ways, and the band is the calmer for it.") dated to that step, ahead of the step's drift lines. No console errors beyond the favicon.
