@@ -78,15 +78,17 @@ const JUDGE: Reading[] = R('judge', 'spirit', null, 'death');
 // The founding figure may be spoken of as female or male; a band may hold either, both or neither.
 const HERO_SEX: Reading[] = R('address', 'hero', 'female', 'male');
 
-// Up to `count` companions, each a set-valued helper with the parts that go with it. The first
-// helper may be empty (a hero alone); a later companion applies only after the one before.
-const companions = (count: number, axes: FeatureDef[]): FeatureDef[] =>
+// Up to `count` members of a sequence, each a set-valued lead part with the parts that go with it
+// (a hero's helper and its aid; a livelihood source and who works it). A later member applies only
+// after the one before has a lead; whether the first may be empty is the lead's own size.
+const each = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 	Array.from({ length: count }, (_, i) =>
 		axes.map((a) => {
 			const own = a.applies === undefined ? [] : Array.isArray(a.applies) ? a.applies : [a.applies];
 			const before = i > 0 && a.size ? [{ part: a.id, stage: 'previous' as const, has: 'anyMember' as const }] : [];
 			const applies = [...before, ...own];
-			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, applies: applies.length ? applies : undefined };
+			const size = a.size && i > 0 ? ([0, a.size[1]] as const) : a.size;
+			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, size, applies: applies.length ? applies : undefined };
 		})
 	).flat();
 
@@ -278,7 +280,7 @@ export const SLOTS: SlotDef[] = [
 					N('fire', 'fire', { mountain: 'strong', forest: 'favours', marsh: 'resists' }, { about: ['fire', 'light', 'warmth'], readings: [...R('win', 'fire', 'living'), ...R('create', 'hearth', null)] })
 				]
 			},
-			...companions(2, [
+			...each(2, [
 				{
 					id: 'helper',
 					label: 'helped by',
@@ -1099,35 +1101,89 @@ export const SLOTS: SlotDef[] = [
 		render: (n) => `${n[0]} with ${n[1]}, ${n[2]}`
 	},
 	{
+		id: 'livelihood',
+		domain: 'Land',
+		name: 'How they are fed',
+		// Contract: for a band that has this custom, every value assumes the band draws its food from
+		// the land by a rule; it assumes nothing about which sources, how many, or who does the work.
+		// Up to three sources, each with its own labour. Strain here is hunger: it hits prosperity.
+		strain: 'food',
+		features: each(3, [
+			{
+				id: 'source',
+				label: 'fed by',
+				size: [1, 1],
+				values: [
+					N('herds/large', 'cattle and horses', { steppe: 'strong', desert: 'favours', mountain: 'favours', forest: 'resists', marsh: 'resists' }, { about: ['herds', 'wealth', 'hierarchy', 'male'], readings: [...R('provide', 'living', 'plenty'), ...R('guard', 'herds', null)] }),
+					N('herds/small', 'sheep and goats', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'resists' }, { about: ['herds', 'thrift', 'patience'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'herds', null)] }),
+					N('crop/hoe', 'hoe crops', { forest: 'strong', marsh: 'favours', river: 'favours', desert: 'resists', steppe: 'resists' }, { about: ['grain', 'growth', 'labour', 'female'], readings: [...R('provide', 'living', 'nourishment'), ...R('create', 'grain', null)] }),
+					N('crop/plough', 'plough crops', { river: 'strong', coast: 'favours', forest: 'resists', mountain: 'resists', marsh: 'resists', desert: 'resists' }, { about: ['grain', 'plenty', 'labour', 'permanence'], readings: [...R('provide', 'living', 'plenty'), ...R('create', 'grain', null)] }),
+					N('catch', 'the catch', { coast: 'strong', river: 'strong', marsh: 'strong', steppe: 'resists', desert: 'excludes' }, { about: ['water', 'wild', 'plenty'], readings: R('provide', 'living', 'nourishment') }),
+					N('hunt', 'the hunt', { forest: 'strong', mountain: 'favours', steppe: 'favours' }, { about: ['wild', 'chase', 'strength'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'wild', null)] }),
+					N('gather', 'gathering', { forest: 'favours', marsh: 'favours', coast: 'favours' }, { about: ['plants', 'patience', 'thrift'], readings: R('provide', 'living', 'nourishment') })
+				]
+			},
+			{
+				id: 'labour',
+				label: 'worked by',
+				applies: { part: 'source', stage: 'same', has: 'anyMember' },
+				values: [
+					N('male', 'the men', undefined, { about: ['male', 'strength', 'hierarchy'], readings: R('provide', 'living', 'nourishment') }),
+					N('female', 'the women', undefined, { about: ['female', 'growth', 'nourishment'], readings: R('provide', 'living', 'nourishment') }),
+					N('shared', 'all together', undefined, { about: ['equality', 'belonging'], readings: R('provide', 'living', 'nourishment') })
+				]
+			}
+		]),
+		render: (n) => [n[0] && `${n[0]} (${n[1]})`, n[2] && `${n[2]} (${n[3]})`, n[4] && `${n[4]} (${n[5]})`].filter(Boolean).join(', ')
+	},
+	{
 		id: 'descent',
 		domain: 'Kinship',
 		name: 'Descent and the household',
+		// Contract: for a band that has this custom, every value assumes belonging and property pass
+		// between generations by a rule; it assumes nothing about which line, where a couple lives, or
+		// who inherits. The affinities here are a terrain proxy for livelihood (herds pull towards the
+		// father's line and the husband's kin, hoe crops towards the mother's); 6SL.3 should read
+		// livelihood's tags instead and retire them.
 		features: [
 			{
 				id: 'line',
 				label: 'line',
 				values: [
-					V('the father', { steppe: 3, desert: 1.5, mountain: 1.5 }),
-					V('the mother', { forest: 1.5, marsh: 1.5, coast: 1.5 }),
-					V('the house', { river: 1.5, coast: 1.5 })
+					N('father', "the father's line", { steppe: 'strong', desert: 'favours', mountain: 'favours' }, { about: ['lineage', 'male', 'kinship', 'hierarchy'], readings: [...R('bind', 'living', 'lineage'), ...R('guard', 'lineage', null)] }),
+					N('mother', "the mother's line", { forest: 'favours', marsh: 'favours', coast: 'favours' }, { about: ['lineage', 'female', 'kinship'], readings: [...R('bind', 'living', 'lineage'), ...R('guard', 'lineage', null)] }),
+					N('house', 'the house', { river: 'favours', coast: 'favours' }, { about: ['hearth', 'enclosure', 'continuity'], readings: [...R('bind', 'living', 'hearth'), ...R('guard', 'hearth', null)] }),
+					N('both', 'both parents', undefined, { about: ['kinship', 'equality', 'belonging'], readings: R('bind', 'living', 'kinship') })
 				]
 			},
 			{
 				id: 'residence',
-				label: 'residence',
+				label: 'couples live',
 				values: [
-					V("with the husband's kin", { steppe: 1.5, desert: 1.5, mountain: 1.5 }),
-					V("with the wife's kin", { forest: 1.5, marsh: 1.5 }),
-					V('at a new hearth', { river: 1.5, coast: 1.5 })
+					N('husband', "with the husband's kin", { steppe: 'favours', desert: 'favours', mountain: 'favours' }, { about: ['male', 'kinship', 'hierarchy'], readings: [...R('guard', 'hearth', null), ...R('bind', 'living', 'kinship')] }),
+					N('wife', "with the wife's kin", { forest: 'favours', marsh: 'favours' }, { about: ['female', 'kinship', 'hearth'], readings: [...R('guard', 'hearth', null), ...R('bind', 'living', 'kinship')] }),
+					N('new', 'at a new hearth', { river: 'favours', coast: 'favours' }, { about: ['hearth', 'origin', 'freedom'], readings: R('create', 'hearth', null) })
 				]
 			},
 			{
-				id: 'inherit',
-				label: 'inheritance',
-				values: [V('to the eldest'), V('divided equally'), V('to the youngest'), V("to the sister's son")]
+				id: 'heirs',
+				label: 'the estate passes to',
+				values: [
+					N('children', 'the children', undefined, { about: ['lineage', 'continuity', 'kinship'], readings: R('provide', 'living', 'continuity') }),
+					N('sister-children', "the sister's children", undefined, { about: ['kinship', 'female', 'lineage'], readings: [...R('provide', 'living', 'continuity'), ...R('bind', 'living', 'kinship')] })
+				]
+			},
+			{
+				id: 'share',
+				label: 'shared',
+				values: [
+					N('eldest', 'to the eldest', { river: 'favours', mountain: 'favours' }, { about: ['age', 'hierarchy', 'permanence'], readings: R('bind', 'living', 'hierarchy') }),
+					N('youngest', 'to the youngest', { steppe: 'favours', desert: 'favours' }, { about: ['youth', 'hearth', 'continuity'], readings: R('guard', 'hearth', null) }),
+					N('equal', 'equally', undefined, { about: ['equality', 'division', 'thrift'], readings: R('bind', 'living', 'equality') })
+				]
 			}
 		],
-		render: (n) => `Through ${n[0]}; couples live ${n[1]}; the estate passes ${n[2]}`
+		render: (n) => `Through ${n[0]}; couples live ${n[1]}; the estate passes to ${n[2]}, ${n[3]}`
 	},
 	{
 		id: 'rule',

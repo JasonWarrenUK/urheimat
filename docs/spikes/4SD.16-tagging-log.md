@@ -167,3 +167,13 @@ Every kind reads with every manner and every taker set; odd pairings (resin drun
 - `on` stays single-valued (`fire`, `water`, `bones`, `weapons`). `witness` is a set, size [1, 3] (`assembly`, `chief`, `gods`); the gods alone is a set of one.
 - `breach` separates the consequence from who imposes it: `penalty`, a set of size [1, 2] (`outlawry`, `death`, `fine`, `curse`), and `imposer` (`assembly`, `chief`, `gods`, `poets`).
 - New noun `breaker`. Grids and affinities as approved.
+
+## Round 12: descent, and a livelihood custom
+
+- Contract for descent: for a band that has this custom, every value assumes belonging and property pass between generations by a rule; it assumes nothing about which line, where a couple lives, or who inherits.
+- `line` is `father`, `mother`, `house`, plus `both` (kin through both parents). `residence` is `husband`, `wife`, `new`. `inherit` splits into `heirs` (`children`, `sister-children`) and `share` (`eldest`, `youngest`, `equal`).
+- Jason asked for the historical rationale behind the affinities. The record ties descent and residence to subsistence and warfare, not terrain: large livestock predicts patriliny (Aberle 1961; Holden and Mace 2003) and patrilocality (Ember and Ember 1971); horticulture predicts matriliny; primogeniture goes with land that cannot be split; ultimogeniture with herding expansion (the Mongol otchigin). Terrain is a poor proxy for livestock culture, so:
+- A `livelihood` custom is added (domain Land): up to three sources (`herds/large`, `herds/small`, `crop/hoe`, `crop/plough`, `catch`, `hunt`, `gather`), each with its own `labour` (`male`, `female`, `shared`), built with the sequence helper `each` that hero's companions use. Its affinities are the land's.
+- Descent's affinities stay as a documented terrain proxy for livelihood; 6SL.3 should pull descent and residence from livelihood's tags and retire them. Warfare (internal versus external) is band state for the cross-band relationship system; `rule/source: war` and `justice/remedy: feud` are the interim tag signals.
+- Engine: a custom may declare `strain: 'food'`. Food strain is hunger and feeds prosperity; custom strain no longer does, and becomes pressure for 6SL.3 to carry. Livelihood is the first food custom.
+- Engine: a later member of a sequence never repeats what an earlier one holds (no band fed by hoe crops twice), and later sequence stages start at size 0.
