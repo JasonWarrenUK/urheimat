@@ -236,6 +236,7 @@ export interface Storylet {
 	id: string;
 	text: string; // {leader} names the band's leader
 	when: Condition[];
+	raisedOnly?: boolean; // never fires on its own conditions; only when a consequence raises it
 	once?: boolean;
 	cooldown?: number; // steps before it may fire again
 	answers: StoryAnswer[];

@@ -75,6 +75,7 @@ export function fire(st: GameState, c: Culture, corpus: readonly Storylet[] = ST
 	st.raised = [];
 	const due = corpus.filter((s) => {
 		if (raised.has(s.id)) return true;
+		if (s.raisedOnly) return false;
 		const last = lastFired(st, s.id);
 		if (s.once && last !== undefined) return false;
 		if (s.cooldown !== undefined && last !== undefined && st.era - last < s.cooldown) return false;
@@ -134,7 +135,8 @@ export const STORYLETS: readonly Storylet[] = [
 	{
 		id: 'elders-resist',
 		text: "The elders keep the hearth-fire's rite from {leader}.",
-		when: [{ not: { year: [0, 100000] } }], // never on its own: only when raised
+		when: [],
+		raisedOnly: true,
 		once: true,
 		answers: [
 			{ id: 'yield', text: 'Yield the rite', then: [{ set: { custom: 'cult', part: 'officiant', value: 'elder-woman' } }, { log: 'The eldest woman keeps the daily rite from now on.' }] },

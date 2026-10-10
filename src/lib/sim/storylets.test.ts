@@ -76,7 +76,7 @@ describe('conditions', () => {
 const always: Storylet = { id: 'always', text: 'Hello {leader}', when: [], answers: [{ id: 'a', text: 'A', then: [{ prosperity: 1 }] }], lie: [{ log: 'lay' }] };
 const spent: Storylet = { ...always, id: 'spent', once: true };
 const cooling: Storylet = { ...always, id: 'cooling', cooldown: 3 };
-const never: Storylet = { ...always, id: 'never', when: [{ year: [-2, -1] }] };
+const never: Storylet = { ...always, id: 'never', when: [], raisedOnly: true };
 
 describe('firing', () => {
 	it('raises every storylet whose conditions hold, names the leader, and honours once and cooldown', () => {
@@ -92,7 +92,7 @@ describe('firing', () => {
 		st.era += 3;
 		expect(fire(st, c, corpus).map((s) => s.storylet)).toEqual(['always', 'cooling']);
 	});
-	it('fires a raised storylet once regardless of its conditions', () => {
+	it('fires a raised-only storylet once, and only when raised', () => {
 		const st = fresh(),
 			c = player(st);
 		apply(st, c, [{ raise: 'never' }]);
