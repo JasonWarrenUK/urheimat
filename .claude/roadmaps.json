@@ -458,7 +458,8 @@
 							"6SL.2"
 						],
 						"notes": "One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r). From the 4SD.4 pilot: conditions query tags with scope (a custom that releases from an oath), and a band may lack a custom altogether, modelled as custom-level absence rather than a none value. From 4SD.16: the sex nouns other customs use (youth's rites, place's access, livelihood's labour, marriage's plural, the powers' address readings) must stay consistent with the gender custom's recognised kinds: a cross-custom constraint.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-10"
 					},
 					{
 						"id": "6SL.6",
