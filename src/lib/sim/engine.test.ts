@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/engine';
 import { begin, defaultOrders, endEra, newGame, reconstruct, render, startTiles } from './engine';
-import { activeCount } from './predicates';
+import { activeCount, activeIn } from './predicates';
 import { SLOTS } from './slots';
 
 describe('engine', () => {
@@ -40,15 +40,23 @@ describe('engine', () => {
 	});
 
 	it('never reconstructs a funeral stage the ancestral people did not have', () => {
-		// Seed 12345's ancestral funeral has one stage; a lost second act must not render as '…'.
-		const state = newGame(fixtures.seed);
+		// Pick a seed whose ancestral funeral has fewer than three stages; a lost later act must not render as '…'.
+		const funeral = SLOTS.findIndex((s) => s.id === 'funeral');
+		const stages = (text: string) => text.split('; then ').length;
+		const seed = Array.from({ length: 200 }, (_, i) => i + 1).find((n) => stages(render(funeral, newGame(n).ancestral[funeral])) < 3);
+		expect(seed).toBeDefined();
+		const state = newGame(seed!);
 		const tiles = startTiles(state);
 		begin(state, tiles[0].x, tiles[0].y);
 		for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultOrders());
-		const funeral = SLOTS.findIndex((s) => s.id === 'funeral');
-		const stages = (text: string) => text.split('; then ').length;
 		const entry = reconstruct(state).entries[funeral];
-		expect(stages(render(funeral, entry.recFv))).toBeLessThanOrEqual(stages(render(funeral, state.ancestral[funeral])));
-		expect(render(funeral, entry.recFv)).not.toContain('… …');
+		// A wrongly recovered act can imply a later stage the truth lacked; that stage shows as lost.
+		// A stage dormant in the recovery is dropped outright, and a lost mark appears exactly once per
+		// live part the scholars could not recover: never for a dormant one.
+		const live = activeIn(SLOTS[funeral], entry.recFv as number[][]);
+		const liveStages = new Set(live.map((fi) => SLOTS[funeral].features[fi].stage)).size;
+		const lost = live.filter((fi) => entry.recFv[fi] === null).length;
+		expect(stages(render(funeral, entry.recFv))).toBe(liveStages);
+		expect((render(funeral, entry.recFv).match(/…/g) ?? []).length).toBe(lost);
 	});
 });

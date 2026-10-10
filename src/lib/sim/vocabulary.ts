@@ -14,6 +14,7 @@ export const NOUNS = [
 	'beyond/sky',
 	'beyond/stars',
 	'beyond/otherworld',
+	'beyond/below',
 	'ancestors',
 	'gods',
 	// what it is about
@@ -99,7 +100,91 @@ export const NOUNS = [
 	'fear',
 	'shame',
 	'violence',
-	'division'
+	'division',
+	// the substance taken in the rite, and who takes it
+	'takers',
+	'chief/self',
+	'chief/family',
+	'priest/self',
+	'priest/family',
+	'tribe/rest',
+	'honey',
+	'sweetness',
+	'festivity',
+	'herds',
+	'nourishment',
+	'grain',
+	'plenty',
+	'blood',
+	'vine',
+	'wealth',
+	'vision',
+	'plants',
+	'fragrance',
+	'sap',
+	'liquid',
+	'swallowing',
+	'chewing',
+	'breath',
+	'air',
+	'skin',
+	'marking',
+	'inside',
+	'outside',
+	'fungus',
+	'flesh',
+	'strength',
+	'offering',
+	'authority',
+	'lineage',
+	'mediation',
+	'calling',
+	'belonging',
+	'speed',
+	'chase',
+	'wild',
+	'cost',
+	'giving',
+	'first',
+	'trust',
+	'consumption',
+	'deposit',
+	'ascent',
+	'endurance',
+	// the daily cult: whose power is honoured, and what the officiants are about
+	'power/greatest',
+	'power/own',
+	'cycle',
+	'age',
+	'youth',
+	'innocence',
+	// the greatest power: the powers that lack a noun, what it is spoken of as, and what it decides
+	'storm',
+	'sun',
+	'sea',
+	'death',
+	'justice',
+	'female',
+	'male',
+	// the founding tale
+	'hero',
+	'loss',
+	'theft',
+	'guidance',
+	// who rules
+	'chance',
+	// how the past is kept
+	'voice',
+	// the stranger at the door
+	'stranger',
+	// justice for a killing
+	'killer',
+	'guilt',
+	// the oath
+	'breaker',
+	// the expressions of sex a culture recognises
+	'sex/both',
+	'sex/neither'
 ] as const satisfies readonly string[];
 
 export const VERBS = [
@@ -124,7 +209,35 @@ export const VERBS = [
 	'withhold',
 	// which way the dead face, and how they lie
 	'face',
-	'rest'
+	'rest',
+	// what a substance does when taken
+	'commune',
+	'bind',
+	'cleanse',
+	'inspire',
+	'heal',
+	// what a sacrifice does for a power
+	'feed',
+	'appease',
+	'thank',
+	'petition',
+	'renew',
+	// a small act of reverence
+	'honour',
+	// what the greatest power does, and how it is spoken of
+	'rule',
+	'create',
+	'guard',
+	'judge',
+	'address',
+	// what a founding deed did for the people
+	'found',
+	'win',
+	'defy',
+	// a stranger taken in
+	'shelter',
+	// a wrong made good
+	'atone'
 ] as const satisfies readonly string[];
 
 export type Noun = (typeof NOUNS)[number];
@@ -140,5 +253,6 @@ export const OPPOSITES: readonly (readonly [Term, Term])[] = [
 	['nearness', 'passage'],
 	['distance', 'nearness'],
 	['equality', 'hierarchy'],
-	['light', 'darkness']
+	['light', 'darkness'],
+	['inside', 'outside']
 ];

@@ -1,12 +1,12 @@
 // Evidence script for 4SD.4 / 4SD.10: is the corpus big enough? Measures Jason's four criteria.
-// Run with: bun run scripts/evidence/corpus-fit.ts [--sweep]
+// Run with: bun run scripts/evidence/corpus-fit.ts [--sweep] [--web]
 //   1. Unique runs: how often two seeds end with the player's band on the same value, per part
 //   2. Density: near neighbours per value within its part (corpus only); 0 = orphan
 //   3. Spread: distinct values alive per part across all bands at run end
 //   4. Kin familiarity: correlation of band likeness with kinship distance
 // Criteria 1, 3 and 4 depend on the change mechanism too, not only the corpus.
 
-import { newGame, begin, startTiles, endEra, defaultOrders } from '../../src/lib/sim/engine';
+import { newGame, begin, startTiles, endEra, defaultOrders, sameSet } from '../../src/lib/sim/engine';
 import { DEFAULT_LENS, NEAR, type Lens } from '../../src/lib/sim/lens';
 import { isActive } from '../../src/lib/sim/predicates';
 import { bandSimilarity, partTable } from '../../src/lib/sim/similarity';
@@ -15,7 +15,7 @@ import type { Culture, CultureTraits } from '../../src/lib/types';
 
 const SEEDS = 50, ERAS = 8;
 const parts = SLOTS.flatMap((s, si) => s.features.map((f, fi) => ({ si, fi, name: `${s.id}.${f.id}`, values: f.values })));
-const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN);
+const mean = (xs: number[]) => ((xs = xs.filter((x) => !Number.isNaN(x))), xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN);
 const pct = (x: number) => (Number.isNaN(x) ? '  n/a' : (100 * x).toFixed(1).padStart(5) + '%');
 
 function pearson(xs: number[], ys: number[]): number {
@@ -48,7 +48,7 @@ function kinDistance(a: Culture, b: Culture, all: Culture[]): number {
 
 // Dormant parts are left out wherever a band's values are compared.
 const sameShare = (a: CultureTraits, b: CultureTraits) =>
-	mean(a.flatMap((s, si) => s.flatMap((v, fi) => (isActive(a, si, fi) && isActive(b, si, fi) ? [v === b[si][fi] ? 1 : 0] : []))));
+	mean(a.flatMap((s, si) => s.flatMap((v, fi) => (isActive(a, si, fi) && isActive(b, si, fi) ? [sameSet(v, b[si][fi]) ? 1 : 0] : []))));
 
 function runs() {
 	return Array.from({ length: SEEDS }, (_, i) => {
@@ -59,6 +59,33 @@ function runs() {
 		return st;
 	});
 }
+
+// ---------- the web ----------
+// Jason's objective for the default lens: within each part, one web of connections (every value
+// reachable from every other, no orphans) that still keeps values far apart (few edges, long
+// chains), rather than a clique. Each candidate is a lens and a rule for drawing edges from its
+// table; the metrics are per part, averaged over parts with three or more values.
+type EdgeRule = (t: number[][]) => boolean[][];
+const above = (near: number): EdgeRule => (t) => t.map((row, a) => row.map((s, b) => a !== b && s >= near));
+// Each value links to its k closest; a link either way counts.
+const knn = (k: number): EdgeRule => (t) => {
+	const n = t.length, e = t.map(() => t.map(() => false));
+	t.forEach((row, a) => {
+		const order = row.map((s, b) => [s, b] as const).filter(([, b]) => b !== a).sort((x, y) => y[0] - x[0]).slice(0, k);
+		order.forEach(([, b]) => { e[a][b] = true; e[b][a] = true; });
+	});
+	return e;
+};
+// A maximum spanning tree (the fewest edges that connect everything), plus every pair above `near`.
+const treePlus = (near: number): EdgeRule => (t) => {
+	const n = t.length, e = above(near)(t), inTree = [0];
+	while (inTree.length < n) {
+		let best: [number, number, number] = [-1, -1, -1];
+		inTree.forEach((a) => t[a].forEach((s, b) => { if (!inTree.includes(b) && s > best[2]) best = [a, b, s]; }));
+		e[best[0]][best[1]] = true; e[best[1]][best[0]] = true; inTree.push(best[1]);
+	}
+	return e;
+};
 
 function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 	console.log(`\n== ${label} ==`);
@@ -86,12 +113,12 @@ function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 	const neighbours = tagged.flatMap((p) => {
 		const t = partTable(p.si, p.fi, lens)!;
 		return p.values.map((v, a) => {
-			const n = t[a].filter((s, b) => b !== a && s >= NEAR).length;
+			const n = treePlus(NEAR)(t)[a].filter(Boolean).length;
 			if (!n) orphans.push(`${p.name}: ${v.name}`);
 			return n;
 		});
 	});
-	console.log(`2 Density: ${neighbours.length ? mean(neighbours).toFixed(2) : 'n/a'} near neighbours per tagged value (near ≥ ${NEAR}); ${orphans.length} orphans`);
+	console.log(`2 Density: ${neighbours.length ? mean(neighbours).toFixed(2) : 'n/a'} near neighbours per tagged value (spanning tree plus pairs ≥ ${NEAR}); ${orphans.length} orphans`);
 	orphans.forEach((o) => console.log(`    orphan  ${o}`));
 
 	// 3. Spread
@@ -99,7 +126,7 @@ function report(lens: Lens, label: string, states: ReturnType<typeof runs>) {
 		states.flatMap((st) =>
 			parts.flatMap((p) => {
 				const live = st.cultures.filter((c) => c.alive && isActive(c.traits, p.si, p.fi));
-				return live.length ? [new Set(live.map((c) => c.traits[p.si][p.fi])).size / p.values.length] : [];
+				return live.length ? [new Set(live.flatMap((c) => c.traits[p.si][p.fi])).size / p.values.length] : [];
 			})
 		)
 	);
@@ -143,4 +170,32 @@ if (process.argv.includes('--sweep')) {
 	];
 	// Drift uses the default lens, so the runs are shared; only the scoring differs.
 	variants.forEach(([label, lens]) => report(lens, label, states));
+}
+
+function webMetrics(e: boolean[][]) {
+	const n = e.length;
+	const comp = Array(n).fill(-1); let c = 0;
+	for (let s = 0; s < n; s++) if (comp[s] < 0) { const q = [s]; comp[s] = c; while (q.length) { const a = q.pop()!; e[a].forEach((x, b) => { if (x && comp[b] < 0) { comp[b] = c; q.push(b); } }); } c++; }
+	const orphans = e.filter((row) => !row.some(Boolean)).length;
+	const edges = e.flat().filter(Boolean).length / 2;
+	const paths: number[] = [];
+	for (let s = 0; s < n; s++) { const d = Array(n).fill(-1); d[s] = 0; const q = [s]; while (q.length) { const a = q.shift()!; e[a].forEach((x, b) => { if (x && d[b] < 0) { d[b] = d[a] + 1; q.push(b); } }); } d.forEach((x, b) => { if (b > s && x > 0) paths.push(x); }); }
+	return { components: c, orphans, density: edges / (n * (n - 1) / 2), path: mean(paths) };
+}
+if (process.argv.includes('--web')) {
+	const max: Lens = { ...DEFAULT_LENS, readings: { ...DEFAULT_LENS.readings, combine: 'max' } };
+	const cands: [string, Lens, EdgeRule][] = [];
+	for (const [ln, lens] of [['meanBest', DEFAULT_LENS], ['max', max]] as const) {
+		for (const near of [400, 500, 600]) cands.push([`${ln}, near ${near}`, lens, above(near)]);
+		for (const k of [1, 2]) cands.push([`${ln}, ${k}-nearest`, lens, knn(k)]);
+		cands.push([`${ln}, tree + near 600`, lens, treePlus(600)]);
+	}
+	const big = parts.filter((p) => p.values.length >= 3);
+	console.log(`\n== the web: ${big.length} parts with three or more values ==`);
+	console.log(`${'candidate'.padEnd(24)} one web  orphans  edge density  mean path`);
+	cands.forEach(([label, lens, rule]) => {
+		const ms = big.map((p) => webMetrics(rule(partTable(p.si, p.fi, lens)!)));
+		const oneWeb = ms.filter((m) => m.components === 1).length / ms.length;
+		console.log(`${label.padEnd(24)} ${pct(oneWeb)}  ${String(ms.reduce((a, m) => a + m.orphans, 0)).padStart(7)}  ${pct(mean(ms.map((m) => m.density))).padStart(12)}  ${mean(ms.map((m) => m.path)).toFixed(2).padStart(9)}`);
+	});
 }

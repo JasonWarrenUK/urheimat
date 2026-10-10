@@ -14,15 +14,16 @@ for (let seed = 1; seed <= SEEDS; seed++) {
 	const t = tiles[seed % tiles.length];
 	begin(st, t.x, t.y);
 	const p = st.cultures[st.playerId as number];
-	const truth = st.ancestral.flat();
+	const key = (flat: number[][]) => flat.map((v) => v.join('+'));
+	const truth = key(st.ancestral.flat());
 	for (let era = 1; era <= ERAS; era++) {
-		const before = p.traits.flat(), nBefore = st.cultures.length, aliveBefore = st.cultures.filter((c) => c.alive).length;
+		const before = key(p.traits.flat()), nBefore = st.cultures.length, aliveBefore = st.cultures.filter((c) => c.alive).length;
 		endEra(st, defaultOrders());
 		splits[era] += st.cultures.length - nBefore;
 		deaths[era] += aliveBefore + (st.cultures.length - nBefore) - st.cultures.filter((c) => c.alive).length;
 		alive[era] += st.cultures.filter((c) => c.alive).length;
 		if (p.alive) {
-			const after = p.traits.flat();
+			const after = key(p.traits.flat());
 			changes[era] += after.filter((v, i) => v !== before[i]).length;
 			kept[era] += after.filter((v, i) => v === truth[i]).length;
 			strain[era] += strainCount(st, p);

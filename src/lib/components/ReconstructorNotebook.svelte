@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { GameState } from '$lib/types';
 	import { SLOTS, FEATURE_COUNT } from '$lib/sim/slots';
-	import { reconstruct, render, vname } from '$lib/sim/engine';
+	import { reconstruct, render, setName } from '$lib/sim/engine';
 	import { game } from '$lib/game-store.svelte';
 
 	interface Props {
@@ -34,7 +34,7 @@
 			{#each entry.feats as f (f.f)}
 				<div class="note">
 					<span class="verdict v-{f.verdict}">{f.verdict === 'correct' ? (f.conf === 'secure' ? 'secure' : 'doubtful') : f.verdict}</span>
-					{f.label}{#if f.verdict === 'wrong'}: <em>{vname(entry.slot, f.f, f.rec as number)}</em> for <em>{vname(entry.slot, f.f, f.truth)}</em>{/if}
+					{f.label}{#if f.verdict === 'wrong'}: <em>{setName(entry.slot, f.f, f.rec ?? [])}</em> for <em>{setName(entry.slot, f.f, f.truth)}</em>{/if}
 					— {@html f.note}
 				</div>
 			{/each}

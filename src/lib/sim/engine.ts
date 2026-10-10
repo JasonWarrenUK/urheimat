@@ -6,12 +6,13 @@ import type {
 	GameState,
 	MapTerrain,
 	Orders,
+	PartValue,
 	Point,
 	ReconstructionResult,
 	Rng,
 	Terrain
 } from '$lib/types';
-import { activeCount, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { activeParts, heldAbout, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
 import { partTable } from './similarity';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -50,11 +51,17 @@ export const strains = (slot: number, f: number, v: number, terrain: MapTerrain)
 const isNeutral = (slot: number, f: number, v: number): boolean => !SLOTS[slot].features[f].values[v].aff;
 // A dormant part renders as '' for the slot's render to drop, a lost one as '…'. Dormancy is checked
 // first: a lost part in a stage that cannot exist is nothing, not an unknown.
-export const render = (slot: number, fv: (number | null)[]): string =>
-	SLOTS[slot].render(fv.map((v, f) => (!isActiveIn(SLOTS[slot], fv, f) ? '' : v === null ? '…' : SLOTS[slot].features[f].values[v].name)));
+// A set renders its members joined by commas; an empty set renders nothing.
+export const render = (slot: number, fv: (PartValue | null)[]): string =>
+	SLOTS[slot].render(fv.map((v, f) => (!isActiveIn(SLOTS[slot], fv, f) ? '' : v === null ? '…' : v.map((vi) => SLOTS[slot].features[f].values[vi].name).join(', '))));
 export const vname = (slot: number, f: number, v: number): string => SLOTS[slot].features[f].values[v].name;
-const clone = (traits: CultureTraits): CultureTraits => traits.map((fv) => fv.slice());
-export const sameCustom = (a: number[], b: number[]): boolean => a.every((v, i) => v === b[i]);
+export const setName = (slot: number, f: number, v: readonly number[]): string => v.map((vi) => vname(slot, f, vi)).join(', ');
+const clone = (traits: CultureTraits): CultureTraits => traits.map((fv) => fv.map((v) => v.slice()));
+// Two held sets are the same when they hold the same members, in any order.
+export const sameSet = (a: readonly number[], b: readonly number[]): boolean => a.length === b.length && a.every((v) => b.includes(v));
+export const sameCustom = (a: readonly PartValue[], b: readonly PartValue[]): boolean => a.every((v, i) => sameSet(v, b[i]));
+const setKey = (v: readonly number[]): string => [...v].sort((x, y) => x - y).join(',');
+const isSetPart = (slot: number, f: number): boolean => SLOTS[slot].features[f].size !== undefined;
 
 // ---------- names ----------
 const CONS = ['k', 't', 'r', 's', 'm', 'n', 'w', 'd', 'g', 'th', 'l', 'v', 'b', 'h'];
@@ -177,7 +184,7 @@ function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
 	// neutral parts are uniform.
 	// Parts are chosen in order, so a staged act only takes what the earlier stages left in hand.
 	return SLOTS.map((s, si) => {
-		const fv: (number | null)[] = s.features.map(() => null);
+		const fv: (PartValue | null)[] = s.features.map(() => null);
 		s.features.forEach((f, fi) => {
 			const open = f.values.map((_, vi) => isAvailableIn(s, fv, fi, vi));
 			let w = f.values.map((_, vi) => {
@@ -185,13 +192,30 @@ function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
 				return open[vi] && a > 0 ? a * a : 0;
 			});
 			if (!w.some((x) => x > 0)) w = open.some(Boolean) ? open.map((o) => (o ? 1 : 0)) : w.map(() => 1);
-			fv[fi] = weighted(
-				r,
-				f.values.map((_, vi) => vi),
-				w
-			);
+			// A later member of a distinct sequence (s2.source after s1.source) never repeats an earlier one.
+			if (f.stage !== undefined && f.distinct) {
+				const axis = f.id.replace(/^s\d+\./, '');
+				s.features.forEach((g, gi) => {
+					if (gi < fi && g.stage !== undefined && g.id.replace(/^s\d+\./, '') === axis) (fv[gi] ?? []).forEach((vi) => (w[vi] = 0));
+				});
+			}
+			// A set part draws its size from its range, then that many distinct members. Only set parts
+			// spend the extra draw, so ordinary parts keep their old random sequence.
+			let n = 1;
+			if (f.size) {
+				const [min, max] = f.size;
+				n = min + Math.floor(r() * (max - min + 1));
+			}
+			const held: number[] = [];
+			const idx = f.values.map((_, vi) => vi);
+			for (let k = 0; k < n && w.some((x) => x > 0); k++) {
+				const vi = weighted(r, idx, w);
+				held.push(vi);
+				w = w.map((x, i) => (i === vi ? 0 : x));
+			}
+			fv[fi] = held;
 		});
-		return fv as number[];
+		return fv as PartValue[];
 	});
 }
 
@@ -282,29 +306,37 @@ export function begin(st: GameState, px: number, py: number): GameState {
 }
 
 // ---------- the era ----------
+const RULE = SLOTS.findIndex((s) => s.id === 'rule'),
+	SOURCE = SLOTS[RULE].features.findIndex((f) => f.id === 'source'),
+	MEMORY = SLOTS.findIndex((s) => s.id === 'memory'),
+	MEDIUM = SLOTS[MEMORY].features.findIndex((f) => f.id === 'medium');
 function retention(_st: GameState, c: Culture): number {
 	let rt = 5 * c.conserv;
-	const ruler = vname(9, 0, c.traits[9][0]),
-		keeper = vname(15, 0, c.traits[15][0]);
-	if (ruler === 'A priest-judge') rt += 1.5;
-	if (ruler === 'A sacral king') rt += 1;
-	if (keeper === 'Carved stones') rt += 1;
-	if (keeper === 'Poets of praise and blame' || keeper === 'Sung genealogies') rt += 0.5;
+	// Rule by law and sacred rule keep custom; so do a stone record and a spoken one.
+	if (heldAbout(c.traits, RULE, SOURCE, 'justice')) rt += 1.5;
+	if (heldAbout(c.traits, RULE, SOURCE, 'mediation')) rt += 1;
+	if (heldAbout(c.traits, MEMORY, MEDIUM, 'stone')) rt += 1;
+	if (heldAbout(c.traits, MEMORY, MEDIUM, 'voice')) rt += 0.5;
 	if (c.migrated) rt -= 2;
 	return Math.max(2, rt);
 }
 
+// One entry per strained member, so a set with two strained members appears twice.
 export function strainedFeatures(st: GameState, c: Culture): [number, number][] {
 	const t = st.map.tiles[c.y][c.x];
 	const out: [number, number][] = [];
 	c.traits.forEach((fv, si) =>
 		fv.forEach((v, fi) => {
-			if (isActive(c.traits, si, fi) && strains(si, fi, v, t)) out.push([si, fi]);
+			if (isActive(c.traits, si, fi)) v.forEach((vi) => strains(si, fi, vi, t) && out.push([si, fi]));
 		})
 	);
 	return out;
 }
 export const strainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).length;
+// Strain in the customs that feed the band: a resisted herd is hunger, not discomfort.
+const isFood = (si: number): boolean => SLOTS[si].strain === 'food';
+export const foodStrainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).filter(([si]) => isFood(si)).length;
+export const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) ? c.traits[si][fi].length : 0), 0);
 
 function tryMove(st: GameState, c: Culture, x: number, y: number): boolean {
 	if (!freeLand(st, x, y) || dist(c, { x, y }) !== 1) return false;
@@ -371,6 +403,7 @@ interface DriftChange {
 }
 
 // Drift acts on one feature at a time. Neighbour states are the pre-era snapshot passed in.
+// Set-valued parts are skipped: how a set changes is defined by the pressure system (6SL.3, 6SL.4).
 function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChange[] {
 	const r = st.rng,
 		t = st.map.tiles[c.y][c.x],
@@ -383,9 +416,9 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 	SLOTS.forEach((slot, si) => {
 		if (c.held.has(si)) return;
 		slot.features.forEach((f, fi) => {
-			if (!isActive(c.traits, si, fi)) return;
+			if (!isActive(c.traits, si, fi) || isSetPart(si, fi)) return;
 			if (r() > 0.35) return;
-			const cur = c.traits[si][fi],
+			const cur = c.traits[si][fi][0],
 				neutral = isNeutral(si, fi, cur),
 				near = partTable(si, fi);
 			const scores = f.values.map((_v, vi) => {
@@ -393,7 +426,7 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 				// The land's pull moves a custom by small steps to near values; untagged parts aren't scaled.
 				let s = (near ? near[cur][vi] / 1000 : 1) * aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
 				nbs.forEach((n) => {
-					if (snapshot[n.k.id][si][fi] === vi) s += 0.9 * n.w;
+					if (snapshot[n.k.id][si][fi][0] === vi) s += 0.9 * n.w;
 				});
 				if (vi === cur) s += rt * (neutral ? 0.6 : 1);
 				return s;
@@ -404,8 +437,8 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 				scores
 			);
 			if (nxt !== cur) {
-				c.traits[si][fi] = nxt;
-				changes.push({ slot: si, f: fi, from: cur, to: nxt, borrowed: nbs.some((n) => snapshot[n.k.id][si][fi] === nxt) });
+				c.traits[si][fi] = [nxt];
+				changes.push({ slot: si, f: fi, from: cur, to: nxt, borrowed: nbs.some((n) => snapshot[n.k.id][si][fi][0] === nxt) });
 			}
 		});
 	});
@@ -414,7 +447,9 @@ function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChang
 
 function prosperityStep(st: GameState, c: Culture, consolidations: number): number {
 	const t = st.map.tiles[c.y][c.x];
-	let d = 1.1 - 5.0 * (strainCount(st, c) / activeCount(c.traits)) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
+	// Only food strain feeds prosperity; custom strain is pressure, which 6SL.3 will carry.
+	const fed = foodHeldCount(c);
+	let d = 1.1 - 5.0 * (fed ? foodStrainCount(st, c) / fed : 0) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
 	if (c.migrated) d -= 1;
 	d = Math.max(-2, Math.min(2.5, d));
 	c.prosperity = Math.max(0, Math.min(10, c.prosperity + d));
@@ -436,12 +471,12 @@ export function endEra(st: GameState, orders: Orders): GameState {
 		p.held = new Set(orders.held);
 		Object.entries(orders.reforms).forEach(([key, v]) => {
 			const [si, fi] = key.split(':').map(Number);
-			if (p.traits[si][fi] !== v) {
+			if (!isSetPart(si, fi) && p.traits[si][fi][0] !== v) {
 				st.log.push({
 					era: st.era,
-					text: `You reform ${SLOTS[si].name.toLowerCase()} (${SLOTS[si].features[fi].label}): <em>${vname(si, fi, p.traits[si][fi])}</em> gives way to <em>${vname(si, fi, v)}</em>.`
+					text: `You reform ${SLOTS[si].name.toLowerCase()} (${SLOTS[si].features[fi].label}): <em>${vname(si, fi, p.traits[si][fi][0])}</em> gives way to <em>${vname(si, fi, v)}</em>.`
 				});
-				p.traits[si][fi] = v;
+				p.traits[si][fi] = [v];
 				p.held.add(si);
 			}
 		});
@@ -454,8 +489,8 @@ export function endEra(st: GameState, orders: Orders): GameState {
 			if (k && k.alive && contact(st, p, k) >= 0.5) {
 				const restored: string[] = [];
 				SLOTS[si].features.forEach((f, fi) => {
-					if (p.traits[si][fi] === st.ancestral[si][fi] && k.traits[si][fi] !== st.ancestral[si][fi]) {
-						k.traits[si][fi] = st.ancestral[si][fi];
+					if (sameSet(p.traits[si][fi], st.ancestral[si][fi]) && !sameSet(k.traits[si][fi], st.ancestral[si][fi])) {
+						k.traits[si][fi] = st.ancestral[si][fi].slice();
 						restored.push(f.label);
 					}
 				});
@@ -521,15 +556,17 @@ export function reconstruct(st: GameState): ReconstructionResult {
 	const entries = SLOTS.map((slot, si) => {
 		const feats = slot.features.flatMap((f, fi) => {
 			if (!isActive(st.ancestral, si, fi)) return [];
-			const byVal = new Map<number, Culture[]>();
+			// A part is recovered as a whole: bands agree when they hold the same set.
+			const byVal = new Map<string, { v: PartValue; cs: Culture[] }>();
 			alive.forEach((c) => {
 				if (!isActive(c.traits, si, fi)) return;
-				const v = c.traits[si][fi];
-				if (!byVal.has(v)) byVal.set(v, []);
-				byVal.get(v)!.push(c);
+				const v = c.traits[si][fi],
+					key = setKey(v);
+				if (!byVal.has(key)) byVal.set(key, { v, cs: [] });
+				byVal.get(key)!.cs.push(c);
 			});
 			const cands = [...byVal.entries()]
-				.map(([v, cs]) => {
+				.map(([, { v, cs }]) => {
 					const seen = new Set<number>();
 					let comps = 0;
 					cs.forEach((c) => {
@@ -552,7 +589,7 @@ export function reconstruct(st: GameState): ReconstructionResult {
 				.sort((a, b) => b.witnesses - a.witnesses || b.terrains - a.terrains || b.cs.length - a.cs.length);
 			const best = cands[0],
 				truth = st.ancestral[si][fi];
-			let rec: number | null = null,
+			let rec: PartValue | null = null,
 				conf: 'secure' | 'suspect' | null = null;
 			if (best && best.witnesses >= 2 && best.terrains >= 2) {
 				rec = best.v;
@@ -561,15 +598,15 @@ export function reconstruct(st: GameState): ReconstructionResult {
 				rec = best.v;
 				conf = 'suspect';
 			}
-			const verdict: 'lost' | 'correct' | 'wrong' = rec === null ? 'lost' : rec === truth ? 'correct' : 'wrong';
+			const verdict: 'lost' | 'correct' | 'wrong' = rec === null ? 'lost' : sameSet(rec, truth) ? 'correct' : 'wrong';
 			const pts = verdict === 'correct' ? (conf === 'secure' ? 2 : 1) : verdict === 'wrong' ? -1 : 0;
-			const survivors = byVal.get(truth);
+			const survivors = byVal.get(setKey(truth))?.cs;
 			let note: string;
 			if (rec === null) {
 				note = !alive.length
 					? 'no descendant survived to be asked'
 					: best && best.witnesses === 2
-						? `${names(best.cs)} agree on <em>${f.values[best.v].name}</em>, but on the same kind of land; left blank as possible convergence${best.v === truth ? ', though it was right' : ''}`
+						? `${names(best.cs)} agree on <em>${setName(si, fi, best.v)}</em>, but on the same kind of land; left blank as possible convergence${sameSet(best.v, truth) ? ', though it was right' : ''}`
 						: survivors
 							? `only ${names(survivors)} kept it; one witness proves nothing`
 							: 'no agreement, and nobody kept the old way';
@@ -599,20 +636,20 @@ export function allowedReforms(st: GameState, c: Culture): number[][][] {
 	const nbs = st.cultures.filter((k) => k.alive && k.id !== c.id && contact(st, c, k) >= 0.5);
 	return SLOTS.map((slot, si) =>
 		slot.features.map((f, fi) =>
-			!isActive(c.traits, si, fi)
+			!isActive(c.traits, si, fi) || isSetPart(si, fi)
 				? []
 				: f.values
 				.map((_, vi) => vi)
 				.filter(
 					(vi) =>
-						vi !== c.traits[si][fi] &&
+						vi !== c.traits[si][fi][0] &&
 						isAvailable(c.traits, si, fi, vi) &&
 						!isNeutral(si, fi, vi) &&
-						(!strains(si, fi, vi, t) || nbs.some((k) => k.traits[si][fi] === vi))
+						(!strains(si, fi, vi, t) || nbs.some((k) => k.traits[si][fi][0] === vi))
 				)
 		)
 	);
 }
 
 export { SLOTS, FEATURE_COUNT, LAND };
-export { aff, isNeutral };
+export { aff, isNeutral, isSetPart };

@@ -7,6 +7,10 @@ export interface Reading {
 	object: Noun;
 	target?: Noun;
 	when?: readonly Noun[];
+	// Counts only when the target takes in the same round or an earlier one and someone else takes
+	// in that round or a later one: a binding to the chief is vacuous if the chief takes alone.
+	// Predicates and display honour it; the similarity table ignores it and reads the full reading.
+	others?: true;
 }
 
 // What an act does to the remains: given this in hand, it leaves that. 'any' accepts whatever came;
@@ -38,17 +42,43 @@ export interface TraitValue extends ValueTags {
 export type Terrain = 'coast' | 'marsh' | 'river' | 'forest' | 'steppe' | 'desert' | 'mountain';
 export type MapTerrain = Terrain | 'water';
 
-// When a part applies: a condition over another part's current value in the same custom (written
+// When a part applies: a condition over another part's current values in the same custom (written
 // in tags, never value ids), or over the material in hand at this part's stage ('some' = anything).
+// Over a set it holds when some member matches; `anyMember` holds when the set is not empty.
 export type Predicate =
-	| { part: string; stage?: 'same' | 'previous'; has: 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } }
+	| { part: string; stage?: 'same' | 'previous'; has: 'anyMember' | 'anyReading' | { verb?: Verb; object?: Noun; target?: Noun } }
 	| { inHand: Noun | 'some' };
+
+// A condition on one named part of a custom: some held value of any active part with that name
+// (a staged part matches every round) is about `about`, is not about `not` and carries a reading
+// matching `has`. Each field given must hold.
+export interface PartTag {
+	part: string;
+	about?: Noun;
+	not?: Noun;
+	has?: { verb?: Verb; object?: Noun; target?: Noun };
+}
+
+// A custom that may be a shadow of another: while every `when` tag holds in this custom and every
+// `holds` tag holds in `custom`, this one is hidden and reads as that one. Either side moving away
+// from the match unhides it. Tags only; value ids never appear.
+export interface ShadowRule {
+	custom: string;
+	when: PartTag[];
+	holds: PartTag[];
+}
 
 export interface FeatureDef {
 	id: string;
 	label: string;
 	values: TraitValue[];
 	stage?: number;
+	// A set-valued part holds between min and max distinct members (min 0 lets it be empty, which
+	// ends a sequence). Any other part holds exactly one value.
+	size?: readonly [min: number, max: number];
+	// A later stage of this part never repeats what an earlier stage holds (a sequence of distinct
+	// members, such as a band's livelihood sources). Set by each(); a taker may take in two rounds.
+	distinct?: true;
 	applies?: Predicate | Predicate[]; // all must hold
 }
 
@@ -57,10 +87,16 @@ export interface SlotDef {
 	domain: string;
 	name: string;
 	features: FeatureDef[];
+	shadows?: ShadowRule[];
+	// What straining against the land costs. Food strain is hunger and hits prosperity directly;
+	// custom strain (the default) is pressure, which the situation system will carry.
+	strain?: 'food' | 'custom';
 	render: (values: string[]) => string;
 }
 
-export type TraitValues = number[];
+// What one part holds: the indices of its held values. Length 1 for an ordinary part.
+export type PartValue = number[];
+export type TraitValues = PartValue[];
 export type CultureTraits = TraitValues[];
 
 export interface Drive {
@@ -133,7 +169,7 @@ export interface TeachPlan {
 
 export interface Orders {
 	held: Set<number>;
-	reforms: Record<string, number>;
+	reforms: Record<string, number>; // single-valued parts only
 	move: MovePlan | null;
 	split: boolean;
 	consolidate: number;
@@ -146,9 +182,9 @@ export type Verdict = 'lost' | 'correct' | 'wrong';
 export interface FeatureReconstruction {
 	f: number;
 	label: string;
-	rec: number | null;
+	rec: PartValue | null;
 	conf: Confidence;
-	truth: number;
+	truth: PartValue;
 	verdict: Verdict;
 	pts: number;
 	note: string;
@@ -158,7 +194,7 @@ export interface SlotReconstruction {
 	slot: number;
 	feats: FeatureReconstruction[];
 	pts: number;
-	recFv: (number | null)[];
+	recFv: (PartValue | null)[];
 }
 
 export interface ReconstructionResult {

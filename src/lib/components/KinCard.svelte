@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Culture, GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
-	import { contact, sameCustom, vname } from '$lib/sim/engine';
+	import { contact, sameCustom, sameSet, setName } from '$lib/sim/engine';
 	import { activeParts } from '$lib/sim/predicates';
 	import { CULTURE_COLOUR, TERRAIN_LABEL } from '$lib/sim/display';
 
@@ -22,14 +22,14 @@
 		SLOTS.map((slot, si) => {
 			if (sameCustom(kin.known[si], gameState.ancestral[si])) return null;
 			const parts = slot.features
-				.map((_f, fi) => (kin.known[si][fi] === gameState.ancestral[si][fi] ? null : vname(si, fi, kin.known[si][fi])))
+				.map((_f, fi) => (sameSet(kin.known[si][fi], gameState.ancestral[si][fi]) ? null : setName(si, fi, kin.known[si][fi])))
 				.filter((x): x is string => x !== null);
 			return `${slot.name.toLowerCase()}: ${parts.join(', ')}`;
 		}).filter((x): x is string => x !== null)
 	);
 	// Only parts live in the ancestral culture count; a dormant part was never there to keep.
 	const ancestralParts = $derived(activeParts(gameState.ancestral));
-	const keptParts = $derived(ancestralParts.filter(([si, fi]) => kin.known[si][fi] === gameState.ancestral[si][fi]).length);
+	const keptParts = $derived(ancestralParts.filter(([si, fi]) => sameSet(kin.known[si][fi], gameState.ancestral[si][fi])).length);
 </script>
 
 <div class="kin" class:dead={!kin.alive}>

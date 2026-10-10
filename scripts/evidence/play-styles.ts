@@ -3,7 +3,7 @@
 
 import {
 	newGame, begin, startTiles, endEra, defaultOrders, reconstruct, strainedFeatures,
-	freeLand, contact, SLOTS, FEATURE_COUNT, aff
+	freeLand, contact, SLOTS, FEATURE_COUNT, aff, sameSet
 } from '../../src/lib/sim/engine';
 
 type St = ReturnType<typeof newGame>;
@@ -11,7 +11,7 @@ type Policy = (st: St, era: number) => ReturnType<typeof defaultOrders>;
 
 const player = (st: St) => st.cultures[st.playerId as number];
 const ancestralSlots = (st: St) =>
-	SLOTS.map((_, si) => si).filter((si) => player(st).traits[si].every((v, fi) => v === st.ancestral[si][fi]));
+	SLOTS.map((_, si) => si).filter((si) => player(st).traits[si].every((v, fi) => sameSet(v, st.ancestral[si][fi])));
 const freeNeighbours = (st: St) => {
 	const p = player(st), out: { x: number; y: number }[] = [];
 	for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++)
@@ -56,7 +56,7 @@ const policies: Record<string, Policy> = {
 		outer: for (const k of st.cultures) {
 			if (k.isPlayer || !k.alive || contact(st, p, k) < 0.5) continue;
 			for (let si = 0; si < SLOTS.length; si++) {
-				if (SLOTS[si].features.some((_, fi) => p.traits[si][fi] === st.ancestral[si][fi] && k.traits[si][fi] !== st.ancestral[si][fi])) {
+				if (SLOTS[si].features.some((_, fi) => sameSet(p.traits[si][fi], st.ancestral[si][fi]) && !sameSet(k.traits[si][fi], st.ancestral[si][fi]))) {
 					o.teach = { kin: k.id, slot: si };
 					break outer;
 				}
@@ -87,7 +87,7 @@ for (const [name, policy] of Object.entries(policies)) {
 		survivors += res.survivors;
 		if (st.playerDead) dead++;
 		const p = player(st);
-		playerKept += p.traits.flat().filter((v, i) => v === st.ancestral.flat()[i]).length;
+		playerKept += p.traits.flat().filter((v, i) => sameSet(v, st.ancestral.flat()[i])).length;
 	}
 	perSeed[name] = pct;
 	const sorted = [...pct].sort((a, b) => a - b);

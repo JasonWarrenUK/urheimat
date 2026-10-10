@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Culture, GameState, MapTerrain, Orders } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
-	import { aff, allowedReforms, render, sameCustom, strains, vname } from '$lib/sim/engine';
+	import { aff, allowedReforms, render, sameCustom, sameSet, strains, vname } from '$lib/sim/engine';
 	import { game } from '$lib/game-store.svelte';
 
 	interface Props {
@@ -18,13 +18,13 @@
 	const held = $derived(orders.held.has(slotIndex));
 	const reformed = $derived(slot.features.map((_f, fi) => orders.reforms[slotIndex + ':' + fi]));
 	const anyReformed = $derived(reformed.some((x) => x !== undefined));
-	const shown = $derived(player.traits[slotIndex].map((v, fi) => (reformed[fi] !== undefined ? reformed[fi] : v)));
+	const shown = $derived(player.traits[slotIndex].map((v, fi) => (reformed[fi] !== undefined ? [reformed[fi]] : v)));
 	const changed = $derived(!sameCustom(player.traits[slotIndex], gameState.ancestral[slotIndex]));
-	const strained = $derived(slot.features.filter((_f, fi) => strains(slotIndex, fi, player.traits[slotIndex][fi], terrain)).map((f) => f.label));
+	const strained = $derived(slot.features.filter((_f, fi) => player.traits[slotIndex][fi].some((vi) => strains(slotIndex, fi, vi, terrain))).map((f) => f.label));
 	const kin = $derived(gameState.cultures.filter((c) => c.alive && !c.isPlayer));
 	const wholeCount = $derived(kin.filter((k) => sameCustom(k.known[slotIndex], gameState.ancestral[slotIndex])).length);
 	const partCount = $derived(
-		kin.filter((k) => !sameCustom(k.known[slotIndex], gameState.ancestral[slotIndex]) && k.known[slotIndex].some((v, fi) => v === gameState.ancestral[slotIndex][fi])).length
+		kin.filter((k) => !sameCustom(k.known[slotIndex], gameState.ancestral[slotIndex]) && k.known[slotIndex].some((v, fi) => sameSet(v, gameState.ancestral[slotIndex][fi]))).length
 	);
 	const allowed = $derived(allowedReforms(gameState, player)[slotIndex]);
 	const hasReform = $derived(allowed.some((a) => a.length));

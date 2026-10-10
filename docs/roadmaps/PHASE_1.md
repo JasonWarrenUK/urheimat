@@ -138,6 +138,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [ ] **6SL.15**: Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation _(blocked: depends on 6SL.1, 4SD.12)_
   - Note: Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).
 - [ ] **6SL.16**: Family opinion as a storylet trigger _(blocked: depends on 6SL.12)_
+
+- [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(blocked: depends on 6SL.1, 4SD.16)_
   - Note: The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).
 
 ---
@@ -167,7 +169,7 @@ graph LR
 	4SD.4["4SD.4: Semantic drift: place feature values on…"]
 	4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
 	4SD.7["4SD.7: Substrate inheritance: dying and displac…"]
-	4SD.16["4SD.16: Tag the corpus: readings, meaning tags,…"]
+	4SD.16["4SD.16: Tag the corpus: readings, meaning tag… ▸"]
 	4SD.10["4SD.10: Expand the corpus: more customs, more p…"]
 	4SD.14["4SD.14: Tag material traces value by value acro…"]
 	4SD.17["4SD.17: Band-held belief: a band holds one read…"]
@@ -179,9 +181,6 @@ graph LR
 	4SD.15["4SD.15: Record history: each band's custom chan…"]
 	5RC.7["5RC.7: The true book: an omniscient history of…"]
 	6SL.2["6SL.2: Remove the order menu and the action bud…"]
-	6SL.3["6SL.3: Layer 1 pressures: surface the land's an…"]
-	4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
-	6SL.4["6SL.4: Answer effects: the one-turn keep, refor…"]
 	6SL.5["6SL.5: Prerequisite structure and storylet engi…"]
 	4SD.11["4SD.11: Territory as a gated custom: every band…"]
 	4SD.9["4SD.9: Inter-culture relations: raids, conquest…"]
@@ -193,22 +192,26 @@ graph LR
 	5RC.6["5RC.6: The scholars' book: one named scholar's…"]
 	5RC.8["5RC.8: Partial credit in reconstruction: a near…"]
 	M5["M5: Reconstruction"]:::mile
-	6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
-	2DS.2["2DS.2: UI spike: information architecture first…"]
-	M2["M2: Design spikes"]:::mile
-	4SD.5["4SD.5: Prestige asymmetry: borrowing flows down…"]
-	6SL.7["6SL.7: Scripted answers for AI bands, shaped by…"]
-	6SL.8["6SL.8: Weather and lulls: situation count by pr…"]
 	6SL.9["6SL.9: Band memory: what the people remember of…"]
 	4SD.8["4SD.8: Taboo and deliberate archaism: sanctify…"]
-	M4["M4: Simulation depth"]:::mile
-	6SL.10["6SL.10: Daughter band as an outcome of pressure…"]
-	6SL.11["6SL.11: Moves: forced by events, or player-star…"]
 	6SL.12["6SL.12: Storylet corpus, first batch: enough au…"]
 	6SL.13["6SL.13: Run ending: history arrives once writte…"]
 	6SL.14["6SL.14: Intro and framing rewrite: no scholars,…"]
 	6SL.15["6SL.15: Derive the new displayed states: recogn…"]
 	6SL.16["6SL.16: Family opinion as a storylet trigger"]
+	6SL.17["6SL.17: Cross-band relationships: warfare (inte…"]
+	6SL.3["6SL.3: Layer 1 pressures: surface the land's an…"]
+	4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
+	6SL.4["6SL.4: Answer effects: the one-turn keep, refor…"]
+	6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
+	2DS.2["2DS.2: UI spike: information architecture first…"]
+	M2["M2: Design spikes"]:::mile
+	4SD.5["4SD.5: Prestige asymmetry: borrowing flows down…"]
+	M4["M4: Simulation depth"]:::mile
+	6SL.7["6SL.7: Scripted answers for AI bands, shaped by…"]
+	6SL.8["6SL.8: Weather and lulls: situation count by pr…"]
+	6SL.10["6SL.10: Daughter band as an outcome of pressure…"]
+	6SL.11["6SL.11: Moves: forced by events, or player-star…"]
 	M6["M6: The situation loop"]:::mile
 	1FN.1 --> 1FN.2
 	1FN.2 --> M1
@@ -236,6 +239,7 @@ graph LR
 	4SD.7 --> M4
 	4SD.16 --> 4SD.10
 	4SD.16 --> 4SD.17
+	4SD.16 --> 6SL.17
 	4SD.10 -.-> 4SD.14
 	4SD.10 --> M4
 	4SD.14 --> 5RC.1
@@ -249,14 +253,44 @@ graph LR
 	6SL.1 --> 4SD.15
 	6SL.1 --> 6SL.9
 	6SL.1 --> 6SL.15
+	6SL.1 --> 6SL.17
 	4SD.13 --> 5RC.1
 	4SD.13 --> M4
 	4SD.15 --> 5RC.7
 	4SD.15 --> M4
 	5RC.7 --> M5
-	6SL.2 --> 6SL.3
 	6SL.2 --> 6SL.5
 	6SL.2 --> 6SL.14
+	6SL.2 --> 6SL.3
+	6SL.5 --> 4SD.11
+	6SL.5 --> 4SD.12
+	6SL.5 --> 6SL.12
+	6SL.5 --> 6SL.8
+	4SD.11 --> 4SD.9
+	4SD.11 --> 4SD.12
+	4SD.9 --> M4
+	4SD.12 --> 5RC.1
+	4SD.12 --> 6SL.13
+	4SD.12 --> 6SL.15
+	4SD.12 --> M4
+	5RC.1 --> 5RC.2
+	5RC.2 --> 5RC.3
+	5RC.3 -.-> 5RC.4
+	5RC.3 --> 5RC.6
+	5RC.3 --> 5RC.8
+	5RC.4 --> M5
+	5RC.6 --> M5
+	5RC.8 --> M5
+	6SL.9 --> 4SD.8
+	6SL.9 --> M6
+	4SD.8 --> M4
+	6SL.12 --> 6SL.16
+	6SL.13 --> M6
+	6SL.14 --> M6
+	6SL.15 --> M6
+	6SL.16 --> M6
+	6SL.17 -.-> 6SL.3
+	6SL.17 --> M6
 	6SL.3 --> 4SD.2
 	6SL.3 --> 6SL.4
 	6SL.3 --> 6SL.6
@@ -266,25 +300,6 @@ graph LR
 	4SD.2 --> 2DS.2
 	4SD.2 --> M4
 	6SL.4 --> M6
-	6SL.5 --> 4SD.11
-	6SL.5 --> 4SD.12
-	6SL.5 --> 6SL.8
-	6SL.5 --> 6SL.12
-	4SD.11 --> 4SD.9
-	4SD.11 --> 4SD.12
-	4SD.9 --> M4
-	4SD.12 --> 5RC.1
-	4SD.12 --> M4
-	4SD.12 --> 6SL.13
-	4SD.12 --> 6SL.15
-	5RC.1 --> 5RC.2
-	5RC.2 --> 5RC.3
-	5RC.3 -.-> 5RC.4
-	5RC.3 --> 5RC.6
-	5RC.3 --> 5RC.8
-	5RC.4 --> M5
-	5RC.6 --> M5
-	5RC.8 --> M5
 	6SL.6 --> 2DS.2
 	6SL.6 --> 4SD.5
 	6SL.6 --> 6SL.10
@@ -292,17 +307,10 @@ graph LR
 	4SD.5 --> M4
 	6SL.7 --> M6
 	6SL.8 --> 6SL.10
-	6SL.9 --> 4SD.8
-	6SL.9 --> M6
-	4SD.8 --> M4
 	6SL.10 --> M6
 	6SL.11 --> M6
-	6SL.12 --> 6SL.16
-	6SL.13 --> M6
-	6SL.14 --> M6
-	6SL.15 --> M6
-	6SL.16 --> M6
-	class 3PL.5,4SD.14,4SD.16,4SD.6,5RC.5,6SL.1,6SL.2 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.10,4SD.11,4SD.12,4SD.13,4SD.15,4SD.17,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
+	class 3PL.5,4SD.14,4SD.6,5RC.5,6SL.1,6SL.2 todo
+	class 4SD.16 inProgress
+	class 2DS.2,3PL.3,3PL.4,4SD.10,4SD.11,4SD.12,4SD.13,4SD.15,4SD.17,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.17,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
 	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.4 done
 ```
