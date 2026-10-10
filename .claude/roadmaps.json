@@ -247,7 +247,7 @@
 					{
 						"id": "4SD.13",
 						"description": "Dated knowledge between every pair of bands, with recognition by graded resemblance",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.1"
 						],
@@ -270,7 +270,7 @@
 					{
 						"id": "4SD.15",
 						"description": "Record history: each band's custom changes, positions and structured events, step by step",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.1"
 						],
@@ -404,29 +404,33 @@
 					{
 						"id": "6SL.1",
 						"description": "World step and leaders: a fixed 25-year step for every band, leaders with a child at 18 and death between 36 and 75, family ages tracked",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"2DS.1"
 						],
 						"notes": "Succession passes to the nearest adult descendant; the age range guarantees one exists. A more robust descent and inheritance system is a later phase. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3b, 3c, 3q).",
 						"assignee": "Jason",
-						"started": "2026-10-10"
+						"started": "2026-10-10",
+						"ended": "2026-10-10",
+						"pr": 7
 					},
 					{
 						"id": "6SL.2",
 						"description": "Remove the order menu and the action budget: an era becomes situations, answers, step",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"2DS.1"
 						],
 						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).",
 						"assignee": "Jason",
-						"started": "2026-10-10"
+						"started": "2026-10-10",
+						"ended": "2026-10-10",
+						"pr": 7
 					},
 					{
 						"id": "6SL.3",
 						"description": "Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.2"
 						],
@@ -449,7 +453,7 @@
 					{
 						"id": "6SL.5",
 						"description": "Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.2"
 						],
@@ -490,7 +494,7 @@
 					{
 						"id": "6SL.9",
 						"description": "Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.1"
 						],
@@ -541,7 +545,7 @@
 					{
 						"id": "6SL.14",
 						"description": "Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.2"
 						],
@@ -572,7 +576,7 @@
 					{
 						"id": "6SL.17",
 						"description": "Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.1",
 							"4SD.16"

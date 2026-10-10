@@ -12,7 +12,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 - [x] **1FN.1**: Create the public GitHub repository and push the existing history
   - Note: https://github.com/JasonWarrenUK/urheimat
-- [x] **1FN.2**: Deploy the current client-side game to Vercel from the repository _(depends on 1FN.1)_
+- [x] **1FN.2**: Deploy the current client-side game to Vercel from the repository
   - Note: https://urheimat.vercel.app/
 
 ---
@@ -36,7 +36,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 - [x] **3PL.1**: Build the MongoDB data layer: runs and scores collections with their document shapes and access helpers
   - Note: Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.
-- [x] **3PL.2**: Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes _(depends on 1FN.2, 3PL.1)_
+- [x] **3PL.2**: Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes
   - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.
 - [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2, 3PL.5)_
   - Note: The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.
@@ -71,11 +71,11 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).
 - [ ] **4SD.12**: Writing as a gated custom in grades, from tallies to full record _(blocked: depends on 6SL.5, 4SD.11)_
   - Note: A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).
-- [ ] **4SD.13**: Dated knowledge between every pair of bands, with recognition by graded resemblance _(blocked: depends on 6SL.1)_
+- [ ] **4SD.13**: Dated knowledge between every pair of bands, with recognition by graded resemblance _(depends on 6SL.1)_
   - Note: What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).
 - [ ] **4SD.14**: Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
-- [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(blocked: depends on 6SL.1)_
+- [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(depends on 6SL.1)_
 - [x] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops
 - [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(depends on 4SD.16)_
   - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).
@@ -107,15 +107,15 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 **Goal:** Replace the order menu with situations and answers, so that every change in a band's customs is something somebody saw happen.
 
-- [ ] **6SL.1**: World step and leaders: a fixed 25-year step for every band, leaders with a child at 18 and death between 36 and 75, family ages tracked _(depends on 2DS.1)_
+- [x] **6SL.1**: World step and leaders: a fixed 25-year step for every band, leaders with a child at 18 and death between 36 and 75, family ages tracked
   - Note: Succession passes to the nearest adult descendant; the age range guarantees one exists. A more robust descent and inheritance system is a later phase. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3b, 3c, 3q).
-- [ ] **6SL.2**: Remove the order menu and the action budget: an era becomes situations, answers, step _(depends on 2DS.1)_
+- [x] **6SL.2**: Remove the order menu and the action budget: an era becomes situations, answers, step
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).
-- [ ] **6SL.3**: Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands _(blocked: depends on 6SL.2)_
+- [ ] **6SL.3**: Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands _(depends on 6SL.2)_
   - Note: "Let it lie" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).
 - [ ] **6SL.4**: Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation _(blocked: depends on 6SL.3)_
   - Note: Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).
-- [ ] **6SL.5**: Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences _(blocked: depends on 6SL.2)_
+- [ ] **6SL.5**: Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences _(depends on 6SL.2)_
   - Note: One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).
 - [ ] **6SL.6**: Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds _(blocked: depends on 6SL.3)_
   - Note: No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).
@@ -123,7 +123,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k).
 - [ ] **6SL.8**: Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines _(blocked: depends on 6SL.3, 6SL.5)_
   - Note: Pressure behaves like weather, with peaks and lulls and no climb towards the end. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3i, 3p, 3t).
-- [ ] **6SL.9**: Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete _(blocked: depends on 6SL.1)_
+- [ ] **6SL.9**: Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete _(depends on 6SL.1)_
   - Note: Ancestral answers draw on what the band remembers. The spirit is a frame only, never named in the game. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1d, 1e, 1g, 1h).
 - [ ] **6SL.10**: Daughter band as an outcome of pressure or opportunity, with the player choosing which branch to follow _(blocked: depends on 6SL.6, 6SL.8)_
   - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).
@@ -133,13 +133,13 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
 - [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 4SD.12)_
   - Note: The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).
-- [ ] **6SL.14**: Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed _(blocked: depends on 6SL.2)_
+- [ ] **6SL.14**: Intro and framing rewrite: no scholars, no rules, no goal; the spirit unnamed _(depends on 6SL.2)_
   - Note: The player sees no reference to the notebook during play, so the chronicle line "Your testimony ends here" (engine.ts:483) goes too. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).
 - [ ] **6SL.15**: Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation _(blocked: depends on 6SL.1, 4SD.12)_
   - Note: Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).
 - [ ] **6SL.16**: Family opinion as a storylet trigger _(blocked: depends on 6SL.12)_
 
-- [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(blocked: depends on 6SL.1, 4SD.16)_
+- [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(depends on 6SL.1, 4SD.16)_
   - Note: The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).
 
 ---
@@ -309,7 +309,7 @@ graph LR
 	6SL.8 --> 6SL.10
 	6SL.10 --> M6
 	6SL.11 --> M6
-	class 3PL.5,4SD.10,4SD.14,4SD.17,4SD.6,5RC.5,6SL.1,6SL.2 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.13,4SD.15,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.17,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4 done
+	class 3PL.5,4SD.10,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.14,6SL.17,6SL.3,6SL.5,6SL.9 todo
+	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.15,6SL.16,6SL.4,6SL.6,6SL.7,6SL.8 blocked
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.2 done
 ```
