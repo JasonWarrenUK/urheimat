@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { GameState } from '$lib/types';
 import * as fixtures from '../../../tests/fixtures/serialise';
-import { begin, defaultOrders, endEra, newGame, reconstruct, startTiles } from './engine';
+import { begin, defaultStep, endEra, newGame, reconstruct, startTiles } from './engine';
 import { deserialiseState, SCHEMA_VERSION, serialiseState } from './serialise';
 
 function play(seed: number, eras: number, state: GameState = newGame(seed)) {
@@ -9,7 +9,7 @@ function play(seed: number, eras: number, state: GameState = newGame(seed)) {
 		const tiles = startTiles(state);
 		begin(state, tiles[0].x, tiles[0].y);
 	}
-	for (let i = 0; i < eras; i++) endEra(state, defaultOrders());
+	for (let i = 0; i < eras; i++) endEra(state, defaultStep());
 	return state;
 }
 

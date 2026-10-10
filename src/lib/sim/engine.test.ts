@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/engine';
-import { begin, defaultOrders, endEra, newGame, reconstruct, render, startTiles } from './engine';
+import { begin, defaultStep, endEra, newGame, reconstruct, render, startTiles } from './engine';
 import { activeCount, activeIn } from './predicates';
 import { SLOTS } from './slots';
 
@@ -14,7 +14,7 @@ describe('engine', () => {
 		expect(state.era).toBe(1);
 
 		for (let i = 0; i < fixtures.eraCount; i++) {
-			endEra(state, defaultOrders());
+			endEra(state, defaultStep());
 		}
 
 		expect(state.over).toBe(true);
@@ -32,7 +32,7 @@ describe('engine', () => {
 			const state = newGame(seed);
 			const tiles = startTiles(state);
 			begin(state, tiles[0].x, tiles[0].y);
-			for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultOrders());
+			for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultStep());
 			return reconstruct(state).total;
 		}
 
@@ -48,7 +48,7 @@ describe('engine', () => {
 		const state = newGame(seed!);
 		const tiles = startTiles(state);
 		begin(state, tiles[0].x, tiles[0].y);
-		for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultOrders());
+		for (let i = 0; i < fixtures.eraCount; i++) endEra(state, defaultStep());
 		const entry = reconstruct(state).entries[funeral];
 		// A wrongly recovered act can imply a later stage the truth lacked; that stage shows as lost.
 		// A stage dormant in the recovery is dropped outright, and a lost mark appears exactly once per

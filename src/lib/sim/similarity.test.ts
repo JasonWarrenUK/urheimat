@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/similarity';
 import * as baseline from '../../../tests/fixtures/drift-baseline';
-import { begin, defaultOrders, endEra, newGame, startTiles } from './engine';
+import { begin, defaultStep, endEra, newGame, startTiles } from './engine';
 import { DEFAULT_LENS, type Lens } from './lens';
 import { entriesScore, setScore, termScore, valueScore } from './similarity';
 
@@ -98,7 +98,7 @@ describe('drift baseline', () => {
 			const st = newGame(Number(seed));
 			const t = startTiles(st)[0];
 			begin(st, t.x, t.y);
-			for (let i = 0; i < baseline.eraCount; i++) endEra(st, defaultOrders());
+			for (let i = 0; i < baseline.eraCount; i++) endEra(st, defaultStep());
 			expect(st.cultures.map((c) => c.traits.flat().map((v) => v.join('+')).join('')).join('|')).toBe(expected);
 		});
 	});

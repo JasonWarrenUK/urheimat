@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/engine';
-import { begin, defaultOrders, endEra, newGame, startTiles } from './engine';
+import { begin, defaultStep, endEra, newGame, startTiles } from './engine';
 import { ADULT, ageOf, alive, leaderOf, yearOf } from './family';
 import type { Culture, GameState } from '$lib/types';
 
@@ -8,7 +8,7 @@ function run(seed: number, steps = fixtures.eraCount): GameState {
 	const st = newGame(seed);
 	const t = startTiles(st);
 	begin(st, t[0].x, t[0].y);
-	for (let i = 0; i < steps; i++) endEra(st, defaultOrders());
+	for (let i = 0; i < steps; i++) endEra(st, defaultStep());
 	return st;
 }
 
@@ -28,7 +28,7 @@ describe('leaders and families', () => {
 					expect(alive(l, year)).toBe(true);
 					expect(ageOf(l, year)).toBeGreaterThanOrEqual(ADULT);
 				});
-				endEra(st, defaultOrders());
+				endEra(st, defaultStep());
 			}
 		}
 	});

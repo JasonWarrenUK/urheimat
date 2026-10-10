@@ -132,7 +132,6 @@ export interface Culture {
 	known: CultureTraits;
 	knownEra: number;
 	migrated: boolean;
-	held: Set<number>;
 	bornEra: number;
 	diedEra: number | null;
 	parent: number | null;
@@ -170,25 +169,28 @@ export interface GameState {
 	peopleName: string;
 	homeTerrain: MapTerrain;
 	ancestral: CultureTraits;
+	situations: Situation[]; // put to the player this step
 }
 
-export interface MovePlan {
-	x: number;
-	y: number;
+// What the player brings to a step: a move (the one act a band may start unprompted, spike 4i) and
+// an answer to each situation, by situation id. Nothing else can be started; there is no budget.
+export interface StepInput {
+	move: Point | null;
+	answers: Record<string, string>;
 }
 
-export interface TeachPlan {
-	kin: number;
-	slot: number;
+// A situation put to the player in a step, and the answers written for it. Pressures (6SL.3) and
+// storylets (6SL.5) raise them; "let it lie" is always offered (spike 3m) and is rendered, not stored.
+// An answer carries no effect yet: 6SL.4 defines effects.
+export interface Answer {
+	id: string;
+	text: string;
 }
 
-export interface Orders {
-	held: Set<number>;
-	reforms: Record<string, number>; // single-valued parts only
-	move: MovePlan | null;
-	split: boolean;
-	consolidate: number;
-	teach: TeachPlan | null;
+export interface Situation {
+	id: string;
+	text: string;
+	answers: Answer[];
 }
 
 export type Confidence = 'secure' | 'suspect' | null;
@@ -238,13 +240,10 @@ export interface RunDocument {
 	createdAt: Date;
 }
 
-/** GameState with Set/function fields replaced by plain JSON-safe shapes for storage. */
-export interface SerializedGameState extends Omit<GameState, 'rng' | 'cultures'> {
+/** GameState with the rng replaced by its state for storage. */
+export interface SerializedGameState extends Omit<GameState, 'rng'> {
 	rngState: number;
-	cultures: SerializedCulture[];
 }
-
-export type SerializedCulture = Omit<Culture, 'held'> & { held: number[] };
 
 /** Leaderboard entry (MongoDB `scores` collection). */
 export interface ScoreDocument {
