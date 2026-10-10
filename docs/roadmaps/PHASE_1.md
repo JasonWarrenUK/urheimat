@@ -65,7 +65,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Decides whether sanctifying exists and how it costs; the spike log holds a think-through of its impact under a loop with no random drift. Revival draws on the spirit's complete memory against the band's fading one. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4f, 1g).
 - [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11)_
   - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).
-- [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(blocked: depends on 2DS.1, 4SD.16)_
+- [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(depends on 2DS.1, 4SD.16)_
   - Note: Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.
 - [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(blocked: depends on 6SL.5)_
   - Note: The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).
@@ -76,8 +76,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [ ] **4SD.14**: Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
 - [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(blocked: depends on 6SL.1)_
-- [ ] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops _(depends on 4SD.4)_
-- [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(blocked: depends on 4SD.16)_
+- [x] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops
+- [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(depends on 4SD.16)_
   - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).
 
 ---
@@ -169,7 +169,7 @@ graph LR
 	4SD.4["4SD.4: Semantic drift: place feature values on…"]
 	4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
 	4SD.7["4SD.7: Substrate inheritance: dying and displac…"]
-	4SD.16["4SD.16: Tag the corpus: readings, meaning tag… ▸"]
+	4SD.16["4SD.16: Tag the corpus: readings, meaning tags,…"]
 	4SD.10["4SD.10: Expand the corpus: more customs, more p…"]
 	4SD.14["4SD.14: Tag material traces value by value acro…"]
 	4SD.17["4SD.17: Band-held belief: a band holds one read…"]
@@ -309,8 +309,7 @@ graph LR
 	6SL.8 --> 6SL.10
 	6SL.10 --> M6
 	6SL.11 --> M6
-	class 3PL.5,4SD.14,4SD.6,5RC.5,6SL.1,6SL.2 todo
-	class 4SD.16 inProgress
-	class 2DS.2,3PL.3,3PL.4,4SD.10,4SD.11,4SD.12,4SD.13,4SD.15,4SD.17,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.17,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.4 done
+	class 3PL.5,4SD.10,4SD.14,4SD.17,4SD.6,5RC.5,6SL.1,6SL.2 todo
+	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.13,4SD.15,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.12,6SL.13,6SL.14,6SL.15,6SL.16,6SL.17,6SL.3,6SL.4,6SL.5,6SL.6,6SL.7,6SL.8,6SL.9 blocked
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4 done
 ```

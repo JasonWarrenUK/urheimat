@@ -215,7 +215,7 @@
 					{
 						"id": "4SD.10",
 						"description": "Expand the corpus: more customs, more parts per custom, more values per part",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"2DS.1",
 							"4SD.16"
@@ -280,18 +280,20 @@
 					{
 						"id": "4SD.16",
 						"description": "Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"4SD.4"
 						],
 						"notes": "One custom per round, top-down: contract, ids, contract check, then full reading grids per value with cells struck deliberately. Carries the sacred-substance decisions (contract B: a sacred substance taken in the rite; custom id substance), holy-place as a cross-custom reading (needs a predicate for when that custom is absent), the guest render branch becoming a predicate, restating legacy affinity tables in named levels, and the lens sweep via scripts/evidence/corpus-fit.ts, from which Jason picks the default lens values. Decided in the 4SD.4 pilot.",
 						"assignee": "Jason",
-						"started": "2026-10-10"
+						"started": "2026-10-10",
+						"ended": "2026-10-10",
+						"pr": 6
 					},
 					{
 						"id": "4SD.17",
 						"description": "Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"4SD.16"
 						],
