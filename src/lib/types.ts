@@ -76,6 +76,9 @@ export interface FeatureDef {
 	// A set-valued part holds between min and max distinct members (min 0 lets it be empty, which
 	// ends a sequence). Any other part holds exactly one value.
 	size?: readonly [min: number, max: number];
+	// A later stage of this part never repeats what an earlier stage holds (a sequence of distinct
+	// members, such as a band's livelihood sources). Set by each(); a taker may take in two rounds.
+	distinct?: true;
 	applies?: Predicate | Predicate[]; // all must hold
 }
 

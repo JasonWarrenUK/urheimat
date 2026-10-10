@@ -192,8 +192,8 @@ function genAncestral(r: () => number, terrain: MapTerrain): CultureTraits {
 				return open[vi] && a > 0 ? a * a : 0;
 			});
 			if (!w.some((x) => x > 0)) w = open.some(Boolean) ? open.map((o) => (o ? 1 : 0)) : w.map(() => 1);
-			// A later member of a sequence (s2.source after s1.source) never repeats what an earlier one holds.
-			if (f.stage !== undefined && f.size) {
+			// A later member of a distinct sequence (s2.source after s1.source) never repeats an earlier one.
+			if (f.stage !== undefined && f.distinct) {
 				const axis = f.id.replace(/^s\d+\./, '');
 				s.features.forEach((g, gi) => {
 					if (gi < fi && g.stage !== undefined && g.id.replace(/^s\d+\./, '') === axis) (fv[gi] ?? []).forEach((vi) => (w[vi] = 0));

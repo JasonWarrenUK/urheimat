@@ -88,7 +88,8 @@ const each = (count: number, axes: FeatureDef[]): FeatureDef[] =>
 			const before = i > 0 && a.size ? [{ part: a.id, stage: 'previous' as const, has: 'anyMember' as const }] : [];
 			const applies = [...before, ...own];
 			const size = a.size && i > 0 ? ([0, a.size[1]] as const) : a.size;
-			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, size, applies: applies.length ? applies : undefined };
+			const distinct = a.size ? (true as const) : undefined;
+			return { ...a, id: `s${i + 1}.${a.id}`, stage: i + 1, size, distinct, applies: applies.length ? applies : undefined };
 		})
 	).flat();
 
