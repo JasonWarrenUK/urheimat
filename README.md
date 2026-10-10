@@ -1,10 +1,10 @@
 # Urheimat
 
-A solo strategy game about the drift of culture and the limits of the comparative method: lead a people across eight eras, then watch future scholars try (and sometimes fail) to reconstruct what you actually believed.
+A solo strategy game about the drift of culture and the limits of the comparative method: guide a people through fifteen steps of twenty-five years, then watch future scholars try (and sometimes fail) to reconstruct what you actually believed.
 
 ## Overview
 
-You start as one ancestral culture with seventeen customs (cosmology, rite, kinship, law, land), each built from several parts that the land, your neighbours and your choices pull on. Across eight eras you hold, reform, migrate, split off daughter bands and teach forgotten customs back to your neighbours. At the end, the game runs its own comparative-method reconstruction against every surviving descendant culture and scores how much of the truth would actually have been recoverable, false convergences and all.
+You start as one ancestral culture with seventeen customs (cosmology, rite, kinship, law, land), each built from several parts that the land, your neighbours and your choices pull on. The world moves in fixed 25-year steps; each band is led by a person from a family whose lives are drawn at birth, and when a leader dies the band's own descent custom decides who follows. There is no menu of actions: a step brings what the land, your neighbours and your own people put to you, and you answer as a leader would (the situations themselves arrive with the pressure and storylet tasks; for now a step carries a move and the world moves on). At the end, the game runs its own comparative-method reconstruction against every surviving descendant culture and scores how much of the truth would actually have been recoverable, false convergences and all.
 
 The game began as a single self-contained HTML artefact and was ported into a full SvelteKit project; see `docs/adrs/001-initial-tech-stack.md` for the port's rationale.
 
@@ -14,6 +14,7 @@ The game began as a single self-contained HTML artefact and was ported into a fu
 - Seventeen customs across 94 parts, every value tagged with what it is about and what a people may believe it does. A part can hold a set of values (who drinks in each round of a rite), a custom can run in stages (a funeral that burns, then buries the ash) and one custom can stand in for another while they describe the same act.
 - Drift pulled by terrain, contact with neighbours and how conservative your rule is, with similarity between values deciding how far a custom moves in one step.
 - A genuine comparative-method scoring pass: secure recoveries, doubtful ones, false reconstructions and unrecoverable losses are all distinguished and explained.
+- Leaders and families: a child at 18, more with halving odds, death between 36 and 75, all seeded, with succession by the band's descent custom and a kinsman as the fallback.
 - Canvas-rendered world map with click-to-select tile interactions for founding a homeland and migrating.
 
 ## Prerequisites
@@ -56,10 +57,10 @@ Sign-in is via GitHub, through Auth.js. These three are optional: leave them uns
 
 ## Project Structure
 
-- `src/lib/sim/`: the pure simulation engine. `engine.ts` runs the eras; `slots.ts` is the corpus of customs; `vocabulary.ts` holds the words tags are written in; `predicates.ts` decides which parts apply and which customs shadow others; `similarity.ts` and `lens.ts` score how alike two values are; `serialise.ts` saves and loads runs; `display.ts` holds display constants. No Svelte or DOM dependency; independently testable.
+- `src/lib/sim/`: the pure simulation engine. `engine.ts` runs the steps; `family.ts` holds leaders, families and succession; `slots.ts` is the corpus of customs; `vocabulary.ts` holds the words tags are written in; `predicates.ts` decides which parts apply and which customs shadow others; `similarity.ts` and `lens.ts` score how alike two values are; `serialise.ts` saves and loads runs; `display.ts` holds display constants. No Svelte or DOM dependency; independently testable.
 - `src/lib/types.ts`: every data shape as an explicit TypeScript interface.
 - `src/lib/game-store.svelte.ts`: the reactive UI-facing game state (Svelte 5 runes).
-- `src/lib/components/`: one component per screen/region (`IntroScreen`, `StartPicker`, `GameScreen`, `ReconstructorNotebook`, `WorldMap`, `TraitRow`, `KinCard`, `TeachPicker`, `TerrainLegend`).
+- `src/lib/components/`: one component per screen/region (`IntroScreen`, `StartPicker`, `GameScreen`, `ReconstructorNotebook`, `WorldMap`, `TraitRow`, `KinCard`, `TerrainLegend`).
 - `src/routes/`: the game route that dispatches between the four game phases, the `signin`/`signout` form actions and `api/runs`.
 - `src/lib/server/`: server-only code, namely the MongoDB connection and access helpers (`db.ts`, `runs.ts`, `scores.ts`), the Auth.js configuration (`auth.ts`) and the ownership guard (`player.ts`).
 - `scripts/evidence/`: evidence scripts run with `bun run scripts/evidence/<name>.ts` (`corpus-fit.ts` measures whether the corpus is big enough and compares lens settings with `--sweep` and `--web`; `pacing.ts` and `play-styles.ts` measure game pacing).
