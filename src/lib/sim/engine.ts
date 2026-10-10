@@ -336,7 +336,7 @@ export const strainCount = (st: GameState, c: Culture): number => strainedFeatur
 // Strain in the customs that feed the band: a resisted herd is hunger, not discomfort.
 const isFood = (si: number): boolean => SLOTS[si].strain === 'food';
 export const foodStrainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).filter(([si]) => isFood(si)).length;
-const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) ? c.traits[si][fi].length : 0), 0);
+export const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) ? c.traits[si][fi].length : 0), 0);
 
 function tryMove(st: GameState, c: Culture, x: number, y: number): boolean {
 	if (!freeLand(st, x, y) || dist(c, { x, y }) !== 1) return false;

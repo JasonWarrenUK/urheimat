@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
-	import { endEra, freeLand, strainCount } from '$lib/sim/engine';
-	import { heldCount } from '$lib/sim/predicates';
+	import { endEra, foodHeldCount, foodStrainCount, freeLand, strainCount } from '$lib/sim/engine';
 	import { game, type Tab as TabType } from '$lib/game-store.svelte';
 	import WorldMap from './WorldMap.svelte';
 	import TerrainLegend from './TerrainLegend.svelte';
@@ -114,8 +113,8 @@
 		<div class="bar"><i class:low={player.prosperity < 3} style:width="{player.prosperity * 10}%"></i></div>
 	</div>
 	<div>
-		<b>{player.alive ? strainCount(gameState, player) : '—'}</b>
-		<span>of {heldCount(player.traits)} values straining against the {terrain}</span>
+		<b>{player.alive ? foodStrainCount(gameState, player) : '—'}</b>
+		<span>of {foodHeldCount(player)} ways they are fed strain against the {terrain}; {player.alive ? strainCount(gameState, player) - foodStrainCount(gameState, player) : '—'} of their customs strain too, which costs nothing yet</span>
 	</div>
 	<div>
 		<b>{aliveCount}</b>
