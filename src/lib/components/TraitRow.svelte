@@ -13,6 +13,7 @@
 	let { gameState, player, slotIndex, terrain }: Props = $props();
 
 	const slot = $derived(SLOTS[slotIndex]);
+	const absent = $derived(player.absent.includes(slot.id));
 	const changed = $derived(!sameCustom(player.traits[slotIndex], gameState.ancestral[slotIndex]));
 	const strained = $derived(slot.features.filter((_f, fi) => player.traits[slotIndex][fi].some((vi) => strains(slotIndex, fi, vi, terrain))).map((f) => f.label));
 	const kin = $derived(gameState.cultures.filter((c) => c.alive && !c.isPlayer));
@@ -28,10 +29,10 @@
 			{slot.name}{#if changed}<span class="faint"> (was: {render(slotIndex, gameState.ancestral[slotIndex])})</span>{/if}
 		</div>
 		<div class="val" class:changed>
-			{render(slotIndex, player.traits[slotIndex])}
+			{absent ? 'No longer kept' : render(slotIndex, player.traits[slotIndex])}
 		</div>
-		<div class="fit" class:strain={strained.length > 0} class:ok={strained.length === 0}>
-			{strained.length ? `strains against the ${terrain}: ${strained.join(', ')}` : `fits the ${terrain}`}
+		<div class="fit" class:strain={!absent && strained.length > 0} class:ok={absent || strained.length === 0}>
+			{absent ? 'nothing to strain' : strained.length ? `strains against the ${terrain}: ${strained.join(', ')}` : `fits the ${terrain}`}
 			<span class="faint"> · {wholeCount} kin keep it whole, {partCount} in part, as far as you know</span>
 		</div>
 	</div>
