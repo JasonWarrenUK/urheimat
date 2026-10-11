@@ -12,6 +12,21 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 - The README is split into what the game is today and what the roadmap says it will become, and says plainly that nothing is saved yet and that signing in stores nothing.
 
+## [0.7.0] - 2026-10-11
+
+### Added
+
+- Thirty storylets, the first batch: successions (an old leader lingering, a kinsman taking over, the old families, a sister's child inheriting, heirs contesting the seat), the customs themselves (an unpaid blood-price, wives quarrelling over heirs, an ordeal drowning the innocent, a feud, an oath-breaker), contact and arrivals (kin who kept the old way, strangers who were kin, the marsh taking the dead, no wood for the pyre, the river taking the fields) and wider dilemmas (a sea god far from the sea, no wine on this land, a rite without a priest, raiders coming home, a generation that never saw the first homeland, strangers eating the band out, a kind of person without a name, brothers sharing a wife, a poet dying half-taught, two powers at one hearth). Every answer changes something: prosperity, a custom, the reign or what comes next; letting a situation lie has consequences of its own.
+- At most two situations a step, drawn at random from the storylets whose conditions hold; a follow-up that an answer raised always fires.
+- A storylet can read what a neighbour practises, either as your band believes it to be from its dated knowledge or as it now is, so a band can be wrong about its kin; it can also test how old that knowledge is, and whether the leader is a kinsman of no tracked line.
+- An answer can end the current reign and let the band's descent rule choose the next leader.
+- An evidence script, `scripts/evidence/storylet-density.ts`, measuring situations per step over passive runs; the batch is sized against it.
+
+### Changed
+
+- Storylets are evaluated for the step about to begin, so a situation's text names the leader who will face it.
+- The roadmap splits the storylet corpus into this batch and a second behind the pressure system.
+
 ## [0.6.0] - 2026-10-10
 
 ### Breaking
@@ -125,7 +140,8 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.3.0...v0.4.0
