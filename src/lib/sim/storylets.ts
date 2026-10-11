@@ -256,6 +256,7 @@ export const STORYLETS: readonly Storylet[] = [
 		text: "A killing among your people, and the killer's kin cannot pay the blood-price.",
 		when: [{ custom: 'justice', part: 'remedy', about: 'wealth' }],
 		once: true,
+		chance: 0.35,
 		answers: [
 			{ id: 'exile', text: 'Take exile instead', then: [{ set: { custom: 'justice', part: 'remedy', value: 'exile' } }, { log: 'The killer goes into exile, and exile is the remedy from now.' }] },
 			{ id: 'feud', text: 'Let the feud run', then: [{ set: { custom: 'justice', part: 'remedy', value: 'feud' } }, { log: 'The dead man\'s kin take their own remedy, and the band lets them.' }] },
@@ -269,6 +270,7 @@ export const STORYLETS: readonly Storylet[] = [
 		text: "The leader's wives quarrel over whose child inherits.",
 		when: [{ custom: 'marriage', part: 'count', about: 'hierarchy' }],
 		once: true,
+		chance: 0.35,
 		answers: [
 			{ id: 'eldest', text: 'The eldest inherits', then: [{ set: { custom: 'descent', part: 'share', value: 'eldest' } }, { log: 'The eldest child inherits, whoever the mother.' }] },
 			{ id: 'equal', text: 'All inherit equally', then: [{ set: { custom: 'descent', part: 'share', value: 'equal' } }, { log: 'The estate is to be divided equally among every child.' }] },
@@ -282,6 +284,7 @@ export const STORYLETS: readonly Storylet[] = [
 		text: 'The ordeal by water drowns a man most believe innocent.',
 		when: [{ custom: 'justice', part: 'finding', about: 'chance' }],
 		once: true,
+		chance: 0.35,
 		answers: [
 			{ id: 'assembly', text: 'Let the assembly judge from now', then: [{ set: { custom: 'justice', part: 'finding', value: 'assembly' } }, { log: 'The water is left alone; the assembly finds guilt from now.' }] },
 			{ id: 'oath', text: 'Let the accused swear with oath-helpers', then: [{ set: { custom: 'justice', part: 'finding', value: 'oath' } }, { log: 'An accused swears with oath-helpers from now, and the gods hear the lie if there is one.' }] },
@@ -295,6 +298,7 @@ export const STORYLETS: readonly Storylet[] = [
 		text: 'A feud between two families has cost three lives this year.',
 		when: [{ custom: 'justice', part: 'remedy', about: 'violence' }],
 		once: true,
+		chance: 0.35,
 		answers: [
 			{ id: 'price', text: 'Impose a blood-price', then: [{ set: { custom: 'justice', part: 'remedy', value: 'price' } }, { log: 'A price is set on each death, and the feud becomes a debt.' }] },
 			{ id: 'exile', text: 'Exile the killers', then: [{ set: { custom: 'justice', part: 'remedy', value: 'exile' } }, { log: 'The killers go out, and exile is the remedy from now.' }] },
@@ -308,6 +312,7 @@ export const STORYLETS: readonly Storylet[] = [
 		text: 'A man who swore before the gods has broken his word, and the band looks to see what follows.',
 		when: [{ custom: 'oath', present: true }],
 		once: true,
+		chance: 0.35,
 		answers: [
 			{ id: 'outlawry', text: 'Outlawry', then: [{ set: { custom: 'oath', part: 'penalty', value: 'outlawry' } }, { log: 'The breaker is put outside the law, and that is the penalty from now.' }] },
 			{ id: 'fine', text: 'A fine', then: [{ set: { custom: 'oath', part: 'penalty', value: 'fine' } }, { log: 'The breaker pays, and a broken oath has a price from now.' }] },
@@ -397,5 +402,169 @@ export const STORYLETS: readonly Storylet[] = [
 			{ id: 'uphill', text: 'Move the fields uphill', then: [{ prosperity: -1 }, { log: 'New fields are cut above the flood line, at a cost.' }] }
 		],
 		lie: [{ prosperity: -1 }, { log: 'The fields are lost for the year, and the band goes hungry.' }]
+	},
+	// Round 4: wide conditions.
+	{
+		id: 'sea-god-far-from-the-sea',
+		text: 'Your people pray to the Sea, and no one living has seen it.',
+		when: [{ not: { seat: ['coast'] } }, { custom: 'highGod', part: 'domain', about: 'sea' }],
+		once: true,
+		answers: [
+			{ id: 'river', text: 'Pray to the river instead', then: [{ set: { custom: 'highGod', part: 'domain', value: 'river' } }, { log: 'The River is the greatest power now; it, at least, is here.' }] },
+			{ id: 'sky', text: 'Pray to the sky', then: [{ set: { custom: 'highGod', part: 'domain', value: 'sky' } }, { log: 'The Sky is the greatest power now; it is over every land.' }] },
+			{ id: 'seek', text: 'Send the young to find the sea', then: [{ prosperity: -1 }, { log: 'Young people go to find the sea; some come back, with a jar of it.' }] },
+			{ id: 'tell', text: 'Keep the Sea and tell of it', then: [{ set: { custom: 'memory', part: 'what', value: ['deeds', 'lineages'] } }, { log: 'The Sea is kept in the telling, with the deeds and the lineages.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The prayers go on to a Sea nobody can picture, and mean a little less each year.' }]
+	},
+	{
+		id: 'no-wine-on-this-land',
+		text: 'The vines do not grow here, and the sacred wine runs out.',
+		when: [{ seat: ['steppe', 'forest', 'marsh'] }, { custom: 'substance', part: 'kind', about: 'vine' }],
+		once: true,
+		answers: [
+			{ id: 'mead', text: 'Mead', then: [{ set: { custom: 'substance', part: 'kind', value: 'drink/mead' } }, { log: 'Mead is the sacred drink from now; the bees do not mind the land.' }] },
+			{ id: 'milk', text: "Mare's milk", then: [{ set: { custom: 'substance', part: 'kind', value: 'drink/mare-milk' } }, { log: "Fermented mare's milk is the sacred drink from now." }] },
+			{ id: 'trade', text: 'Trade for it dear', then: [{ prosperity: -1 }, { log: 'Wine comes from far off at a price, and the rite keeps its taste.' }] },
+			{ id: 'herb', text: 'Herb smoke instead', then: [{ set: { custom: 'substance', part: 'kind', value: 'plant/herb' } }, { set: { custom: 'substance', part: 'manner', value: 'inhaled' } }, { log: 'The rite takes herb smoke instead of wine, and the smoke is sacred from now.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The rite goes on with less wine each year, then with none.' }]
+	},
+	{
+		id: 'herds-sicken-in-the-marsh',
+		text: 'The herds sicken on wet ground.',
+		when: [{ seat: ['marsh'] }, { custom: 'livelihood', part: 'source', about: 'herds' }],
+		cooldown: 6,
+		answers: [
+			{ id: 'fish', text: 'Fish instead', then: [{ set: { custom: 'livelihood', part: 's1.source', value: 'catch' } }, { log: 'The band turns to the water for its food.' }] },
+			{ id: 'hoe', text: 'Hoe crops instead', then: [{ set: { custom: 'livelihood', part: 's1.source', value: 'crop/hoe' } }, { log: 'Gardens are cut on the hummocks, and the band is fed from them.' }] },
+			{ id: 'drive', text: 'Drive the herds to drier ground each season', then: [{ prosperity: -1 }, { log: 'The herds are driven out and back each year, and the band with them.' }] },
+			{ id: 'drown', text: 'Drown a beast for the marsh', then: [{ prosperity: -0.5 }, { set: { custom: 'sacrifice', part: 'manner', value: 'drowned' } }, { log: 'A beast is given to the marsh, and the marsh is asked to spare the rest.' }] }
+		],
+		lie: [{ prosperity: -1 }, { log: 'The herds dwindle, and the band with them.' }]
+	},
+	{
+		id: 'the-rite-has-no-priest',
+		text: 'The priest who kept the daily rite is dead, and no one was taught it.',
+		when: [{ custom: 'cult', part: 'officiant', about: 'priest/self' }],
+		cooldown: 6,
+		chance: 0.5,
+		answers: [
+			{ id: 'woman', text: 'The eldest woman keeps it', then: [{ set: { custom: 'cult', part: 'officiant', value: 'elder-woman' } }, { log: 'The eldest woman keeps the daily rite from now.' }] },
+			{ id: 'heads', text: 'Each household head keeps it', then: [{ set: { custom: 'cult', part: 'officiant', value: 'household-head' } }, { log: 'Every household head keeps the daily rite at their own hearth.' }] },
+			{ id: 'children', text: 'The children keep it', then: [{ set: { custom: 'cult', part: 'officiant', value: 'children' } }, { log: 'The children keep the daily rite, and learn it by keeping it.' }] },
+			{ id: 'leader', text: 'The leader takes the rite', then: [{ set: { custom: 'rule', part: 'source', value: 'sacred' } }, { log: '{leader} takes the rite, and rules by it from now.' }] }
+		],
+		lie: [{ lose: 'cult' }, { log: 'Nobody keeps the daily rite, and after a while nobody remembers there was one.' }]
+	},
+	{
+		id: 'the-young-come-back-changed',
+		text: 'The young come back from raiding with herds that are not theirs and ways that are not yours.',
+		when: [{ custom: 'youth', part: 'rite', about: 'violence' }],
+		cooldown: 5,
+		chance: 0.6,
+		answers: [
+			{ id: 'spear', text: 'Keep the herds and rule by the spear', then: [{ set: { custom: 'rule', part: 'source', value: 'war' } }, { log: 'The herds are kept, and the raiders are the band\'s strength from now.' }] },
+			{ id: 'return', text: 'Give the herds back', then: [{ prosperity: -1 }, { log: 'The herds go back over the hills, with apologies.' }] },
+			{ id: 'craft', text: 'End the raiding; apprentice them', then: [{ set: { custom: 'youth', part: 's1.rite', value: 'craft' } }, { log: 'The young are bound to a craft from now, and the spears hang up.' }] },
+			{ id: 'feast', text: 'Make a feast of the return', then: [{ prosperity: -0.5 }, { set: { custom: 'sacrifice', part: 'manner', value: 'feast' } }, { log: 'The return is feasted, and what is offered is shared from now.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The young keep their new ways, and the old look away.' }]
+	},
+	{
+		id: 'no-one-saw-the-first-homeland',
+		text: 'No one leading now ever saw the first homeland.',
+		when: [{ leader: { generation: [3, 99] } }],
+		once: true,
+		answers: [
+			{ id: 'names', text: 'Keep the names of the dead', then: [{ set: { custom: 'memory', part: 'what', value: ['dead', 'lineages'] } }, { log: 'The names of the dead are kept with the lineages, back to the scattering.' }] },
+			{ id: 'face', text: 'Face the dead towards the first homeland', then: [{ set: { custom: 'funeral', part: 's1.orientation', value: 'homeland/first' } }, { log: 'The dead are laid facing the first homeland, though nobody living could point to it.' }] },
+			{ id: 'let-go', text: 'Let the old land go', then: [{ set: { custom: 'funeral', part: 's1.orientation', value: 'homeland/last-seat' } }, { log: 'The dead face the last seat, which the living remember.' }] },
+			{ id: 'seek', text: 'Send a party back to find it', then: [{ prosperity: -1 }, { log: 'A party goes back along the old road; what they find is not what the elders said.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The first homeland becomes a word, and then a word that needs explaining.' }]
+	},
+	{
+		id: 'no-one-to-marry-out-to',
+		text: 'Your custom takes spouses from another people, and no other people is near.',
+		when: [{ custom: 'marriage', part: 'people', about: 'stranger' }, { contact: 'none' }],
+		cooldown: 5,
+		answers: [
+			{ id: 'within', text: 'Marry within the band', then: [{ set: { custom: 'marriage', part: 'people', value: 'own' } }, { log: 'Spouses are taken from among your own people from now.' }] },
+			{ id: 'far', text: 'Send the young far to find spouses', then: [{ prosperity: -1 }, { log: 'The young go far for spouses, and not all of them come back.' }] },
+			{ id: 'wait', text: 'Wait a generation', then: [{ prosperity: -0.5 }, { log: 'A generation goes unwed, and the band is smaller for it.' }] },
+			{ id: 'welcome', text: 'Make kin of the next strangers who come', then: [{ set: { custom: 'guest', part: 'stance', value: 'welcome' } }, { log: 'The door is opened, in the hope that spouses walk through it.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The custom stands and nobody marries, which the custom did not intend.' }]
+	},
+	// Round 5: more wide conditions.
+	{
+		id: 'strangers-eat-the-band-out',
+		text: 'Strangers come and keep coming, and the stores go with them.',
+		when: [{ custom: 'guest', part: 'stance', about: 'sanctuary' }, { contact: 'some' }],
+		cooldown: 5,
+		chance: 0.4,
+		answers: [
+			{ id: 'bar', text: 'Bar the door', then: [{ set: { custom: 'guest', part: 'stance', value: 'bar' } }, { log: 'The door is barred, and the strangers go elsewhere.' }] },
+			{ id: 'meal', text: 'Shelter for one meal only', then: [{ set: { custom: 'guest', part: 'unit', value: 'meals' } }, { set: { custom: 'guest', part: 'count', value: 'one' } }, { log: 'A stranger gets one meal and the road, from now.' }] },
+			{ id: 'gift', text: 'Ask a gift at the door', then: [{ set: { custom: 'guest', part: 'gift/stranger', value: 'wealth/metal' } }, { log: 'A stranger brings a ring to the door, or does not come in.' }] },
+			{ id: 'own', text: "Feed them from the leader's own", then: [{ prosperity: -1 }, { log: '{leader} feeds the strangers from their own stores, and goes short.' }] }
+		],
+		lie: [{ prosperity: -1 }, { log: 'The strangers eat, and the band goes hungry before the spring.' }]
+	},
+	{
+		id: 'a-kind-of-person-without-a-name',
+		text: 'Among your people is someone the kinds of people do not name, and the rites do not know what to do with them.',
+		when: [{ unrecognised: true }],
+		once: true,
+		answers: [
+			{ id: 'both', text: 'Recognise those who are both', then: [{ set: { custom: 'gender', part: 'kinds', value: ['male', 'female', 'both'] } }, { log: 'Those who are both are named, and the rites make room.' }] },
+			{ id: 'neither', text: 'Recognise those who are neither', then: [{ set: { custom: 'gender', part: 'kinds', value: ['male', 'female', 'neither'] } }, { log: 'Those who are neither are named, and the rites make room.' }] },
+			{ id: 'priest', text: 'Make them a priest, outside the kinds', then: [{ set: { custom: 'cult', part: 'officiant', value: 'priest' } }, { log: 'They keep the daily rite, outside the kinds and above them.' }] },
+			{ id: 'away', text: 'Send them away', then: [{ prosperity: -0.5 }, { log: 'They go, and the band is poorer by one and by more than one.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'Nobody says what they are, and the rites go on around them.' }]
+	},
+	{
+		id: 'brothers-share-a-wife',
+		text: 'The brothers who share one wife quarrel over whose son is whose.',
+		when: [{ custom: 'marriage', part: 'plural', about: 'male' }],
+		cooldown: 6,
+		chance: 0.5,
+		answers: [
+			{ id: 'all', text: "All sons are all brothers'", then: [{ set: { custom: 'descent', part: 'share', value: 'equal' } }, { log: 'Every son is every brother\'s, and the estate is divided among them all.' }] },
+			{ id: 'eldest', text: "The eldest brother's", then: [{ set: { custom: 'descent', part: 'share', value: 'eldest' } }, { log: 'The sons are the eldest brother\'s, and the eldest inherits.' }] },
+			{ id: 'one', text: 'One husband from now', then: [{ set: { custom: 'marriage', part: 'count', value: 'one' } }, { log: 'One husband to a wife from now, and no quarrel over sons.' }] },
+			{ id: 'mother', text: "Let the mothers' line decide", then: [{ set: { custom: 'descent', part: 'line', value: 'mother' } }, { log: 'A child belongs to the mother\'s line, and the brothers need not ask.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The brothers quarrel on, and the sons grow up listening.' }]
+	},
+	{
+		id: 'a-poet-dies-half-taught',
+		text: 'A poet dies with a lineage half-taught.',
+		when: [{ custom: 'memory', part: 'medium', about: 'voice' }],
+		cooldown: 6,
+		chance: 0.5,
+		answers: [
+			{ id: 'stone', text: 'Carve the names in stone', then: [{ set: { custom: 'memory', part: 'medium', value: 'stone' } }, { log: 'The names go into stone, which does not die half-taught.' }] },
+			{ id: 'dance', text: 'Dance them', then: [{ set: { custom: 'memory', part: 'medium', value: 'dance' } }, { log: 'The lineages are danced, and the dancers teach the dance.' }] },
+			{ id: 'two', text: 'Train two poets for every one', then: [{ prosperity: -0.5 }, { log: 'Two are trained for every poet, and the band feeds them.' }] },
+			{ id: 'let-go', text: 'Let the lineages go', then: [{ set: { custom: 'memory', part: 'what', value: ['deeds'] } }, { log: 'The lineages are let go; the deeds are kept.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The half-taught lineage is sung wrong from now, and nobody knows it.' }]
+	},
+	{
+		id: 'two-powers-one-hearth',
+		text: 'The daily rite is for the hearth-fire, but the greatest power is another, and the priest asks which the band truly serves.',
+		when: [{ custom: 'cult', part: 'figure', about: 'hearth' }, { not: { custom: 'highGod', part: 'domain', about: 'fire' } }],
+		cooldown: 6,
+		chance: 0.4,
+		answers: [
+			{ id: 'fire', text: 'Make Fire the greatest power', then: [{ set: { custom: 'highGod', part: 'domain', value: 'fire' } }, { log: 'Fire is the greatest power from now, and the hearth is its seat.' }] },
+			{ id: 'dawn', text: 'Honour the Dawn daily instead', then: [{ set: { custom: 'cult', part: 'figure', value: 'dawn' } }, { log: 'The daily rite turns to the Dawn.' }] },
+			{ id: 'both', text: 'Keep both and feed both', then: [{ prosperity: -0.5 }, { log: 'Both powers are fed, and the band feeds them.' }] },
+			{ id: 'priest', text: 'Let the priest decide', then: [{ set: { custom: 'cult', part: 'officiant', value: 'priest' } }, { log: 'The priest keeps the rite, and decides whom it is for.' }] }
+		],
+		lie: [{ prosperity: -0.5 }, { log: 'The question goes unanswered, and the priest asks it again at every meal.' }]
 	}
 ];
