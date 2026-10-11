@@ -51,7 +51,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 **Goal:** Deepen the drift model and inter-culture dynamics so reconstruction has something harder to work on.
 
-- [ ] **4SD.2**: Remove the aggregate strain count; the per-custom fit line is all that remains _(blocked: depends on 6SL.3)_
+- [ ] **4SD.2**: Remove the aggregate strain count; the per-custom fit line is all that remains _(depends on 6SL.3)_
   - Note: Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b).
 - [x] **4SD.4**: Semantic drift: place feature values on a similarity graph so drift favours near neighbours
   - Note: Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value.
@@ -111,23 +111,23 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Succession passes to the nearest adult descendant; the age range guarantees one exists. A more robust descent and inheritance system is a later phase. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3b, 3c, 3q).
 - [x] **6SL.2**: Remove the order menu and the action budget: an era becomes situations, answers, step
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).
-- [ ] **6SL.3**: Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands _(depends on 6SL.2)_
+- [x] **6SL.3**: Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands
   - Note: "Let it lie" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).
-- [ ] **6SL.4**: Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation _(blocked: depends on 6SL.3)_
+- [ ] **6SL.4**: Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation _(depends on 6SL.3)_
   - Note: Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).
 - [x] **6SL.5**: Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences
   - Note: One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).
-- [ ] **6SL.6**: Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds _(blocked: depends on 6SL.3)_
+- [ ] **6SL.6**: Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds _(depends on 6SL.3)_
   - Note: No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).
-- [ ] **6SL.7**: Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle _(blocked: depends on 6SL.3)_
+- [ ] **6SL.7**: Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle _(depends on 6SL.3)_
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k).
-- [ ] **6SL.8**: Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines _(blocked: depends on 6SL.3, 6SL.5)_
+- [ ] **6SL.8**: Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines _(depends on 6SL.3, 6SL.5)_
   - Note: Pressure behaves like weather, with peaks and lulls and no climb towards the end. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3i, 3p, 3t).
 - [ ] **6SL.9**: Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete _(depends on 6SL.1)_
   - Note: Ancestral answers draw on what the band remembers. The spirit is a frame only, never named in the game. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1d, 1e, 1g, 1h).
 - [ ] **6SL.10**: Daughter band as an outcome of pressure or opportunity, with the player choosing which branch to follow _(blocked: depends on 6SL.6, 6SL.8)_
   - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).
-- [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(blocked: depends on 6SL.3)_
+- [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(depends on 6SL.3)_
   - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).
 - [x] **6SL.12**: Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
@@ -315,7 +315,7 @@ graph LR
 	6SL.10 --> M6
 	6SL.11 --> M6
 	6SL.18 --> M6
-	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.14,6SL.16,6SL.17,6SL.3,6SL.9 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.18,6SL.4,6SL.6,6SL.7,6SL.8 blocked
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.5 done
+	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.17,6SL.4,6SL.6,6SL.7,6SL.8,6SL.9 todo
+	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.13,6SL.15,6SL.18 blocked
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5 done
 ```

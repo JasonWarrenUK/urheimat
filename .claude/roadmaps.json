@@ -142,7 +142,7 @@
 					{
 						"id": "4SD.2",
 						"description": "Remove the aggregate strain count; the per-custom fit line is all that remains",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3"
 						],
@@ -430,7 +430,7 @@
 					{
 						"id": "6SL.3",
 						"description": "Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"6SL.2"
 						],
@@ -439,12 +439,13 @@
 						"softDependsOn": [
 							"6SL.17"
 						],
-						"started": "2026-10-11"
+						"started": "2026-10-11",
+						"ended": "2026-10-11"
 					},
 					{
 						"id": "6SL.4",
 						"description": "Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3"
 						],
@@ -467,7 +468,7 @@
 					{
 						"id": "6SL.6",
 						"description": "Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3"
 						],
@@ -477,7 +478,7 @@
 					{
 						"id": "6SL.7",
 						"description": "Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3"
 						],
@@ -487,7 +488,7 @@
 					{
 						"id": "6SL.8",
 						"description": "Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3",
 							"6SL.5"
@@ -519,7 +520,7 @@
 					{
 						"id": "6SL.11",
 						"description": "Moves: forced by events, or player-started with diegetic justification or a consequence",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3"
 						],
