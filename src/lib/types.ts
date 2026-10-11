@@ -76,6 +76,9 @@ export interface FeatureDef {
 	// A set-valued part holds between min and max distinct members (min 0 lets it be empty, which
 	// ends a sequence). Any other part holds exactly one value.
 	size?: readonly [min: number, max: number];
+	// What the land does to this part being empty (an unwed power, no image). A set with no members
+	// carries no value affinity, so the land's pull towards absence is written here (6SL.3).
+	empty?: Affinity;
 	// A later stage of this part never repeats what an earlier stage holds (a sequence of distinct
 	// members, such as a band's livelihood sources). Set by each(); a taker may take in two rounds.
 	distinct?: true;
@@ -139,6 +142,49 @@ export interface Culture {
 	family: Person[];
 	leader: number; // a Person id in family
 	absent: string[]; // custom ids the band lacks; their traits stay as a dormant memory
+	pulls: Pull[]; // the pressures building on the band's customs, carried between steps
+	lost: Lost[]; // values the band once held and no longer does (spike 3w)
+	lands: Partial<Record<Terrain, number>>; // steps lived on each kind of land
+}
+
+// ---------- layer 1 pressures (6SL.3) ----------
+// Every change to a band's customs is a pull answered (by the player or, for an AI band, by its
+// let-it-lie outcome) or a storylet consequence; random drift is gone (spike 4a, 4e, 4m). A pull is
+// one source's pressure on one part towards one operation; it accumulates between steps until it
+// reaches the part's hold, then surfaces as a situation.
+export type PullSource =
+	| { kind: 'land' } // the land under the band's seat
+	| { kind: 'neighbour'; band: number } // a band in contact practises it
+	| { kind: 'memory' } // the band once held it (3w)
+	| { kind: 'landscape'; terrain: Terrain } // a land the band lived on before
+	| { kind: 'custom'; custom: string } // another custom's tags ask for it (livelihood on descent)
+	| { kind: 'absence' }; // the land favours this part being empty
+
+export type PullOp = 'adopt' | 'add' | 'drop';
+
+export interface Pull {
+	custom: number;
+	part: number;
+	op: PullOp; // adopt: an ordinary part takes the value; add or drop: a set gains or loses the member
+	value: number;
+	strength: number; // accumulated over steps
+	source: PullSource; // whichever source contributed most this step
+	live: boolean; // some source still pulls this way this step; otherwise the pull is fading
+}
+
+export interface Lost {
+	custom: number;
+	part: number;
+	value: number;
+	step: number;
+}
+
+// A pull one custom's tags make on another's part: while the band holds a value about `about` in
+// `custom`, `to` is pulled at `strength` a step. The corpus lists them (PULLS).
+export interface CustomPull {
+	when: { custom: string; about: Noun };
+	to: { custom: string; part: string; value: string };
+	strength: number;
 }
 
 export interface GameMap {
@@ -193,9 +239,17 @@ export interface Answer {
 
 export interface Situation {
 	id: string; // unique within the step
-	storylet: string; // which storylet raised it
+	storylet?: string; // which storylet raised it, for a storylet situation
+	pressure?: Pressure; // the pull it surfaces, for a pressure situation
 	text: string;
 	answers: Answer[];
+}
+
+// A surfaced pull, with the third course worked out when it was raised (a value found through the
+// lens for its cause: the nearest by meaning the land allows, or their means with your reason).
+export interface Pressure {
+	pull: Pull;
+	third: number | null;
 }
 
 // ---------- the prerequisite structure (6SL.5) ----------
@@ -219,6 +273,7 @@ export type Condition =
 	| { fired: string; within?: number } // a storylet fired, within so many steps
 	| { answered: { storylet: string; answer: string }; within?: number }
 	| { unrecognised: true } // a custom names a kind of person the gender custom does not recognise
+	| { pressure: { custom: string; part?: string; source?: PullSource['kind'] } } // a pull surfaces on it this step
 	| { not: Condition };
 
 export type StepEvent = 'succession' | 'move' | 'split' | 'death';

@@ -56,6 +56,22 @@ export const DEFAULT_LENS: Lens = {
 	}
 };
 
+// A lens per cause of change (6SL.3, from the 4SD.4 pilot). Scarcity keeps the reason and swaps the
+// material: a third course under the land's pull is the value nearest by what it does and is about.
+// Upheaval keeps the material and changes the reason: a neighbour's way taken up with your own
+// meaning is the value nearest theirs by what physically happens.
+const term = (weight: number): TermCriteria => ({ weight, sibling: 0.5, opposite: 0.25 });
+export const SCARCITY_LENS: Lens = {
+	about: { weight: 0.3, rule: 'jaccard', opposite: 0.25 },
+	material: { weight: 0, combine: 'meanBest', fields: { accepts: term(0.4), yields: term(0.6) } },
+	readings: { weight: 0.7, combine: 'meanBest', fields: { verb: term(0.4), object: term(0.4), target: term(0.2) } }
+};
+export const UPHEAVAL_LENS: Lens = {
+	about: { weight: 0.3, rule: 'jaccard', opposite: 0.25 },
+	material: { weight: 0.7, combine: 'meanBest', fields: { accepts: term(0.4), yields: term(0.6) } },
+	readings: { weight: 0, combine: 'meanBest', fields: { verb: term(0.4), object: term(0.4), target: term(0.2) } }
+};
+
 // What counts as a near neighbour, for the evidence script and for near credit (5RC.8): within a
 // part, the maximum spanning tree of the similarity table (the fewest edges that connect every
 // value) plus every pair scoring at least NEAR. Chosen in 4SD.16 as one web with the longest chains.

@@ -87,7 +87,7 @@
 	</div>
 	<div>
 		<b>{player.alive ? foodStrainCount(gameState, player) : '—'}</b>
-		<span>of {foodHeldCount(player)} ways they are fed strain against the {terrain}; {player.alive ? strainCount(gameState, player) - foodStrainCount(gameState, player) : '—'} of their customs strain too, which costs nothing yet</span>
+		<span>of {foodHeldCount(player)} ways they are fed strain against the {terrain}; {player.alive ? strainCount(gameState, player) - foodStrainCount(gameState, player) : '—'} of their customs strain too, and the land presses on them</span>
 	</div>
 	<div>
 		<b>{aliveCount}</b>

@@ -12,9 +12,9 @@ import type {
 	StepInput,
 	Terrain
 } from '$lib/types';
-import { activeParts, heldAbout, isActive, isActiveIn, isAvailable, isAvailableIn } from './predicates';
+import { activeParts, isActive, isActiveIn, isAvailableIn } from './predicates';
 import { advance, ageOf, found, split, yearOf } from './family';
-import { partTable } from './similarity';
+import { pressureStep } from './pressures';
 import { answer, fire } from './storylets';
 import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
 
@@ -250,7 +250,10 @@ function makeCulture(
 		parent: null,
 		family: [],
 		leader: -1,
-		absent: []
+		absent: [],
+		pulls: [],
+		lost: [],
+		lands: {}
 	};
 }
 
@@ -316,21 +319,6 @@ export function begin(st: GameState, px: number, py: number): GameState {
 }
 
 // ---------- the era ----------
-const RULE = SLOTS.findIndex((s) => s.id === 'rule'),
-	SOURCE = SLOTS[RULE].features.findIndex((f) => f.id === 'source'),
-	MEMORY = SLOTS.findIndex((s) => s.id === 'memory'),
-	MEDIUM = SLOTS[MEMORY].features.findIndex((f) => f.id === 'medium');
-function retention(_st: GameState, c: Culture): number {
-	let rt = 5 * c.conserv;
-	// Rule by law and sacred rule keep custom; so do a stone record and a spoken one.
-	if (heldAbout(c.traits, RULE, SOURCE, 'justice')) rt += 1.5;
-	if (heldAbout(c.traits, RULE, SOURCE, 'mediation')) rt += 1;
-	if (heldAbout(c.traits, MEMORY, MEDIUM, 'stone')) rt += 1;
-	if (heldAbout(c.traits, MEMORY, MEDIUM, 'voice')) rt += 0.5;
-	if (c.migrated) rt -= 2;
-	return Math.max(2, rt);
-}
-
 // One entry per strained member, so a set with two strained members appears twice.
 export function strainedFeatures(st: GameState, c: Culture): [number, number][] {
 	const t = st.map.tiles[c.y][c.x];
@@ -399,61 +387,13 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	if (c.isPlayer) d.conserv = 1.2 + r() * 0.3;
 	d.known = clone(c.traits);
 	d.knownEra = st.era;
+	// The daughter carries what the parent remembers: the values it lost and the lands it lived on.
+	d.lost = c.lost.map((l) => ({ ...l }));
+	d.lands = { ...c.lands };
 	c.prosperity -= 2;
 	st.cultures.push(d);
 	st.log.push({ era: st.era, text: `A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}, led by ${founder.name}.` });
 	return d;
-}
-
-interface DriftChange {
-	slot: number;
-	f: number;
-	from: number;
-	to: number;
-	borrowed: boolean;
-}
-
-// Drift acts on one feature at a time. Neighbour states are the pre-era snapshot passed in.
-// Set-valued parts are skipped: how a set changes is defined by the pressure system (6SL.3, 6SL.4).
-function drift(st: GameState, c: Culture, snapshot: CultureTraits[]): DriftChange[] {
-	const r = st.rng,
-		t = st.map.tiles[c.y][c.x],
-		rt = retention(st, c),
-		changes: DriftChange[] = [];
-	const nbs = st.cultures
-		.filter((k) => k.alive && k.id !== c.id)
-		.map((k) => ({ k, w: contact(st, c, k) }))
-		.filter((n) => n.w > 0);
-	SLOTS.forEach((slot, si) => {
-		if (c.absent.includes(slot.id)) return;
-		slot.features.forEach((f, fi) => {
-			if (!isActive(c.traits, si, fi) || isSetPart(si, fi)) return;
-			if (r() > 0.35) return;
-			const cur = c.traits[si][fi][0],
-				neutral = isNeutral(si, fi, cur),
-				near = partTable(si, fi);
-			const scores = f.values.map((_v, vi) => {
-				if (!isAvailableIn(slot, c.traits[si], fi, vi)) return 0;
-				// The land's pull moves a custom by small steps to near values; untagged parts aren't scaled.
-				let s = (near ? near[cur][vi] / 1000 : 1) * aff(si, fi, vi, t) + (neutral ? 0.3 : 0.05);
-				nbs.forEach((n) => {
-					if (snapshot[n.k.id][si][fi][0] === vi) s += 0.9 * n.w;
-				});
-				if (vi === cur) s += rt * (neutral ? 0.6 : 1);
-				return s;
-			});
-			const nxt = weighted(
-				r,
-				f.values.map((_, vi) => vi),
-				scores
-			);
-			if (nxt !== cur) {
-				c.traits[si][fi] = [nxt];
-				changes.push({ slot: si, f: fi, from: cur, to: nxt, borrowed: nbs.some((n) => snapshot[n.k.id][si][fi][0] === nxt) });
-			}
-		});
-	});
-	return changes;
 }
 
 function prosperityStep(st: GameState, c: Culture, consolidations: number): number {
@@ -472,7 +412,8 @@ export function defaultStep(): StepInput {
 }
 
 // One step of 25 years. The player brings a move and their answers (spike 3l, 3o: no menu, no
-// budget); nothing else can be started. Answers have no effect until 6SL.4.
+// budget); nothing else can be started. Every change to a band's customs is a pressure answered or a
+// storylet consequence (4e, 4m): there is no random drift.
 export function endEra(st: GameState, step: StepInput): GameState {
 	step = step || defaultStep();
 	const p = st.cultures[st.playerId as number];
@@ -509,19 +450,9 @@ export function endEra(st: GameState, step: StepInput): GameState {
 					})
 				);
 		});
-	const snapshot = st.cultures.map((c) => clone(c.traits));
-	st.cultures
-		.filter((c) => c.alive)
-		.forEach((c) => {
-			const ch = drift(st, c, snapshot);
-			if (c.isPlayer)
-				ch.forEach((x) =>
-					st.log.push({
-						era: st.era,
-						text: `Among your people, ${SLOTS[x.slot].name.toLowerCase()} shifts (${SLOTS[x.slot].features[x.f].label}): <em>${vname(x.slot, x.f, x.from)}</em> becomes <em>${vname(x.slot, x.f, x.to)}</em>${x.borrowed ? ' — learned from neighbours' : ''}.`
-					})
-				);
-		});
+	// The pulls on every band build; an AI band's surfaced pulls resolve now, the player's become the
+	// coming step's situations, read before the storylets fire so a storylet can see them.
+	const pressures = st.cultures.filter((c) => c.alive).flatMap((c) => pressureStep(st, c));
 	st.cultures
 		.filter((c) => c.alive)
 		.forEach((c) => {
@@ -543,10 +474,11 @@ export function endEra(st: GameState, step: StepInput): GameState {
 				c.knownEra = st.era;
 			}
 		});
-	// The coming step's situations: storylets whose conditions hold as that step begins (6SL.3 adds
-	// pressures), so the era advances first and the conditions read the new year and leader.
+	// The coming step's situations: the pressures that surfaced, then storylets whose conditions hold
+	// as that step begins, so the era advances first and the conditions read the new year and leader.
 	st.era++;
-	st.situations = p.alive ? fire(st, p) : [];
+	st.situations = p.alive ? pressures : [];
+	if (p.alive) st.situations.push(...fire(st, p));
 	if (st.era > st.maxEra) st.over = true;
 	return st;
 }
