@@ -1,0 +1,11 @@
+# 6SL.12 log
+
+Decisions made with Jason while authoring the first storylet batch (pressure-agnostic storylets on state the engine already exposes).
+
+- Scale is set by density, not a count: over 200 passive runs of 15 steps, a mean of 1.0 to 1.5 situations per step, no more than 30% of steps empty, no more than 10% with three or more, and no storylet firing more than twice per run on average. `scripts/evidence/storylet-density.ts` measures it.
+- Themes: successions, the customs themselves, contact with neighbours, arrivals on new land and chains raised by answers. Daughter bands are 6SL.10's; pressures and reform bite-back are 6SL.18's. Consequences use only the engine's vocabulary.
+- Every authored answer changes something (prosperity, a custom, a follow-up, a reign); no log-only choices. "Let it lie" is the passive path and carries its own consequences, so no passive answer sits beside it. Storylets carry four authored answers each, five with let-it-lie.
+- New engine pieces the batch needed: a `neighbour` condition reading what a band in contact practises, as the band knows it (dated, possibly stale) or as it now is, so a storylet can play the gap between knowledge and truth; a `stale` condition on how old that knowledge is; a `leader.line` condition (a kinsman of no tracked line, flagged on the person); a `succession` consequence that ends the current reign and lets the band's descent rule choose again; a per-storylet `chance` drawn from the seeded rng.
+- Spreading: the five custom dilemmas fire once per run, every steady-state storylet carries a chance, and at most two situations fire a step: a raised storylet always fires, the rest are drawn at random from the pool of qualifying storylets, and the unpicked do not fire that step. The scattering itself is not evaluated, so step 1 raises nothing. 6SL.8 replaces the flat cap with weather.
+- `kinsman-takes-over` is kept though unreachable today (the breeding bound and the absence of player splits mean no player band is led by a kinsman); it becomes live with 6SL.10.
+- Result, 30 storylets over 200 passive runs: mean 1.19 per step, 25.9% of steps empty, none with three or more, top storylet 2.0 per run. By step: 0.0, 1.9, 1.9, 1.8, 1.4, 1.2, then 0.9 to 1.2.

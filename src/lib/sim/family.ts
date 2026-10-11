@@ -65,10 +65,12 @@ function materialise(r: Rng, family: Person[], root: Person, year: number): void
 	}
 }
 
-// Someone of no tracked line, aged 18 to 45, with the family they already have.
-function kinsman(r: Rng, family: Person[], generation: number, year: number): Person {
+// Someone of no tracked line, aged 18 to 45, with the family they already have. A founder at the
+// scattering is not marked a kinsman: every line starts somewhere.
+function kinsman(r: Rng, family: Person[], generation: number, year: number, founder = false): Person {
 	const age = between(r, ADULT, FERTILE_UNTIL);
 	const p = bear(r, family, year - age, null, generation, age);
+	if (!founder) p.kinsman = true;
 	materialise(r, family, p, year);
 	return p;
 }
@@ -142,7 +144,7 @@ export function successor(r: Rng, c: Culture, year: number): Person {
 // The first leader of a band at the scattering: aged 18 to 45, with the children already born to
 // them, so the tree is complete at year 0.
 export function found(r: Rng, c: Culture, year: number): Person {
-	const p = kinsman(r, c.family, 1, year);
+	const p = kinsman(r, c.family, 1, year, true);
 	c.leader = p.id;
 	return p;
 }

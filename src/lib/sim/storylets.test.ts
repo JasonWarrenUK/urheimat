@@ -3,7 +3,7 @@ import * as fixtures from '../../../tests/fixtures/engine';
 import type { GameState, Storylet } from '$lib/types';
 import { begin, defaultStep, endEra, newGame, startTiles } from './engine';
 import { SLOTS } from './slots';
-import { answer, apply, fire, holds, unrecognisedKinds } from './storylets';
+import { STORYLETS, answer, apply, fire, holds, unrecognisedKinds } from './storylets';
 
 function fresh(seed = fixtures.seed): GameState {
 	const st = newGame(seed);
@@ -47,6 +47,26 @@ describe('conditions', () => {
 		expect(holds(st, c, { leader: { generation: [1, 1], age: [18, 45] } })).toBe(true);
 		expect(holds(st, c, { contact: 'some' }) || holds(st, c, { contact: 'none' })).toBe(true);
 	});
+	it('reads what a neighbour practises, as known or as it now is, and how stale that knowledge is', () => {
+		const st = fresh(),
+			c = player(st);
+		const k = st.cultures.find((x) => !x.isPlayer)!;
+		k.x = c.x + 1;
+		k.y = c.y;
+		const si = custom('guest'),
+			fi = part(si, 'stance');
+		const bar = SLOTS[si].features[fi].values.findIndex((v) => v.id === 'bar');
+		const welcome = SLOTS[si].features[fi].values.findIndex((v) => v.id === 'welcome');
+		k.known[si][fi] = [bar];
+		k.traits[si][fi] = [welcome];
+		expect(holds(st, c, { neighbour: { custom: 'guest', part: 'stance', about: 'boundary' } })).toBe(true);
+		expect(holds(st, c, { neighbour: { custom: 'guest', part: 'stance', about: 'boundary', via: 'now' } })).toBe(false);
+		k.knownEra = 0;
+		st.era = 5;
+		expect(holds(st, c, { stale: 3 })).toBe(true);
+		expect(holds(st, c, { stale: 6 })).toBe(false);
+	});
+
 	it('reads this step\'s events and the engine\'s own history', () => {
 		const st = fresh(),
 			c = player(st);
@@ -84,13 +104,24 @@ describe('firing', () => {
 			c = player(st);
 		const corpus = [always, spent, cooling, never];
 		const first = fire(st, c, corpus);
-		expect(first.map((s) => s.storylet)).toEqual(['always', 'spent', 'cooling']);
+		expect(first).toHaveLength(2);
+		expect(first.every((s) => ['always', 'spent', 'cooling'].includes(s.storylet))).toBe(true);
 		expect(first[0].text).not.toContain('{leader}');
-		first.forEach((s) => st.story.push({ storylet: s.storylet, step: st.era, answer: null }));
+		['spent', 'cooling'].forEach((id) => st.story.push({ storylet: id, step: st.era, answer: null }));
 		st.era += 1;
 		expect(fire(st, c, corpus).map((s) => s.storylet)).toEqual(['always']);
 		st.era += 3;
-		expect(fire(st, c, corpus).map((s) => s.storylet)).toEqual(['always', 'cooling']);
+		expect(fire(st, c, corpus).map((s) => s.storylet).sort()).toEqual(['always', 'cooling']);
+	});
+	it('draws at most two from the pool, keeping what was raised', () => {
+		const st = fresh(),
+			c = player(st);
+		const many = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ ...always, id }));
+		expect(fire(st, c, many)).toHaveLength(2);
+		apply(st, c, [{ raise: 'never' }]);
+		const withRaised = fire(st, c, [...many, never]);
+		expect(withRaised).toHaveLength(2);
+		expect(withRaised.map((s) => s.storylet)).toContain('never');
 	});
 	it('fires a raised-only storylet once, and only when raised', () => {
 		const st = fresh(),
@@ -114,6 +145,32 @@ describe('answers and consequences', () => {
 			['always', 'a'],
 			['cooling', null]
 		]);
+	});
+	it('ends a reign now and reads the leader\'s line', () => {
+		const st = fresh(),
+			c = player(st);
+		expect(holds(st, c, { leader: { line: 'tracked' } })).toBe(true);
+		const before = c.leader;
+		apply(st, c, [{ succession: true }]);
+		expect(c.leader).not.toBe(before);
+		expect(st.events).toContain('succession');
+		expect(st.log.at(-1)?.text).toMatch(/leads the/);
+	});
+	it('resolves every storylet\'s custom, part and value ids against the corpus', () => {
+		STORYLETS.forEach((s: Storylet) => {
+			[...s.answers.flatMap((a) => a.then), ...(s.lie ?? [])].forEach((k) => {
+				if ('set' in k) {
+					const si = custom(k.set.custom);
+					expect(si, `${s.id}: ${k.set.custom}`).toBeGreaterThanOrEqual(0);
+					const fi = part(si, k.set.part);
+					expect(fi, `${s.id}: ${k.set.custom}/${k.set.part}`).toBeGreaterThanOrEqual(0);
+					(Array.isArray(k.set.value) ? k.set.value : [k.set.value]).forEach((id) =>
+						expect(SLOTS[si].features[fi].values.some((v) => v.id === id), `${s.id}: ${k.set.custom}/${k.set.part}=${id}`).toBe(true)
+					);
+				}
+				if ('raise' in k) expect(STORYLETS.some((x: Storylet) => x.id === k.raise), `${s.id} raises ${k.raise}`).toBe(true);
+			});
+		});
 	});
 	it('sets a part by value id, loses and regains a custom', () => {
 		const st = fresh(),

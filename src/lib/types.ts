@@ -116,6 +116,7 @@ export interface Person {
 	parent: number | null;
 	generation: number;
 	children: number[];
+	kinsman?: true; // taken from outside the tree after the scattering, of no line anyone can name
 }
 
 export interface Culture {
@@ -207,8 +208,13 @@ export type Condition =
 	| { year: [from: number, to: number] }
 	| { seat: Terrain[] }
 	| { prosperity: { below?: number; above?: number } }
-	| { leader: { age?: [lo: number, hi: number]; generation?: [lo: number, hi: number] } }
+	| { leader: { age?: [lo: number, hi: number]; generation?: [lo: number, hi: number]; line?: 'tracked' | 'kinsman' } }
 	| { contact: 'some' | 'none' }
+	// A neighbour in contact practises something: `known` reads the band's dated knowledge of its kin
+	// (which may be stale), `now` the neighbour's actual customs. A storylet that reads `known` and
+	// resolves on `now` plays the gap between what a band believes of its kin and what is true.
+	| { neighbour: { custom: string; about: Noun; part?: string; via?: 'known' | 'now' } }
+	| { stale: number } // some neighbour in contact was last known more than so many steps ago
 	| { event: StepEvent } // happened to the band this step
 	| { fired: string; within?: number } // a storylet fired, within so many steps
 	| { answered: { storylet: string; answer: string }; within?: number }
@@ -224,7 +230,8 @@ export type Consequence =
 	| { set: { custom: string; part: string; value: string | string[] } } // by value id
 	| { lose: string }
 	| { gain: string }
-	| { raise: string }; // a storylet fires next step whatever its conditions
+	| { raise: string } // a storylet fires next step whatever its conditions
+	| { succession: true }; // the reign ends now; the band's descent rule picks the next leader
 
 export interface StoryAnswer {
 	id: string;
@@ -237,6 +244,7 @@ export interface Storylet {
 	text: string; // {leader} names the band's leader
 	when: Condition[];
 	raisedOnly?: boolean; // never fires on its own conditions; only when a consequence raises it
+	chance?: number; // odds of firing each time its conditions hold, from the seeded rng (1 when absent)
 	once?: boolean;
 	cooldown?: number; // steps before it may fire again
 	answers: StoryAnswer[];
