@@ -543,9 +543,10 @@ export function endEra(st: GameState, step: StepInput): GameState {
 				c.knownEra = st.era;
 			}
 		});
-	// The coming step's situations: storylets whose conditions hold now (6SL.3 adds pressures).
-	st.situations = p.alive ? fire(st, p) : [];
+	// The coming step's situations: storylets whose conditions hold as that step begins (6SL.3 adds
+	// pressures), so the era advances first and the conditions read the new year and leader.
 	st.era++;
+	st.situations = p.alive ? fire(st, p) : [];
 	if (st.era > st.maxEra) st.over = true;
 	return st;
 }
