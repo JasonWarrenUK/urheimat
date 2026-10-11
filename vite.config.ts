@@ -32,6 +32,8 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					environment: 'node',
+					// Full 15-step runs share the machine with a dozen worker files; the default 5s trips under load.
+					testTimeout: 30000,
 					include: ['src/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
 				}

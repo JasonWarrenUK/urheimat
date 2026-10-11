@@ -7,7 +7,9 @@ import { rngFrom } from './engine';
 // 4: Every band has a leading family and a leader; a run is 15 steps of 25 years; the order menu
 //    is gone, so a culture no longer carries a held set and the state carries its situations.
 // 5: Storylets: a culture may lack customs (absent), and the state carries events, story and raised.
-export const SCHEMA_VERSION = 5;
+// 6: Pressures: a culture carries its pulls, the values it lost and the lands it has lived on; a
+//    situation may surface a pressure instead of a storylet.
+export const SCHEMA_VERSION = 6;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, ...rest } = st;

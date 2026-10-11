@@ -1,4 +1,4 @@
-import type { AffLevel, Affinity, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, CustomPull, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
 import type { Noun, Verb } from './vocabulary';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
@@ -198,9 +198,9 @@ export const SLOTS: SlotDef[] = [
 			{
 				id: 'consort',
 				label: 'consort',
-				// An empty set is an unwed power. The old unwed value favoured desert and mountain; an empty
-				// set carries no affinity, so that pull waits for the pressure system to weigh absence.
+				// An empty set is an unwed power; the land's pull towards it is written on the part.
 				size: [0, 2],
+				empty: { desert: 'strong', mountain: 'favours' },
 				values: [
 					N('earth', 'wedded to the Earth', { river: 'favours', forest: 'favours', steppe: 'favours' }, {
 						about: ['earth', 'growth', 'kinship'],
@@ -1092,9 +1092,9 @@ export const SLOTS: SlotDef[] = [
 			{
 				id: 'image',
 				label: 'with',
-				// An empty set is no image. The old no-image value favoured desert, steppe and marsh; an
-				// empty set carries no affinity (parked with the other absence pulls).
+				// An empty set is no image; the land's pull towards it is written on the part.
 				size: [0, 1],
+				empty: { desert: 'favours', steppe: 'favours', marsh: 'favours' },
 				values: [
 					N('stone', 'an unshaped stone', { mountain: 'favours', desert: 'favours', steppe: 'favours' }, { about: ['stone', 'permanence', 'plainness'], readings: [...R('mark', 'land', null), ...R('honour', 'gods', null)] }),
 					N('post', 'a carved post', { forest: 'favours', river: 'favours', coast: 'favours' }, { about: ['craft', 'trees', 'visibility'], readings: [...R('mark', 'land', null), ...R('honour', 'gods', null)] }),
@@ -1188,17 +1188,18 @@ export const SLOTS: SlotDef[] = [
 		name: 'Descent and the household',
 		// Contract: for a band that has this custom, every value assumes belonging and property pass
 		// between generations by a rule; it assumes nothing about which line, where a couple lives, or
-		// who inherits. The affinities here are a terrain proxy for livelihood (herds pull towards the
-		// father's line and the husband's kin, hoe crops towards the mother's); 6SL.3 should read
-		// livelihood's tags instead and retire them.
+		// who inherits. The land says nothing here: the record ties descent and residence to
+		// subsistence (large livestock predicts patriliny and patrilocality, horticulture matriliny;
+		// Aberle 1961, Ember and Ember 1971, Holden and Mace 2003), so livelihood's tags pull these
+		// parts through PULLS below, and warfare adds its own pull on residence in 6SL.17.
 		features: [
 			{
 				id: 'line',
 				label: 'line',
 				values: [
-					N('father', "the father's line", { steppe: 'strong', desert: 'favours', mountain: 'favours' }, { about: ['lineage', 'male', 'kinship', 'hierarchy'], readings: [...R('bind', 'living', 'lineage'), ...R('guard', 'lineage', null)] }),
-					N('mother', "the mother's line", { forest: 'favours', marsh: 'favours', coast: 'favours' }, { about: ['lineage', 'female', 'kinship'], readings: [...R('bind', 'living', 'lineage'), ...R('guard', 'lineage', null)] }),
-					N('house', 'the house', { river: 'favours', coast: 'favours' }, { about: ['hearth', 'enclosure', 'continuity'], readings: [...R('bind', 'living', 'hearth'), ...R('guard', 'hearth', null)] }),
+					N('father', "the father's line", undefined, { about: ['lineage', 'male', 'kinship', 'hierarchy'], readings: [...R('bind', 'living', 'lineage'), ...R('guard', 'lineage', null)] }),
+					N('mother', "the mother's line", undefined, { about: ['lineage', 'female', 'kinship'], readings: [...R('bind', 'living', 'lineage'), ...R('guard', 'lineage', null)] }),
+					N('house', 'the house', undefined, { about: ['hearth', 'enclosure', 'continuity'], readings: [...R('bind', 'living', 'hearth'), ...R('guard', 'hearth', null)] }),
 					N('both', 'both parents', undefined, { about: ['kinship', 'equality', 'belonging'], readings: R('bind', 'living', 'kinship') })
 				]
 			},
@@ -1206,9 +1207,9 @@ export const SLOTS: SlotDef[] = [
 				id: 'residence',
 				label: 'couples live',
 				values: [
-					N('husband', "with the husband's kin", { steppe: 'favours', desert: 'favours', mountain: 'favours' }, { about: ['male', 'kinship', 'hierarchy'], readings: [...R('guard', 'hearth', null), ...R('bind', 'living', 'kinship')] }),
-					N('wife', "with the wife's kin", { forest: 'favours', marsh: 'favours' }, { about: ['female', 'kinship', 'hearth'], readings: [...R('guard', 'hearth', null), ...R('bind', 'living', 'kinship')] }),
-					N('new', 'at a new hearth', { river: 'favours', coast: 'favours' }, { about: ['hearth', 'origin', 'freedom'], readings: R('create', 'hearth', null) })
+					N('husband', "with the husband's kin", undefined, { about: ['male', 'kinship', 'hierarchy'], readings: [...R('guard', 'hearth', null), ...R('bind', 'living', 'kinship')] }),
+					N('wife', "with the wife's kin", undefined, { about: ['female', 'kinship', 'hearth'], readings: [...R('guard', 'hearth', null), ...R('bind', 'living', 'kinship')] }),
+					N('new', 'at a new hearth', undefined, { about: ['hearth', 'origin', 'freedom'], readings: R('create', 'hearth', null) })
 				]
 			},
 			{
@@ -1223,8 +1224,8 @@ export const SLOTS: SlotDef[] = [
 				id: 'share',
 				label: 'shared',
 				values: [
-					N('eldest', 'to the eldest', { river: 'favours', mountain: 'favours' }, { about: ['age', 'hierarchy', 'permanence'], readings: R('bind', 'living', 'hierarchy') }),
-					N('youngest', 'to the youngest', { steppe: 'favours', desert: 'favours' }, { about: ['youth', 'hearth', 'continuity'], readings: R('guard', 'hearth', null) }),
+					N('eldest', 'to the eldest', undefined, { about: ['age', 'hierarchy', 'permanence'], readings: R('bind', 'living', 'hierarchy') }),
+					N('youngest', 'to the youngest', undefined, { about: ['youth', 'hearth', 'continuity'], readings: R('guard', 'hearth', null) }),
 					N('equal', 'equally', undefined, { about: ['equality', 'division', 'thrift'], readings: R('bind', 'living', 'equality') })
 				]
 			}
@@ -1606,3 +1607,20 @@ export const SLOTS: SlotDef[] = [
 ];
 
 export const FEATURE_COUNT = SLOTS.reduce((a, s) => a + s.features.length, 0);
+
+// Pulls one custom makes on another through its tags (6SL.3). What feeds a band shapes how it
+// reckons descent: large livestock goes with the father's line and the husband's kin, and with the
+// youngest heir where herds expand (the Mongol otchigin); the plough with the father's line, the
+// husband's kin and the eldest, since ploughland cannot be split; hoe crops with the mother's line
+// and the wife's kin (Aberle 1961; Ember and Ember 1971; Holden and Mace 2003; Boserup 1970).
+const pull = (about: Noun, part: string, value: string, strength = 0.6): CustomPull => ({ when: { custom: 'livelihood', about }, to: { custom: 'descent', part, value }, strength });
+export const PULLS: readonly CustomPull[] = [
+	pull('herds', 'line', 'father'),
+	pull('herds', 'residence', 'husband'),
+	pull('herds', 'share', 'youngest', 0.4),
+	pull('permanence', 'line', 'father'),
+	pull('permanence', 'residence', 'husband'),
+	pull('permanence', 'share', 'eldest', 0.4),
+	pull('growth', 'line', 'mother'),
+	pull('growth', 'residence', 'wife')
+];

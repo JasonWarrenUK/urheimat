@@ -90,7 +90,7 @@ describe('values', () => {
 	});
 });
 
-describe('drift baseline', () => {
+describe('pressure baseline', () => {
 	// A snapshot: re-captured whenever the corpus changes. The untagged fallback was proven against
 	// the pre-4SD.4 capture before any part was fully tagged.
 	it('reproduces the captured traits for seeded passive runs', () => {

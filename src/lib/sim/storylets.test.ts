@@ -105,7 +105,7 @@ describe('firing', () => {
 		const corpus = [always, spent, cooling, never];
 		const first = fire(st, c, corpus);
 		expect(first).toHaveLength(2);
-		expect(first.every((s) => ['always', 'spent', 'cooling'].includes(s.storylet))).toBe(true);
+		expect(first.every((s) => ['always', 'spent', 'cooling'].includes(s.storylet!))).toBe(true);
 		expect(first[0].text).not.toContain('{leader}');
 		['spent', 'cooling'].forEach((id) => st.story.push({ storylet: id, step: st.era, answer: null }));
 		st.era += 1;

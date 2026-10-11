@@ -1,6 +1,7 @@
 import type { Condition, Consequence, Culture, GameState, Situation, StepInput, Storylet } from '$lib/types';
 import { ageOf, leaderOf, successor, yearOf } from './family';
 import { contact } from './engine';
+import { change, resolve } from './pressures';
 import { SLOTS } from './slots';
 
 // The prerequisite structure and the storylet engine (2DS.1, decisions 3a, 3r; 6SL.5). Conditions
@@ -78,6 +79,15 @@ export function holds(st: GameState, c: Culture, cond: Condition): boolean {
 	if ('answered' in cond)
 		return st.story.some((r) => r.storylet === cond.answered.storylet && r.answer === cond.answered.answer && (cond.within === undefined || st.era - r.step <= cond.within));
 	if ('unrecognised' in cond) return unrecognisedKinds(c).length > 0;
+	if ('pressure' in cond) {
+		const want = cond.pressure;
+		return st.situations.some(({ pressure }) => {
+			if (!pressure) return false;
+			const p = pressure.pull,
+				f = SLOTS[p.custom].features[p.part];
+			return SLOTS[p.custom].id === want.custom && (want.part === undefined || f.id === want.part || f.id.endsWith(`.${want.part}`)) && (want.source === undefined || p.source.kind === want.source);
+		});
+	}
 	return false;
 }
 
@@ -123,7 +133,7 @@ export function apply(st: GameState, c: Culture, cons: Consequence[]): void {
 			if (fi < 0) return;
 			const ids = Array.isArray(k.set.value) ? k.set.value : [k.set.value];
 			const vis = ids.map((id) => SLOTS[si].features[fi].values.findIndex((v) => v.id === id)).filter((vi) => vi >= 0);
-			if (vis.length) c.traits[si][fi] = vis;
+			if (vis.length) change(st, c, si, fi, vis);
 		} else if ('lose' in k) {
 			if (!c.absent.includes(k.lose)) c.absent.push(k.lose);
 		} else if ('gain' in k) c.absent = c.absent.filter((id) => id !== k.gain);
@@ -139,12 +149,16 @@ export function apply(st: GameState, c: Culture, cons: Consequence[]): void {
 }
 
 // The player's answers to last step's situations, applied and remembered. An unanswered situation
-// was let lie: its storylet's `lie` consequences run, if it has any.
+// was let lie: a storylet's `lie` consequences run, if it has any; a pressure takes its own outcome.
 export function answer(st: GameState, c: Culture, step: StepInput, corpus: readonly Storylet[] = STORYLETS): void {
 	st.situations.forEach((sit) => {
+		const chosen = step.answers[sit.id];
+		if (sit.pressure) {
+			resolve(st, c, sit.pressure, sit.answers.some((a) => a.id === chosen) ? chosen : null);
+			return;
+		}
 		const s = corpus.find((x) => x.id === sit.storylet);
 		if (!s) return;
-		const chosen = step.answers[sit.id];
 		const a = s.answers.find((x) => x.id === chosen);
 		st.story.push({ storylet: s.id, step: st.era, answer: a ? a.id : null });
 		apply(st, c, a ? a.then : (s.lie ?? []));
