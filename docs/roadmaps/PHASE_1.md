@@ -129,7 +129,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).
 - [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(blocked: depends on 6SL.3)_
   - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).
-- [ ] **6SL.12**: Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run _(depends on 6SL.5)_
+- [x] **6SL.12**: Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
 - [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 4SD.12)_
   - Note: The fallback fires only if history has not arrived after a long time and there has been no recent progress towards it. A run is medium to long: fifteen turns or more. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 2u, 3j, 3u).
@@ -137,7 +137,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: The player sees no reference to the notebook during play, so the chronicle line "Your testimony ends here" (engine.ts:483) goes too. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).
 - [ ] **6SL.15**: Derive the new displayed states: recognition, settledness and writing as hidden custom categories, leader and generation _(blocked: depends on 6SL.1, 4SD.12)_
   - Note: Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).
-- [ ] **6SL.16**: Family opinion as a storylet trigger _(blocked: depends on 6SL.12)_
+- [ ] **6SL.16**: Family opinion as a storylet trigger _(depends on 6SL.12)_
 
 - [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(depends on 6SL.1, 4SD.16)_
 
@@ -315,7 +315,7 @@ graph LR
 	6SL.10 --> M6
 	6SL.11 --> M6
 	6SL.18 --> M6
-	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.12,6SL.14,6SL.17,6SL.3,6SL.9 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.16,6SL.18,6SL.4,6SL.6,6SL.7,6SL.8 blocked
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.2,6SL.5 done
+	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.6,5RC.5,6SL.14,6SL.16,6SL.17,6SL.3,6SL.9 todo
+	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.2,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.18,6SL.4,6SL.6,6SL.7,6SL.8 blocked
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.5 done
 ```

@@ -528,13 +528,15 @@
 					{
 						"id": "6SL.12",
 						"description": "Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"6SL.5"
 						],
 						"notes": "Authored with cooldowns and once flags doing 6SL.8's job of capping situations per step until weather lands. Writing's first grade belongs to 4SD.12; pressure and bite-back storylets to the second batch. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decision 3a).",
 						"assignee": "Jason",
-						"started": "2026-10-10"
+						"started": "2026-10-10",
+						"ended": "2026-10-11",
+						"pr": 9
 					},
 					{
 						"id": "6SL.13",
@@ -570,7 +572,7 @@
 					{
 						"id": "6SL.16",
 						"description": "Family opinion as a storylet trigger",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.12"
 						],
