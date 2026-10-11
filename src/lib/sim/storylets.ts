@@ -83,12 +83,17 @@ export function holds(st: GameState, c: Culture, cond: Condition): boolean {
 
 const lastFired = (st: GameState, id: string): number | undefined => st.story.filter((r) => r.storylet === id).map((r) => r.step).pop();
 
-// Which storylets fire now: everything raised by a consequence, plus every storylet whose
-// conditions hold and that is not spent (once) or cooling down. 6SL.8 later caps the count.
+// At most this many situations a step: a raised storylet always fires, and the rest are drawn at
+// random from the pool of storylets whose conditions hold. The unpicked do not fire this step. 6SL.8
+// replaces the flat cap with weather.
+export const SITUATIONS_PER_STEP = 2;
+
+// Which storylets fire now: everything raised by a consequence, plus storylets whose conditions
+// hold and that are not spent (once) or cooling down, drawn to the cap.
 export function fire(st: GameState, c: Culture, corpus: readonly Storylet[] = STORYLETS): Situation[] {
 	const raised = new Set(st.raised);
 	st.raised = [];
-	const due = corpus.filter((s) => {
+	const pool = corpus.filter((s) => {
 		if (raised.has(s.id)) return true;
 		if (s.raisedOnly) return false;
 		const last = lastFired(st, s.id);
@@ -97,6 +102,9 @@ export function fire(st: GameState, c: Culture, corpus: readonly Storylet[] = ST
 		if (!s.when.every((cond) => holds(st, c, cond))) return false;
 		return s.chance === undefined || st.rng() < s.chance;
 	});
+	const due = pool.filter((s) => raised.has(s.id));
+	const rest = pool.filter((s) => !raised.has(s.id));
+	while (due.length < SITUATIONS_PER_STEP && rest.length) due.push(rest.splice(Math.floor(st.rng() * rest.length), 1)[0]);
 	return due.map((s) => ({
 		id: `${st.era}:${s.id}`,
 		storylet: s.id,

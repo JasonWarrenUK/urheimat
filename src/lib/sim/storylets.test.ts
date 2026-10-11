@@ -104,13 +104,24 @@ describe('firing', () => {
 			c = player(st);
 		const corpus = [always, spent, cooling, never];
 		const first = fire(st, c, corpus);
-		expect(first.map((s) => s.storylet)).toEqual(['always', 'spent', 'cooling']);
+		expect(first).toHaveLength(2);
+		expect(first.every((s) => ['always', 'spent', 'cooling'].includes(s.storylet))).toBe(true);
 		expect(first[0].text).not.toContain('{leader}');
-		first.forEach((s) => st.story.push({ storylet: s.storylet, step: st.era, answer: null }));
+		['spent', 'cooling'].forEach((id) => st.story.push({ storylet: id, step: st.era, answer: null }));
 		st.era += 1;
 		expect(fire(st, c, corpus).map((s) => s.storylet)).toEqual(['always']);
 		st.era += 3;
-		expect(fire(st, c, corpus).map((s) => s.storylet)).toEqual(['always', 'cooling']);
+		expect(fire(st, c, corpus).map((s) => s.storylet).sort()).toEqual(['always', 'cooling']);
+	});
+	it('draws at most two from the pool, keeping what was raised', () => {
+		const st = fresh(),
+			c = player(st);
+		const many = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ ...always, id }));
+		expect(fire(st, c, many)).toHaveLength(2);
+		apply(st, c, [{ raise: 'never' }]);
+		const withRaised = fire(st, c, [...many, never]);
+		expect(withRaised).toHaveLength(2);
+		expect(withRaised.map((s) => s.storylet)).toContain('never');
 	});
 	it('fires a raised-only storylet once, and only when raised', () => {
 		const st = fresh(),
