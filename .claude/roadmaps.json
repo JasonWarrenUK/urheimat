@@ -230,7 +230,7 @@
 						"dependsOn": [
 							"6SL.5"
 						],
-						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism.",
+						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here.",
 						"assignee": "Jason"
 					},
 					{
@@ -434,7 +434,7 @@
 						"dependsOn": [
 							"6SL.2"
 						],
-						"notes": "\"Let it lie\" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m). From the 4SD.4 pilot: similarity is judged through a lens per cause of change (scarcity keeps the reason and swaps the material; upheaval the reverse), defined here; and two pulls that affinity tables never encode, memory of past landscapes and settledness, using band history. From 4SD.16: define how a set-valued part changes (drift and reform skip sets until then); weigh absence, since an empty set (unwed consort, no image, never clean) carries no affinity; pull descent and residence from livelihood's tags and retire their terrain proxy; custom strain is pressure here (only food strain feeds prosperity now); a marriage rule with no qualifying band in reach is pressure; the band/kin threshold (placeholder 2 splits) is set here. Also from 4SD.16: with only food strain feeding prosperity and the restated affinities defaulting to allows, the base game drifts upward (prosperity near the cap by era 6, about a third more bands alive than before); the food channel's weight was never tuned for that, so tune it here, not before.",
+						"notes": "\"Let it lie\" is the pull's diegetic outcome: the land and a neighbour win, a memory fizzles. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m). Built here: a pull per source (the land, each neighbour in contact, memory, past landscapes, livelihood on descent through the corpus PULLS table, absence as a per-part empty affinity), pulls building on the band to a hold, a cap of three a step, sets changing by add, drop or swap, a lens per cause of change (scarcity and upheaval) for the third course, AI bands taking the let-it-lie outcome until 6SL.7. Log: docs/spikes/6SL.3-pressures-log.md. Moved out: a marriage rule with no qualifying band in reach to 6SL.17, settledness as a pull to 4SD.11, the food channel's prosperity tuning to 6SL.6.",
 						"assignee": "Jason",
 						"softDependsOn": [
 							"6SL.17"
@@ -471,7 +471,7 @@
 						"dependsOn": [
 							"6SL.3"
 						],
-						"notes": "No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).",
+						"notes": "No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here, where prosperity becomes strands.",
 						"assignee": "Jason"
 					},
 					{
@@ -588,7 +588,7 @@
 							"6SL.1",
 							"4SD.16"
 						],
-						"notes": "From 4SD.16: residence is pulled by whether a band's warfare is internal or external (Ember and Ember 1971); rule/source: war and justice/remedy: feud are the interim tag signals. A chief answering for a killer belongs to killings between bands and was dropped from justice/answerer until this exists. Marriage's partner rules resolve against the band tree and contact here.",
+						"notes": "From 4SD.16: residence is pulled by whether a band's warfare is internal or external (Ember and Ember 1971); rule/source: war and justice/remedy: feud are the interim tag signals. A chief answering for a killer belongs to killings between bands and was dropped from justice/answerer until this exists. Marriage's partner rules resolve against the band tree and contact here. From 6SL.3: a marriage rule with no qualifying band in reach is pressure; raise it here once kin distance and reach exist (placeholder threshold two splits).",
 						"assignee": "Jason"
 					},
 					{
