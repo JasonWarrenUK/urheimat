@@ -4,7 +4,18 @@
 		"path": "docs/roadmaps/PHASE_1.md",
 		"project": "Urheimat",
 		"archived": false,
-		"externalGates": [],
+		"externalGates": [
+			{
+				"id": "G-SAVES",
+				"name": "Players hold saves worth keeping",
+				"status": "pending",
+				"imposes": "deferred",
+				"blocks": [
+					"7SC.1"
+				],
+				"notes": "Releases the secondary tier. Until real players hold saved runs, discarding a save on a schema bump costs nothing worth migrating."
+			}
+		],
 		"milestones": [
 			{
 				"id": "M1",
@@ -117,7 +128,9 @@
 						"status": "blocked",
 						"dependsOn": [
 							"3PL.2",
-							"5RC.5"
+							"5RC.5",
+							"5RC.6",
+							"5RC.7"
 						],
 						"notes": "Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c). Ships with integration tests for the archive helpers, which replace recordScore.",
 						"assignee": "Jason"
@@ -603,6 +616,28 @@
 						],
 						"notes": "Split out of 6SL.12 because bite-back needs 6SL.4's reform effects and pressure storylets need 6SL.3; the first batch is pressure-agnostic. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 4b).",
 						"assignee": "Jason"
+					}
+				]
+			},
+			{
+				"id": "M7",
+				"name": "Saved-run continuity (Secondary)",
+				"goal": "A saved run survives every change to the game's state shape, once players hold saves worth keeping.",
+				"tasks": [
+					{
+						"id": "7SC.1",
+						"description": "Forward migration of saved runs: each schema version bump ships a migration from the previous version, and loading walks a saved run up to SCHEMA_VERSION instead of discarding it",
+						"status": "deferred",
+						"dependsOn": [
+							"M1",
+							"M2",
+							"M3",
+							"M4",
+							"M5",
+							"M6",
+							"G-SAVES"
+						],
+						"notes": "Replaces the discard-on-mismatch in deserialiseState (src/lib/sim/serialise.ts). Decided in the 2026-10-12 roadmap review of M3: 3PL.3 ships version-gated discard so it does not wait on the shape-changing tasks."
 					}
 				]
 			}

@@ -40,7 +40,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.
 - [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2, 3PL.5)_
   - Note: Saves are version-gated and discarded this phase: deserialiseState returns null when a saved run's schemaVersion differs from SCHEMA_VERSION (src/lib/sim/serialise.ts), so save/resume does not wait on the tasks that change GameState's shape. Forward migration of saved runs lives in a secondary tier, released once players hold saves worth keeping. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.
-- [ ] **3PL.4**: Archive of finished runs: unranked records (people, seed, how it ended), each able to rebuild its notebook on demand _(blocked: depends on 3PL.2, 5RC.5)_
+- [ ] **3PL.4**: Archive of finished runs: unranked records (people, seed, how it ended), each able to rebuild its notebook on demand _(blocked: depends on 3PL.2, 5RC.5, 5RC.6, 5RC.7)_
   - Note: Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c). Ships with integration tests for the archive helpers, which replace recordScore.
 - [ ] **3PL.5**: Wire integration tests for the runs access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI) _(depends on 3PL.1)_
   - Note: The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.
@@ -146,6 +146,15 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 ---
 
+## Milestone 7: Saved-run continuity (Secondary)
+
+**Goal:** A saved run survives every change to the game's state shape, once players hold saves worth keeping.
+
+- [ ] **7SC.1**: Forward migration of saved runs: each schema version bump ships a migration from the previous version, and loading walks a saved run up to SCHEMA_VERSION instead of discarding it _(deferred: G-SAVES, and every Core milestone)_
+  - Note: Replaces the discard-on-mismatch in deserialiseState (src/lib/sim/serialise.ts). Decided in the 2026-10-12 roadmap review of M3: 3PL.3 ships version-gated discard so it does not wait on the shape-changing tasks.
+
+---
+
 ## Dependency Diagram
 
 ```mermaid
@@ -159,66 +168,77 @@ graph LR
 	classDef outOfScope fill:#f6f6f6,stroke:#717171,color:#717171,stroke-dasharray:2 2
 	classDef mile fill:#e3f7ff,stroke:#007590,color:#007590,font-weight:bold
 	classDef external fill:#fff9e5,stroke:#7d6f00,color:#7d6f00,stroke-dasharray:4 3,font-style:italic
-	1FN.1["1FN.1: Create the public GitHub repository and…"]
-	1FN.2["1FN.2: Deploy the current client-side game to V…"]
-	M1["M1: Foundations and launch"]:::mile
-	2DS.1["2DS.1: Gameplay-loop spike: interrogate the cor…"]
-	2DS.3["2DS.3: Notebook design spike: the structure, to…"]
-	3PL.1["3PL.1: Build the MongoDB data layer: runs and s…"]
-	3PL.2["3PL.2: Wire Auth.js with a GitHub OAuth app and…"]
-	3PL.5["3PL.5: Wire integration tests for the runs acce…"]
-	3PL.3["3PL.3: Save and resume a run across sessions an…"]
-	4SD.4["4SD.4: Semantic drift: place feature values on…"]
-	4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
-	4SD.7["4SD.7: Substrate inheritance: dying and displac…"]
-	4SD.16["4SD.16: Tag the corpus: readings, meaning tags,…"]
-	4SD.10["4SD.10: Expand the corpus: more customs, more p…"]
-	4SD.14["4SD.14: Tag material traces value by value acro…"]
-	4SD.17["4SD.17: Band-held belief: a band holds one read…"]
-	5RC.5["5RC.5: Notebook shell: two books (the scholars'…"]
-	3PL.4["3PL.4: Archive of finished runs: unranked recor…"]
-	M3["M3: Persistence"]:::mile
-	6SL.1["6SL.1: World step and leaders: a fixed 25-year…"]
-	4SD.13["4SD.13: Dated knowledge between every pair of b…"]
-	4SD.15["4SD.15: Record history: each band's custom chan…"]
-	5RC.7["5RC.7: The true book: an omniscient history of…"]
-	6SL.2["6SL.2: Remove the order menu and the action bud…"]
-	6SL.5["6SL.5: Prerequisite structure and storylet engi…"]
-	4SD.11["4SD.11: Territory as a gated custom: every band…"]
-	4SD.9["4SD.9: Inter-culture relations: raids, conquest…"]
-	4SD.12["4SD.12: Writing as a gated custom in grades, fr…"]
-	5RC.1["5RC.1: The evidence model: what the scholars ca…"]
-	5RC.2["5RC.2: Attestation derived from the evidence mo…"]
-	5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
-	5RC.4["5RC.4: The notebook accounts for the second sto…"]
-	5RC.6["5RC.6: The scholars' book: one named scholar's…"]
-	5RC.8["5RC.8: Partial credit in reconstruction: a near…"]
-	M5["M5: Reconstruction"]:::mile
-	6SL.9["6SL.9: Band memory: what the people remember of…"]
-	4SD.8["4SD.8: Taboo and deliberate archaism: sanctify…"]
-	6SL.12["6SL.12: Storylet corpus, first batch: pressure-…"]
-	6SL.13["6SL.13: Run ending: history arrives once writte…"]
-	6SL.14["6SL.14: Intro and framing rewrite: no scholars,…"]
-	6SL.15["6SL.15: Derive the new displayed states: recogn…"]
-	6SL.16["6SL.16: Family opinion as a storylet trigger"]
-	6SL.17["6SL.17: Cross-band relationships: warfare (inte…"]
-	6SL.3["6SL.3: Layer 1 pressures: surface the land's an…"]
-	4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
-	6SL.4["6SL.4: Answer effects: the one-turn keep, refor…"]
-	6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
-	2DS.2["2DS.2: UI spike: information architecture first…"]
-	M2["M2: Design spikes"]:::mile
-	4SD.5["4SD.5: Prestige asymmetry: borrowing flows down…"]
-	M4["M4: Simulation depth"]:::mile
-	6SL.7["6SL.7: Scripted answers for AI bands, shaped by…"]
-	6SL.8["6SL.8: Weather and lulls: situation count by pr…"]
-	6SL.10["6SL.10: Daughter band as an outcome of pressure…"]
-	6SL.11["6SL.11: Moves: forced by events, or player-star…"]
-	6SL.18["6SL.18: Storylet corpus, second batch: storylet…"]
-	M6["M6: The situation loop"]:::mile
+	classDef tierUnderway fill:#c3cede,stroke:#2f3b4c,color:#2f3b4c
+	classDef tierDeferred fill:#dccbb9,stroke:#4a3826,color:#4a3826,stroke-dasharray:6 4
+	subgraph tier0["Core · underway"]
+		1FN.1["1FN.1: Create the public GitHub repository and…"]
+		1FN.2["1FN.2: Deploy the current client-side game to V…"]
+		M1["M1: Foundations and launch"]:::mile
+		2DS.1["2DS.1: Gameplay-loop spike: interrogate the cor…"]
+		2DS.3["2DS.3: Notebook design spike: the structure, to…"]
+		3PL.1["3PL.1: Build the MongoDB data layer: runs and s…"]
+		3PL.2["3PL.2: Wire Auth.js with a GitHub OAuth app and…"]
+		3PL.5["3PL.5: Wire integration tests for the runs acce…"]
+		3PL.3["3PL.3: Save and resume a run across sessions an…"]
+		4SD.4["4SD.4: Semantic drift: place feature values on…"]
+		4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
+		4SD.7["4SD.7: Substrate inheritance: dying and displac…"]
+		4SD.16["4SD.16: Tag the corpus: readings, meaning tags,…"]
+		4SD.10["4SD.10: Expand the corpus: more customs, more p…"]
+		4SD.14["4SD.14: Tag material traces value by value acro…"]
+		4SD.17["4SD.17: Band-held belief: a band holds one read…"]
+		5RC.5["5RC.5: Notebook shell: two books (the scholars'…"]
+		6SL.1["6SL.1: World step and leaders: a fixed 25-year…"]
+		4SD.13["4SD.13: Dated knowledge between every pair of b…"]
+		4SD.15["4SD.15: Record history: each band's custom chan…"]
+		5RC.7["5RC.7: The true book: an omniscient history of…"]
+		6SL.2["6SL.2: Remove the order menu and the action bud…"]
+		6SL.5["6SL.5: Prerequisite structure and storylet engi…"]
+		4SD.11["4SD.11: Territory as a gated custom: every band…"]
+		4SD.9["4SD.9: Inter-culture relations: raids, conquest…"]
+		4SD.12["4SD.12: Writing as a gated custom in grades, fr…"]
+		5RC.1["5RC.1: The evidence model: what the scholars ca…"]
+		5RC.2["5RC.2: Attestation derived from the evidence mo…"]
+		5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
+		5RC.4["5RC.4: The notebook accounts for the second sto…"]
+		5RC.6["5RC.6: The scholars' book: one named scholar's…"]
+		3PL.4["3PL.4: Archive of finished runs: unranked recor…"]
+		M3["M3: Persistence"]:::mile
+		5RC.8["5RC.8: Partial credit in reconstruction: a near…"]
+		M5["M5: Reconstruction"]:::mile
+		6SL.9["6SL.9: Band memory: what the people remember of…"]
+		4SD.8["4SD.8: Taboo and deliberate archaism: sanctify…"]
+		6SL.12["6SL.12: Storylet corpus, first batch: pressure-…"]
+		6SL.13["6SL.13: Run ending: history arrives once writte…"]
+		6SL.14["6SL.14: Intro and framing rewrite: no scholars,…"]
+		6SL.15["6SL.15: Derive the new displayed states: recogn…"]
+		6SL.16["6SL.16: Family opinion as a storylet trigger"]
+		6SL.17["6SL.17: Cross-band relationships: warfare (inte…"]
+		6SL.3["6SL.3: Layer 1 pressures: surface the land's an…"]
+		4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
+		6SL.4["6SL.4: Answer effects: the one-turn keep, refor…"]
+		6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
+		2DS.2["2DS.2: UI spike: information architecture first…"]
+		M2["M2: Design spikes"]:::mile
+		4SD.5["4SD.5: Prestige asymmetry: borrowing flows down…"]
+		M4["M4: Simulation depth"]:::mile
+		6SL.7["6SL.7: Scripted answers for AI bands, shaped by…"]
+		6SL.8["6SL.8: Weather and lulls: situation count by pr…"]
+		6SL.10["6SL.10: Daughter band as an outcome of pressure…"]
+		6SL.11["6SL.11: Moves: forced by events, or player-star…"]
+		6SL.18["6SL.18: Storylet corpus, second batch: storylet…"]
+		M6["M6: The situation loop"]:::mile
+	end
+	subgraph tier1["Secondary · deferred"]
+		G-SAVES["G-SAVES: Players hold saves worth keeping"]:::external
+		7SC.1["7SC.1: Forward migration of saved runs: each sc…"]
+		M7["M7: Saved-run continuity (Secondary)"]:::mile
+	end
+	G-SAVES --> 7SC.1
 	1FN.1 --> 1FN.2
 	1FN.2 --> M1
 	1FN.2 --> 3PL.2
+	M1 --> 7SC.1
 	2DS.1 --> 2DS.3
 	2DS.1 --> 4SD.4
 	2DS.1 --> 4SD.6
@@ -248,10 +268,9 @@ graph LR
 	4SD.14 --> 5RC.1
 	4SD.14 --> M4
 	4SD.17 --> M4
-	5RC.5 --> 3PL.4
 	5RC.5 --> 5RC.7
 	5RC.5 --> 5RC.6
-	3PL.4 --> M3
+	5RC.5 --> 3PL.4
 	6SL.1 --> 4SD.13
 	6SL.1 --> 4SD.15
 	6SL.1 --> 6SL.9
@@ -261,6 +280,7 @@ graph LR
 	4SD.13 --> M4
 	4SD.15 --> 5RC.7
 	4SD.15 --> M4
+	5RC.7 --> 3PL.4
 	5RC.7 --> M5
 	6SL.2 --> 6SL.5
 	6SL.2 --> 6SL.14
@@ -282,8 +302,12 @@ graph LR
 	5RC.3 --> 5RC.6
 	5RC.3 --> 5RC.8
 	5RC.4 --> M5
+	5RC.6 --> 3PL.4
 	5RC.6 --> M5
+	3PL.4 --> M3
+	M3 --> 7SC.1
 	5RC.8 --> M5
+	M5 --> 7SC.1
 	6SL.9 --> 4SD.8
 	6SL.9 --> M6
 	4SD.8 --> M4
@@ -309,13 +333,20 @@ graph LR
 	6SL.6 --> 4SD.5
 	6SL.6 --> 6SL.10
 	2DS.2 --> M2
+	M2 --> 7SC.1
 	4SD.5 --> M4
+	M4 --> 7SC.1
 	6SL.7 --> M6
 	6SL.8 --> 6SL.10
 	6SL.10 --> M6
 	6SL.11 --> M6
 	6SL.18 --> M6
+	M6 --> 7SC.1
+	7SC.1 --> M7
 	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.17,6SL.4,6SL.6,6SL.7,6SL.8,6SL.9 todo
 	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.13,6SL.15,6SL.18 blocked
+	class 7SC.1 deferred
 	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5 done
+	class tier0 tierUnderway
+	class tier1 tierDeferred
 ```
