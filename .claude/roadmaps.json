@@ -108,7 +108,7 @@
 							"3PL.2",
 							"3PL.5"
 						],
-						"notes": "The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.",
+						"notes": "Saves are version-gated and discarded this phase: deserialiseState returns null when a saved run's schemaVersion differs from SCHEMA_VERSION (src/lib/sim/serialise.ts), so save/resume does not wait on the tasks that change GameState's shape. Forward migration of saved runs lives in a secondary tier, released once players hold saves worth keeping. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.",
 						"assignee": "Jason"
 					},
 					{
@@ -119,12 +119,12 @@
 							"3PL.2",
 							"5RC.5"
 						],
-						"notes": "Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c).",
+						"notes": "Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c). Ships with integration tests for the archive helpers, which replace recordScore.",
 						"assignee": "Jason"
 					},
 					{
 						"id": "3PL.5",
-						"description": "Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)",
+						"description": "Wire integration tests for the runs access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)",
 						"status": "todo",
 						"dependsOn": [
 							"3PL.1"

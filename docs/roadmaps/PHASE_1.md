@@ -39,10 +39,10 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [x] **3PL.2**: Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes
   - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.
 - [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2, 3PL.5)_
-  - Note: The serialised state shape needs a schema version: GameState will keep changing through the simulation-depth milestone, and old saved runs must not break on load. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.
+  - Note: Saves are version-gated and discarded this phase: deserialiseState returns null when a saved run's schemaVersion differs from SCHEMA_VERSION (src/lib/sim/serialise.ts), so save/resume does not wait on the tasks that change GameState's shape. Forward migration of saved runs lives in a secondary tier, released once players hold saves worth keeping. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.
 - [ ] **3PL.4**: Archive of finished runs: unranked records (people, seed, how it ended), each able to rebuild its notebook on demand _(blocked: depends on 3PL.2, 5RC.5)_
-  - Note: Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c).
-- [ ] **3PL.5**: Wire integration tests for the runs and scores access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI) _(depends on 3PL.1)_
+  - Note: Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c). Ships with integration tests for the archive helpers, which replace recordScore.
+- [ ] **3PL.5**: Wire integration tests for the runs access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI) _(depends on 3PL.1)_
   - Note: The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.
 
 ---
@@ -166,7 +166,7 @@ graph LR
 	2DS.3["2DS.3: Notebook design spike: the structure, to…"]
 	3PL.1["3PL.1: Build the MongoDB data layer: runs and s…"]
 	3PL.2["3PL.2: Wire Auth.js with a GitHub OAuth app and…"]
-	3PL.5["3PL.5: Wire integration tests for the runs and…"]
+	3PL.5["3PL.5: Wire integration tests for the runs acce…"]
 	3PL.3["3PL.3: Save and resume a run across sessions an…"]
 	4SD.4["4SD.4: Semantic drift: place feature values on…"]
 	4SD.6["4SD.6: Second founding stock: seed two unrelate…"]
