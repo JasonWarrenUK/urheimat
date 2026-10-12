@@ -637,7 +637,8 @@
 							"M6",
 							"G-SAVES"
 						],
-						"notes": "Replaces the discard-on-mismatch in deserialiseState (src/lib/sim/serialise.ts). Decided in the 2026-10-12 roadmap review of M3: 3PL.3 ships version-gated discard so it does not wait on the shape-changing tasks."
+						"notes": "Replaces the discard-on-mismatch in deserialiseState (src/lib/sim/serialise.ts). Decided in the 2026-10-12 roadmap review of M3: 3PL.3 ships version-gated discard so it does not wait on the shape-changing tasks.",
+						"assignee": "Jason"
 					}
 				]
 			}

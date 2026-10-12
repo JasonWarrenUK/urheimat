@@ -44,8 +44,8 @@ Three things carry the argument. The first is memory: every band's knowledge of 
 
 ## External blockers (flag early)
 
-None outside the author's control; the phase has no external gates. Three things are worth watching:
+One gate sits outside the author's control: G-SAVES, which holds the secondary tier until players hold saves worth keeping. Three things are worth watching:
 
 - **M6 is large and everything waits on it.** Sixteen tasks, most of them new systems; both M4 and M5 depend on its early steps. If the storylet engine or the pressure surfacing proves slower than expected, the whole phase slips with it.
 - **Content is now load-bearing.** A medium run needs enough authored storylets (6SL.12) to keep the weather interesting, and the corpus needs material-trace tags value by value (4SD.14). Neither is engineering; both are on the critical path to a playable game.
-- **Saved runs will outlive the schema.** GameState changes throughout M6 and M4, so the serialised state needs a version from the start or early saved runs will break on load as the loop is rebuilt.
+- **Saved runs die on every schema bump.** GameState changes throughout M6 and M4, and a saved run whose schemaVersion differs from SCHEMA_VERSION is discarded on load. That is cheap while the author is the only player and costly once anyone else is; forward migration (7SC.1) waits behind G-SAVES for exactly that moment, so the gate needs releasing before saves matter to someone.
