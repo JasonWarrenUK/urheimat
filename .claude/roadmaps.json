@@ -486,7 +486,8 @@
 							"6SL.3"
 						],
 						"notes": "No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here, where prosperity becomes strands.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-12"
 					},
 					{
 						"id": "6SL.7",
