@@ -4,13 +4,26 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-11
+
+### Breaking
+
+- Runs saved under the previous schema no longer load; start a new game after updating. The save schema is now version 6: a band carries the pulls building on its customs, the values it has lost and the lands it has lived on, and a situation may surface a pressure instead of a storylet.
+
 ### Added
 
-- A favicon: one root branching into three, in the game's colours, as SVG with an `.ico` fallback and an Apple touch icon. The browser tab no longer shows the Svelte logo.
+- Pressures. Random drift is gone for every band: every change to a custom now comes from a pull that was put to someone. The land under the seat, each band in contact, the band's memory of a value it lost, lands it lived on before, what feeds it and the land's preference for a part being empty each pull on the customs; pulls build over steps and surface as situations when they reach the band's hold, at most three a step beside the storylets.
+- Answers written per kind of pull. Letting it lie does what the fiction makes likely: the land and a neighbour win, a memory fades. Holding fast delays the pull, which returns at half strength while its source persists. Where a close compromise exists, a third course keeps the meaning and changes the means under the land's pull, or takes a neighbour's way for your own reason.
+- Set-valued customs change by adding, dropping or swapping a member; a full set swaps out the member the land likes least.
+- Bands you are not playing feel the same pulls and let every one lie; their changes appear in your chronicle while you are in contact, with the cause named.
+- Descent follows livelihood: large herds and the plough pull towards the father's line, the husband's kin and the eldest or youngest heir, hoe crops and women's labour towards the mother's line and the wife's kin. The desert pulls the greatest power towards being unwed, and the desert, steppe and marsh a holy place towards having no image.
+- A storylet can read a live pressure on a custom.
+- An evidence script, `scripts/evidence/pressures.ts`, measuring pressures per step by source and the rate of change per band.
 
 ### Changed
 
-- The README is split into what the game is today and what the roadmap says it will become, and says plainly that nothing is saved yet and that signing in stores nothing.
+- Descent's parts no longer carry terrain affinities; the land reaches them through livelihood.
+- A band changes about two parts a step, each one seen, where it changed about five silently before.
 
 ## [0.7.0] - 2026-10-11
 
@@ -140,7 +153,8 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.4.0...v0.5.0
