@@ -66,9 +66,11 @@
 						"dependsOn": [
 							"2DS.1",
 							"4SD.2",
-							"6SL.6"
+							"6SL.6",
+							"6SL.19",
+							"6SL.20"
 						],
-						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a).",
+						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. From 6SL.6: also designs how a strand that stands out is shown in prose (the panel is quiet in ordinary times), the warnings each ladder gives and the health and morale lines. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a).",
 						"assignee": "Jason"
 					},
 					{
@@ -180,9 +182,9 @@
 						"description": "Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight",
 						"status": "blocked",
 						"dependsOn": [
-							"6SL.6"
+							"6SL.20"
 						],
-						"notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.6). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).",
+						"notes": "Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.20). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).",
 						"assignee": "Jason"
 					},
 					{
@@ -220,9 +222,10 @@
 						"description": "Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started",
 						"status": "blocked",
 						"dependsOn": [
-							"4SD.11"
+							"4SD.11",
+							"6SL.19"
 						],
-						"notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).",
+						"notes": "Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l). From 6SL.6: real trade replaces the gift and beg stand-ins in 6SL.21's surplus storylets, and absorption becomes the outcome of 6SL.19's small-and-shunned route, which ends in extinction until it exists.",
 						"assignee": "Jason"
 					},
 					{
@@ -244,7 +247,10 @@
 							"6SL.5"
 						],
 						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here. From 6SL.6: the food buffer's cap depends on lifestyle, since a granary implies a settled band; 6SL.6 stands in a counter of steps spent on the current seat (a move resets it), so replace that counter with the real settledness custom here and revisit the cap curve.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"softDependsOn": [
+							"6SL.6"
+						]
 					},
 					{
 						"id": "4SD.12",
@@ -457,12 +463,13 @@
 					},
 					{
 						"id": "6SL.4",
-						"description": "Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation",
-						"status": "todo",
+						"description": "Answer effects: the one-turn keep and reform from any source; a reform can bite back with a follow-up situation",
+						"status": "blocked",
 						"dependsOn": [
-							"6SL.3"
+							"6SL.3",
+							"6SL.6"
 						],
-						"notes": "Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d). From 4SD.16: an answer may add, drop or swap a member of a set-valued part.",
+						"notes": "Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d). From 4SD.16: an answer may add, drop or swap a member of a set-valued part. From 6SL.6: condition gained is the generic strand consequence that 6SL.6 supplies; a cautious answer names the strand it improves, and a reform answer can name the strands it costs.",
 						"assignee": "Jason"
 					},
 					{
@@ -480,23 +487,25 @@
 					},
 					{
 						"id": "6SL.6",
-						"description": "Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds",
+						"description": "Condition core: a hidden headcount with size tiers, food as yield against numbers with a surplus buffer, health and morale as strands, the generic strand vocabulary and the ladder engine; replaces prosperity",
 						"status": "todo",
 						"dependsOn": [
 							"6SL.3"
 						],
-						"notes": "No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here, where prosperity becomes strands.",
+						"notes": "Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as yield (land, terrain richness, fit of the livelihood customs, a ceiling per source, a labour floor, overuse depletion, the labour custom) against numbers, with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (a pull per route, tiers, a refusal count, combined pressures, a forced top tier, one ladder situation a step) with no routes; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; one schema bump with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter.",
 						"assignee": "Jason",
 						"started": "2026-10-12"
 					},
 					{
 						"id": "6SL.7",
 						"description": "Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle",
-						"status": "todo",
+						"status": "blocked",
 						"dependsOn": [
-							"6SL.3"
+							"6SL.3",
+							"6SL.10",
+							"6SL.19"
 						],
-						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k).",
+						"notes": "Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k). From 6SL.6: the scripts also answer the death, split and surplus ladder situations; until then an AI band resolves each by its let-it-lie outcome.",
 						"assignee": "Jason"
 					},
 					{
@@ -522,23 +531,24 @@
 					},
 					{
 						"id": "6SL.10",
-						"description": "Daughter band as an outcome of pressure or opportunity, with the player choosing which branch to follow",
+						"description": "Split ladders: a daughter band as an outcome of pressure (hunger, quarrel) or opportunity (open land), with the player choosing which branch to follow",
 						"status": "blocked",
 						"dependsOn": [
 							"6SL.6",
 							"6SL.8"
 						],
-						"notes": "The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).",
+						"notes": "The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g) and the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md). Routes are data on 6SL.6's ladder engine: hunger, quarrel and open land, with the numbers tier as one more input; a standing avenue waits for the leaders' internal reputation strand. A split arrives as a situation whose acceptance and refusal both carry pros and cons; refusing while the pressure remains climbs to higher-stakes storylets, live split pulls combine into one situation, and a forced split at the top tier is rare. Heads are shared by reason: hunger sends out those the land cannot feed, a quarrel a faction, open land a small party; the daughter starts with that reason's health and morale. Deletes 6SL.6's interim AI split roll.",
 						"assignee": "Jason"
 					},
 					{
 						"id": "6SL.11",
 						"description": "Moves: forced by events, or player-started with diegetic justification or a consequence",
-						"status": "todo",
+						"status": "blocked",
 						"dependsOn": [
-							"6SL.3"
+							"6SL.3",
+							"6SL.6"
 						],
-						"notes": "In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).",
+						"notes": "In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i). From 6SL.6: this task supplies the reason for a move (forced or chosen), which the morale and head costs of a move read; 6SL.6 already cuts the food buffer and resets the seat counter on every whole-band move.",
 						"assignee": "Jason"
 					},
 					{
@@ -598,12 +608,13 @@
 					{
 						"id": "6SL.17",
 						"description": "Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands",
-						"status": "todo",
+						"status": "blocked",
 						"dependsOn": [
 							"6SL.1",
-							"4SD.16"
+							"4SD.16",
+							"6SL.20"
 						],
-						"notes": "From 4SD.16: residence is pulled by whether a band's warfare is internal or external (Ember and Ember 1971); rule/source: war and justice/remedy: feud are the interim tag signals. A chief answering for a killer belongs to killings between bands and was dropped from justice/answerer until this exists. Marriage's partner rules resolve against the band tree and contact here. From 6SL.3: a marriage rule with no qualifying band in reach is pressure; raise it here once kin distance and reach exist (placeholder threshold two splits).",
+						"notes": "From 6SL.6: feuds, raids and killings between bands move standing (6SL.20) and numbers. From 4SD.16: residence is pulled by whether a band's warfare is internal or external (Ember and Ember 1971); rule/source: war and justice/remedy: feud are the interim tag signals. A chief answering for a killer belongs to killings between bands and was dropped from justice/answerer until this exists. Marriage's partner rules resolve against the band tree and contact here. From 6SL.3: a marriage rule with no qualifying band in reach is pressure; raise it here once kin distance and reach exist (placeholder threshold two splits).",
 						"assignee": "Jason"
 					},
 					{
@@ -617,6 +628,38 @@
 						],
 						"notes": "Split out of 6SL.12 because bite-back needs 6SL.4's reform effects and pressure storylets need 6SL.3; the first batch is pressure-agnostic. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 4b).",
 						"assignee": "Jason"
+					},
+					{
+						"id": "6SL.19",
+						"description": "Death ladders: famine, attrition, starved and shunned, and small and shunned, each a ladder of situations ending in the band's end",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.6",
+							"6SL.20"
+						],
+						"notes": "Four routes written as data on 6SL.6's ladder engine: famine (adequacy below need once the buffer is spent), attrition (numbers below what keeps a band going), starved and shunned (food with standing) and small and shunned (numbers with standing). Every answer carries pros and cons; refusing while the strands stay low climbs the tiers, the top tier ends the band, and live pulls combine into one situation. Deletes 6SL.6's interim death rule and emits structured events for the notebook. Sudden deaths (raid, plague, massacre) are a later task. Small and shunned ends in extinction until 4SD.9 gives it absorption. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).",
+						"softDependsOn": [
+							"6SL.8"
+						]
+					},
+					{
+						"id": "6SL.20",
+						"description": "Standing: each band's regard for another, stored per band and moved by storylet answers, relative size, parentage and shared customs",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.6"
+						],
+						"notes": "Stored per band as each other band's regard, read from its dated knowledge (2k, 2s); the aggregate that prestige needs is derived on read. A storylet answer that moves standing always names the bands concerned, and naming none is an error. Size reads the headcount tiers from 6SL.6, parentage the band tree and shared customs bandSimilarity (src/lib/sim/similarity.ts). The leaders' reputation within a band is not standing and is a later strand. 4SD.5 reads this task; 6SL.17's feuds, raids and killings move it. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md)."
+					},
+					{
+						"id": "6SL.21",
+						"description": "Surplus storylets: a surplus building, drawing on the buffer, the buffer nearly spent and the cap reached, with rationing acting on health and morale",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.6",
+							"6SL.20"
+						],
+						"notes": "Storylets reading 6SL.6's buffer against its cap and against numbers. Rationing costs health and saves stores; a feast lifts morale and spends them. Gift and beg answers act on a named neighbour in contact (the band's buffer, standing and the neighbour's own buffer) as stand-ins until 4SD.9 gives real trade. Loss of the buffer (stores rot, raids, a sick herd) is a sudden event for a later task. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md)."
 					}
 				]
 			},
