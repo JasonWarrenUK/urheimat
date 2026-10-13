@@ -1,4 +1,4 @@
-import type { AffLevel, Affinity, CustomPull, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, CustomPull, DemographyRow, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
 import type { Noun, Verb } from './vocabulary';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
@@ -1623,4 +1623,20 @@ export const PULLS: readonly CustomPull[] = [
 	pull('permanence', 'share', 'eldest', 0.4),
 	pull('growth', 'line', 'mother'),
 	pull('growth', 'residence', 'wife')
+];
+
+// How a band's customs shift its births and deaths (6SL.6), keyed by custom and tag as PULLS is: a
+// row applies once while the band holds some value about the noun in the custom. A dangerous way of
+// life costs extra heads a step; a marriage rule shifts the birth rate. The table starts small and
+// grows with the corpus. NO row is sourced yet: every row is a placeholder in direction and size,
+// marked unverified, and a row stays until a source confirms, corrects or removes it.
+export const DEMOGRAPHY: readonly DemographyRow[] = [
+	// Dangerous lifestyles.
+	{ when: { custom: 'youth', about: 'violence' }, deaths: 0.04, unverified: true }, // raiding as a rite of passage
+	{ when: { custom: 'rule', about: 'violence' }, deaths: 0.03, unverified: true }, // rule won and held by war
+	{ when: { custom: 'justice', about: 'violence' }, deaths: 0.03, unverified: true }, // feud as remedy
+	{ when: { custom: 'livelihood', about: 'chase' }, deaths: 0.02, unverified: true }, // the hunt
+	{ when: { custom: 'hero', about: 'chase' }, deaths: 0.01, unverified: true }, // the hero's deed is a chase
+	// Marriage: many partners or wives (marriage values about hierarchy).
+	{ when: { custom: 'marriage', about: 'hierarchy' }, births: 0.05, unverified: true }
 ];

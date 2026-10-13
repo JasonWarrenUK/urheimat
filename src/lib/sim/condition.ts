@@ -1,4 +1,5 @@
 import type { BandCondition, Culture, FoodReading, GameState, StrandId, WritableStrandId } from '$lib/types';
+import { birthRate, deathRate, stepHealth, stepNumbers } from './demography';
 import { MAX_STRAND, MOVE_RESERVE_KEPT, NUMBERS_TIERS, START_HEALTH, START_MORALE, START_NUMBERS } from './figures';
 import { foodReading, stepReserve, workReading } from './food';
 import { meanStanding, strandIn } from './history';
@@ -69,15 +70,15 @@ export function writeStrand(target: Culture, source: Culture, id: WritableStrand
 
 // One step of every strand but the ladders; returns the food the step ran on, for the snapshot. The
 // band works its tile (drawing its pools down), the reserve banks or spends, a whole-band move cuts
-// the reserve and starts the seat counter again. STUB until the demography step: numbers and health
-// move by fixed rates on the adequacy the band felt.
+// the reserve and starts the seat counter again. Numbers change by births less deaths (demography.ts)
+// on the adequacy the band felt, and health follows what it was fed.
 export function conditionStep(st: GameState, c: Culture): FoodReading {
 	const k = c.condition,
 		work = workReading(st, c),
 		kept = stepReserve(c, work);
 	workTile(st, c.x, c.y, work.use);
-	k.numbers = Math.max(0, Math.round(k.numbers * (kept.fed < 1 ? 0.8 : 1.1)));
-	k.health = clamp(k.health + (kept.fed < 1 ? -1 : 0.5));
+	k.numbers = stepNumbers(k.numbers, birthRate(c, kept.fed), deathRate(st, c, kept.fed, work.capacity));
+	k.health = stepHealth(k.health, kept.fed);
 	k.buffer = kept.reserve;
 	if (c.migrated && c.bornEra < st.era) k.buffer *= MOVE_RESERVE_KEPT;
 	k.seatSteps = c.migrated ? 0 : k.seatSteps + 1;

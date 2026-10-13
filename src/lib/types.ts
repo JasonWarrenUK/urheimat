@@ -190,6 +190,17 @@ export interface CustomPull {
 	strength: number;
 }
 
+// A band's custom changes how many are born or die while it holds a value about `about` in `custom`
+// (6SL.6). `births` is a relative change to the birth rate, `deaths` an extra fraction of numbers lost
+// a step. The corpus lists them (DEMOGRAPHY); each row's real-world claim needs a source.
+export interface DemographyRow {
+	when: { custom: string; about: Noun };
+	births?: number;
+	deaths?: number;
+	source?: string; // where the claim comes from
+	unverified?: true; // no source yet
+}
+
 // ---------- condition strands (6SL.6) ----------
 // Condition is felt through situations and never shown as numbers (spike 5f). Food is derived each
 // step from the land, the livelihood customs and the numbers, so it is read and recorded but never

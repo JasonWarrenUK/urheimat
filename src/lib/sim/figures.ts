@@ -106,10 +106,11 @@ export const MOVE_RESERVE_KEPT = 0.25;
 // ---------- births and deaths ----------
 
 // TUNING: rates per step are fractions of numbers, over twenty-five years. A crude birth rate of
-// about 40 a thousand a year over a step is one head per head; a death rate of about 34 a thousand
-// is about 0.85; their difference is about half a percent a year of growth.
+// about 40 a thousand a year over a step is one head per head, and natural fertility can run higher;
+// the base sits at the healthy end and is scaled down by health and morale, so a band at the start
+// (health 7, morale 7) nets about even and one in good health grows. Deaths are the mirror.
 export const BIRTHS = {
-	base: 1.0,
+	base: 1.3,
 	// Adequacy above one helps up to this much more; below one it falls in proportion.
 	adequacyCap: 1.2,
 	// Health and morale scale births between these bounds (at 0 the low bound, at 10 the high).
@@ -119,7 +120,7 @@ export const BIRTHS = {
 	settledBonus: 0.1
 };
 export const DEATHS = {
-	base: 0.85,
+	base: 0.8,
 	// Extra deaths per unit of shortfall in adequacy (famine mortality).
 	hunger: 1.5,
 	// Extra deaths at health 0 (disease); none at 10.

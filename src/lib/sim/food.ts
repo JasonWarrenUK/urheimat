@@ -78,10 +78,13 @@ export interface SourceWork {
 	keeps: NonNullable<TraitValue['keeps']>;
 	yield: number; // heads fed
 	load: number; // the share of the source's full ceiling used
+	full: number; // the source's full ceiling on this land, before its pool's stock
 }
 
 export interface Work {
 	food: FoodReading;
+	// The heads the sources would feed with full pools and full crews: what the land can hold.
+	capacity: number;
 	sources: SourceWork[];
 	use: Partial<Record<PoolId, PoolUse>>;
 }
@@ -101,8 +104,9 @@ export function workReading(st: GameState, c: Culture): Work {
 		const full = fig.ceiling * aff(LIVELIHOOD, s.fi, s.vi, terrain) * (1 + (RICHNESS[terrain] ?? 0)) * (haul ? HAND_HAULED : 1);
 		const crew = hands[i] / fig.hands;
 		const yielded = crew < Math.min(1, fig.minCrew * (haul ? HAND_HAULED_CREW : 1)) ? 0 : full * stockOf(st, c.x, c.y, fig.pool) * Math.min(1, crew);
-		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, load: full > 0 ? yielded / full : 0 };
+		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, load: full > 0 ? yielded / full : 0, full };
 	});
+	const capacity = sources.reduce((n, s) => n + s.full, 0);
 	const use: Partial<Record<PoolId, PoolUse>> = {};
 	sources.forEach((s) => {
 		const u = (use[s.pool] ??= { load: 0, drawn: 0, herds: 0 });
@@ -112,7 +116,7 @@ export function workReading(st: GameState, c: Culture): Work {
 	});
 	const total = sources.reduce((n, s) => n + s.yield, 0),
 		need = c.condition.numbers;
-	return { food: { yield: total, need, adequacy: need > 0 ? total / need : 1 }, sources, use };
+	return { food: { yield: total, need, adequacy: need > 0 ? total / need : 1 }, capacity, sources, use };
 }
 
 // The food the band's customs and land would give it now.
