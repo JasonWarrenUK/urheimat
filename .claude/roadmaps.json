@@ -243,7 +243,7 @@
 						"dependsOn": [
 							"6SL.5"
 						],
-						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here.",
+						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here. From 6SL.6: the food buffer's cap depends on lifestyle, since a granary implies a settled band; 6SL.6 stands in a counter of steps spent on the current seat (a move resets it), so replace that counter with the real settledness custom here and revisit the cap curve.",
 						"assignee": "Jason"
 					},
 					{
