@@ -236,7 +236,7 @@
 							"2DS.1",
 							"4SD.16"
 						],
-						"notes": "Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values). From 4SD.16: how gender is assigned (birth, rite, choice); the hero's passage as a reading family; a grain kind for substance so a harvest feast can shadow it.",
+						"notes": "Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values). From 4SD.16: how gender is assigned (birth, rite, choice); the hero's passage as a reading family; a grain kind for substance so a harvest feast can shadow it. From 6SL.6: dividing livelihood labour by the kinds a band recognises is 4SD.18's, which assumes recognised kinds as the vocabulary gender assignment settles.",
 						"assignee": "Jason"
 					},
 					{
@@ -318,6 +318,18 @@
 						],
 						"notes": "Reinterpretation: a people keeps boat burial while its reason slides from the body being unclean to the spirit needing the afterlife. Practice leaves material traces; belief leaves none, so the scholars can recover the boat and get the reason wrong. A reading's when-condition limits which readings a band can hold. Decided in the 4SD.4 pilot.",
 						"assignee": "Jason"
+					},
+					{
+						"id": "4SD.18",
+						"description": "Labour by recognised kinds: each livelihood source's worked-by becomes a set of the kinds the band recognises, replacing the men, the women and all together",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.6"
+						],
+						"notes": "The current values hard-code two genders. The change reaches the labour tags that pull descent and residence (PULLS in slots.ts), the cross-custom constraint on sex nouns (6SL.5), how gender is assigned (4SD.10) and the unrecognised condition. Replaces and deletes the interim labour rule in 6SL.6's food model. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).",
+						"softDependsOn": [
+							"4SD.10"
+						]
 					}
 				]
 			},
@@ -492,7 +504,7 @@
 						"dependsOn": [
 							"6SL.3"
 						],
-						"notes": "Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as yield (land, terrain richness, fit of the livelihood customs, a ceiling per source, a labour floor, overuse depletion, the labour custom) against numbers, with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (a pull per route, tiers, a refusal count, combined pressures, a forced top tier, one ladder situation a step) with no routes; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; one schema bump with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter.",
+						"notes": "Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as yield (land, terrain richness, fit of the livelihood customs, a ceiling per source, a labour floor, overuse depletion, the labour custom) against numbers, with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (a pull per route, tiers, a refusal count, combined pressures, a forced top tier, one ladder situation a step) with no routes; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; one schema bump with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter. Food is in heads fed, set against the headcount: a ceiling per source is a base figure times the terrain affinity weight times one plus richness, hands come from the working band split by recognised kind, and labour uses an interim rule (the men and the women draw on their own kind, all-together sources on every recognised kind, other kinds on all-together sources only) that 4SD.18 replaces.",
 						"assignee": "Jason",
 						"started": "2026-10-12"
 					},

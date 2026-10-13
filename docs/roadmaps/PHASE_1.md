@@ -66,7 +66,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11, 6SL.19)_
   - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l). From 6SL.6: real trade replaces the gift and beg stand-ins in 6SL.21's surplus storylets, and absorption becomes the outcome of 6SL.19's small-and-shunned route, which ends in extinction until it exists.
 - [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(depends on 2DS.1, 4SD.16)_
-  - Note: Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.
+  - Note: Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values). From 4SD.16: how gender is assigned (birth, rite, choice); the hero's passage as a reading family; a grain kind for substance so a harvest feast can shadow it. From 6SL.6: dividing livelihood labour by the kinds a band recognises is 4SD.18's, which assumes recognised kinds as the vocabulary gender assignment settles.
 - [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(depends on 6SL.5)_
   - Note: The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here. From 6SL.6: the food buffer's cap depends on lifestyle, since a granary implies a settled band; 6SL.6 stands in a counter of steps spent on the current seat (a move resets it), so replace that counter with the real settledness custom here and revisit the cap curve.
 - [ ] **4SD.12**: Writing as a gated custom in grades, from tallies to full record _(blocked: depends on 6SL.5, 4SD.11)_
@@ -79,6 +79,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 - [x] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops
 - [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(depends on 4SD.16)_
   - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).
+- [ ] **4SD.18**: Labour by recognised kinds: each livelihood source's worked-by becomes a set of the kinds the band recognises, replacing the men, the women and all together _(blocked: depends on 6SL.6)_
+  - Note: The current values hard-code two genders. The change reaches the labour tags that pull descent and residence (PULLS in slots.ts), the cross-custom constraint on sex nouns (6SL.5), how gender is assigned (4SD.10) and the unrecognised condition. Replaces and deletes the interim labour rule in 6SL.6's food model. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).
 
 ---
 
@@ -218,6 +220,7 @@ graph LR
 		4SD.9["4SD.9: Inter-culture relations: raids, conquest…"]
 		4SD.11["4SD.11: Territory as a gated custom: every band…"]
 		4SD.12["4SD.12: Writing as a gated custom in grades, fr…"]
+		4SD.18["4SD.18: Labour by recognised kinds: each liveli…"]
 		5RC.1["5RC.1: The evidence model: what the scholars ca…"]
 		5RC.2["5RC.2: Attestation derived from the evidence mo…"]
 		5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
@@ -275,6 +278,7 @@ graph LR
 	4SD.16 --> 6SL.17
 	4SD.10 -.-> 4SD.14
 	4SD.10 --> M4
+	4SD.10 -.-> 4SD.18
 	4SD.14 --> M4
 	4SD.14 --> 5RC.1
 	4SD.17 --> M4
@@ -323,6 +327,7 @@ graph LR
 	4SD.12 --> 5RC.1
 	4SD.12 --> 6SL.13
 	4SD.12 --> 6SL.15
+	4SD.18 --> M4
 	5RC.1 --> 5RC.2
 	5RC.2 --> 5RC.3
 	5RC.3 -.-> 5RC.4
@@ -342,6 +347,7 @@ graph LR
 	6SL.4 --> 6SL.18
 	6SL.6 --> 2DS.2
 	6SL.6 -.-> 4SD.11
+	6SL.6 --> 4SD.18
 	6SL.6 --> 6SL.4
 	6SL.6 --> 6SL.10
 	6SL.6 --> 6SL.11
@@ -370,7 +376,7 @@ graph LR
 	7SC.1 --> M7
 	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.2,4SD.6,5RC.5,6SL.14,6SL.16,6SL.8,6SL.9 todo
 	class 6SL.6 inProgress
-	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.17,6SL.18,6SL.19,6SL.20,6SL.21,6SL.4,6SL.7 blocked
+	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.18,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.17,6SL.18,6SL.19,6SL.20,6SL.21,6SL.4,6SL.7 blocked
 	class 7SC.1 deferred
 	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5 done
 	class tier0 tierUnderway
