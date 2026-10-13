@@ -128,7 +128,7 @@ export const DEATHS = {
 	// Extra deaths per unit that numbers exceed the whole tile's ceiling (crowding); unverified.
 	crowding: 0.3
 };
-// TUNING: how far health moves toward its target each step, and the target's relation to adequacy.
+// TUNING: how far health moves towards its target each step, and the target's relation to adequacy.
 export const HEALTH_STEP = 0.5;
 
 // ---------- ladders ----------

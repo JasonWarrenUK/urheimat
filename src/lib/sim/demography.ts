@@ -51,7 +51,7 @@ export function deathRate(st: GameState, c: Culture, fed: number, capacity: numb
 	return Math.min(1, total);
 }
 
-// Health moves toward a target set by what the band was fed, a step at a time, so hunger sickens a
+// Health moves towards a target set by what the band was fed, a step at a time, so hunger sickens a
 // band before it thins it and a good year does not cure a bad decade.
 export const stepHealth = (health: number, fed: number): number => health + HEALTH_STEP * (MAX_STRAND * Math.max(0, Math.min(1, fed)) - health);
 

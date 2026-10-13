@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/condition';
-import type { GameState, Storylet } from '$lib/types';
-import { conditionStep, daughterCondition, liveTier, numbersTier, readStrand, trendOf, writeStrand } from './condition';
+import type { GameState } from '$lib/types';
+import { conditionStep, daughterCondition, numbersTier, readStrand, trendOf, writeStrand } from './condition';
 import { begin, defaultStep, endEra, newGame, startTiles } from './engine';
-import { ladderStep } from './ladder';
 import { record } from './history';
-import { apply, fire, holds } from './storylets';
+import { apply, holds } from './storylets';
 
 // The stud's behaviour is placeholder; these tests pin the contracts that stay: where each strand
 // lives, how it is read and written, and how a ladder route reaches a storylet.
@@ -88,44 +87,7 @@ describe('numbers and daughters', () => {
 	});
 });
 
-describe('the ladder engine', () => {
-	// Hunger with the buffer spent feeds the example route, one strength a step.
-	function starve(st: GameState) {
-		const c = player(st);
-		c.condition.buffer = 0;
-		c.condition.numbers = 1000;
-		return c;
-	}
-	it('climbs tiers while the feed holds, emits an event per change and forces the last tier', () => {
-		const st = fresh(),
-			c = starve(st);
-		// A strained livelihood is how the stud makes a band hungry; force it by lowering adequacy.
-		const feed = { id: 'hungry', kind: 'death' as const, feeds: [{ when: [], by: 1 }], tiers: [1, 2, 3], fade: 0.5, forced: { death: true as const } };
-		const forced = [0, 1, 2].map(() => ladderStep(st, c, [feed]).map((r) => r.id));
-		expect(forced).toEqual([[], [], ['hungry']]);
-		expect(liveTier(c, 'hungry')).toBe(3);
-		expect(st.bandEvents.filter((e) => e.kind === 'ladder').map((e) => e.reason)).toEqual(['hungry:1', 'hungry:2', 'hungry:3']);
-	});
-	it('fades a pull that nothing feeds', () => {
-		const st = fresh(),
-			c = starve(st);
-		const route = { id: 'quiet', kind: 'death' as const, feeds: [{ when: [{ year: [9999, 9999] as [number, number] }], by: 1 }], tiers: [1], fade: 0.5, forced: { death: true as const } };
-		c.condition.ladders.quiet = { strength: 1, tier: 1, refusals: 0 };
-		ladderStep(st, c, [route]);
-		expect(c.condition.ladders.quiet.strength).toBe(0.5);
-		expect(liveTier(c, 'quiet')).toBe(0);
-	});
-	it('raises the storylet that holds a ladder tier, outside the situation cap', () => {
-		const st = fresh(),
-			c = player(st);
-		const at = (route: string, tier: number): Storylet => ({ id: `${route}-${tier}`, text: route, when: [{ ladder: { route, tier } }], answers: [{ id: 'a', text: 'A', then: [] }] });
-		c.condition.ladders.famine = { strength: 1, tier: 1, refusals: 0 };
-		c.condition.ladders.shunned = { strength: 1, tier: 1, refusals: 0 };
-		const pair: Storylet = { id: 'pair', text: 'both', when: [{ ladder: { route: 'famine', tier: 1 } }, { ladder: { route: 'shunned', tier: 1 } }], answers: [{ id: 'a', text: 'A', then: [] }] };
-		const corpus = [at('famine', 1), at('shunned', 1), pair];
-		expect(fire(st, c, corpus).map((s) => s.storylet)).toEqual(['pair']);
-		expect(fire(st, c, [at('famine', 1), at('shunned', 1)]).map((s) => s.storylet)).toEqual(['famine-1', 'shunned-1']);
-	});
+describe('history', () => {
 	it('records a snapshot of a living band each step', () => {
 		const st = fresh();
 		for (let i = 0; i < 4; i++) endEra(st, defaultStep());

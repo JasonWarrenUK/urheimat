@@ -26,7 +26,10 @@ export function daughterCondition(parent: Culture): BandCondition {
 }
 
 // A ladder route is live at the tier its pull has reached (0 when it has built nothing).
-export const liveTier = (c: Culture, route: string): number => c.condition.ladders[route]?.tier ?? 0;
+export function liveTier(c: Culture, route: string): number {
+	const state = c.condition.ladders[route];
+	return state?.surfaced ? state.refusals + 1 : 0;
+}
 
 // One strand now. Food reads as adequacy and standing as the mean regard; the rest are stored.
 export function readStrand(st: GameState, c: Culture, id: StrandId): number {

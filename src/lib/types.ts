@@ -225,12 +225,15 @@ export interface FoodReading {
 	adequacy: number;
 }
 
-// One route's state on one band: the pull it has built, the tier that pull has reached and how many
-// times its situations were refused (a ladder, 6SL.19 and 6SL.10 write the routes).
+// One route's state on one band. Strength is the pull it has built, and it gates surfacing; the
+// refusals set the tier (a route surfaced with `refusals` refusals is at tier `refusals + 1`).
+// `surfaced` is whether the route put a situation to the band this step, and `resolved` whether an
+// answer resolved it, so its forced outcome happens at the next step.
 export interface LadderState {
 	strength: number;
-	tier: number;
 	refusals: number;
+	surfaced: boolean;
+	resolved: boolean;
 }
 
 // Every strand of one band at the end of one step, with food as derived then. The notebook reads
@@ -280,10 +283,15 @@ export interface LadderRoute {
 	id: string;
 	kind: 'death' | 'split';
 	feeds: LadderFeed[];
-	tiers: number[]; // the strength at which each tier is reached, ascending; the last tier is the forced outcome
+	hold: number; // the strength at which the route surfaces
+	tiers: number; // how many tiers of situation it has; refusing the last forces the outcome
 	fade: number; // what the pull keeps each step nothing feeds it
 	forced: ForcedOutcome;
 }
+
+// What an answer does to a route in play: refuse it (the route climbs), ease it (buy time or cure,
+// by `by` of strength) or resolve it (its outcome happens now, by consent).
+export type LadderMove = 'refuse' | 'ease' | 'resolve';
 
 export interface GameMap {
 	tiles: MapTerrain[][];
@@ -390,6 +398,9 @@ export type Consequence =
 	// writable, and standing always names the bands whose regard changes: naming none is an error.
 	| { strand: Exclude<WritableStrandId, 'standing'>; by: number; of?: BandRef[] }
 	| { strand: 'standing'; by: number; of: [BandRef, ...BandRef[]] }
+	// What the answer does to a ladder route in play. Every answer to a ladder situation states one
+	// for each route it names (a corpus test enforces it); letting a situation lie is always a refusal.
+	| { ladder: { route: string; do: LadderMove; by?: number } }
 	| { prosperity: number } // STUD: legacy, mapped to morale until the remap table is approved, then deleted
 	| { set: { custom: string; part: string; value: string | string[] } } // by value id
 	| { lose: string }

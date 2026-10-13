@@ -28,7 +28,7 @@ export interface PoolUse {
 }
 
 // One step of one pool. The band draws the stock down in proportion to its load, then the pool
-// regrows in proportion to what the load left unused: soil and pasture and plants toward full at
+// regrows in proportion to what the load left unused: soil and pasture and plants towards full at
 // their rate, game and fish in proportion to what remains, so a pool driven near zero recovers very
 // slowly. Herds on the tile add to the soil's regrowth.
 export function stepPool(pool: PoolId, stock: number, use: PoolUse, soilManure = 0): number {

@@ -2,6 +2,7 @@ import type { BandRef, Condition, Consequence, Culture, GameState, Situation, St
 import { liveTier, readStrand, trendOf, writeStrand } from './condition';
 import { ageOf, leaderOf, successor, yearOf } from './family';
 import { contact } from './engine';
+import { moveRoute } from './ladder';
 import { change, resolve } from './pressures';
 import { SLOTS } from './slots';
 
@@ -106,7 +107,7 @@ export const SITUATIONS_PER_STEP = 2;
 
 // The ladder routes a storylet names in its conditions. A storylet that names a route is that
 // route's situation at that tier, and one that names several is their combination (6SL.6).
-const namedRoutes = (s: Storylet): string[] => s.when.flatMap((w) => ('ladder' in w ? [w.ladder.route] : []));
+export const namedRoutes = (s: Storylet): string[] => s.when.flatMap((w) => ('ladder' in w ? [w.ladder.route] : []));
 
 // Of the ladder storylets that hold, the most specific wins and consumes the routes it names: a
 // storylet whose routes another holding storylet names too, and more, is dropped.
@@ -156,6 +157,7 @@ function bandsFor(st: GameState, c: Culture, refs: readonly BandRef[]): Culture[
 export function apply(st: GameState, c: Culture, cons: Consequence[]): void {
 	cons.forEach((k) => {
 		if ('log' in k) st.log.push({ era: st.era, text: k.log.replace(/\{leader\}/g, leaderOf(c).name) });
+		else if ('ladder' in k) moveRoute(c, k.ladder.route, k.ladder.do, k.ladder.by);
 		else if ('strand' in k) bandsFor(st, c, k.of ?? ['self']).forEach((target) => writeStrand(target, c, k.strand, k.by));
 		else if ('prosperity' in k) writeStrand(c, c, 'morale', k.prosperity); // STUD: legacy shim until the remap table is approved
 		else if ('set' in k) {
@@ -192,6 +194,9 @@ export function answer(st: GameState, c: Culture, step: StepInput, corpus: reado
 		if (!s) return;
 		const a = s.answers.find((x) => x.id === chosen);
 		st.story.push({ storylet: s.id, step: st.era, answer: a ? a.id : null });
+		// Letting a ladder situation lie is always a refusal of every route it names; an answer says what
+		// it does to each route in its own consequences.
+		if (!a) namedRoutes(s).forEach((route) => moveRoute(c, route, 'refuse'));
 		apply(st, c, a ? a.then : (s.lie ?? []));
 	});
 }
@@ -204,8 +209,26 @@ export const STORYLETS: readonly Storylet[] = [
 		text: 'The stores are gone and the herds and fields do not feed everyone. The elders ask what is to be done.',
 		when: [{ ladder: { route: 'famine', tier: 1 } }],
 		answers: [
-			{ id: 'ration', text: 'Ration what there is', then: [{ strand: 'health', by: -1 }, { strand: 'buffer', by: 0.05 }] },
-			{ id: 'feast', text: 'Hold a feast and trust in the gods', then: [{ strand: 'morale', by: 1 }, { strand: 'health', by: -1 }] }
+			{ id: 'ration', text: 'Ration what there is', then: [{ ladder: { route: 'famine', do: 'ease', by: 1 } }, { strand: 'health', by: -1 }, { strand: 'buffer', by: 0.05 }] },
+			{ id: 'feast', text: 'Hold a feast and trust in the gods', then: [{ ladder: { route: 'famine', do: 'refuse' } }, { strand: 'morale', by: 1 }, { strand: 'health', by: -1 }] }
+		]
+	},
+	{
+		id: 'famine-2',
+		text: 'The hunger has not lifted. People are leaving the fires to forage, and the old are not eating.',
+		when: [{ ladder: { route: 'famine', tier: 2 } }],
+		answers: [
+			{ id: 'ration-hard', text: 'Ration hard and share it by lot', then: [{ ladder: { route: 'famine', do: 'ease', by: 1.5 } }, { strand: 'health', by: -1 }, { strand: 'morale', by: -1 }] },
+			{ id: 'wait', text: 'Wait for the season to turn', then: [{ ladder: { route: 'famine', do: 'refuse' } }] }
+		]
+	},
+	{
+		id: 'famine-3',
+		text: 'People are dying of want. The elders say the band cannot hold together another year like this.',
+		when: [{ ladder: { route: 'famine', tier: 3 } }],
+		answers: [
+			{ id: 'slaughter', text: 'Eat the seed and the breeding stock', then: [{ ladder: { route: 'famine', do: 'ease', by: 2 } }, { strand: 'health', by: -2 }, { strand: 'morale', by: -2 }] },
+			{ id: 'endure', text: 'Endure it', then: [{ ladder: { route: 'famine', do: 'refuse' } }] }
 		]
 	},
 	{
