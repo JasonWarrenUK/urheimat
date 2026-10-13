@@ -12,11 +12,15 @@ import type {
 	StepInput,
 	Terrain
 } from '$lib/types';
+import { conditionStep, daughterCondition, SPLIT_NUMBERS, startingCondition } from './condition';
+import { foodReading } from './food';
+import { emit, record } from './history';
+import { ladderStep } from './ladder';
 import { activeParts, isActive, isActiveIn, isAvailableIn } from './predicates';
 import { advance, ageOf, found, split, yearOf } from './family';
 import { pressureStep } from './pressures';
 import { answer, fire } from './storylets';
-import { AFF_WEIGHT, FEATURE_COUNT, LAND, RICHNESS, SLOTS } from './slots';
+import { AFF_WEIGHT, FEATURE_COUNT, LAND, SLOTS } from './slots';
 
 export function rngFrom(seed: number, state?: number): Rng {
 	let a = (state ?? seed) | 0;
@@ -239,7 +243,7 @@ function makeCulture(
 		traits: clone(traits),
 		alive: true,
 		isPlayer,
-		prosperity: 6,
+		condition: startingCondition(),
 		conserv: 0.7 + r() * 0.7,
 		drive,
 		known: clone(st.ancestral),
@@ -279,6 +283,7 @@ export function newGame(seed: number): GameState {
 		ancestral: [],
 		situations: [],
 		events: [],
+		bandEvents: [],
 		story: [],
 		raised: []
 	};
@@ -341,6 +346,8 @@ function tryMove(st: GameState, c: Culture, x: number, y: number): boolean {
 	c.x = x;
 	c.y = y;
 	c.migrated = true;
+	// STUD: the reason is 6SL.11's (forced or chosen), which the move's morale and head costs read.
+	emit(st, 'move', c.id, 'unspecified');
 	return true;
 }
 
@@ -369,7 +376,9 @@ function aiMove(st: GameState, c: Culture): void {
 
 function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	const r = st.rng;
-	if (!forced && !(c.prosperity >= 7 && st.era <= 6 && r() < 0.25)) return null;
+	// INTERIM (deleted by 6SL.10): today's AI split roll, translated from prosperity to the numbers and
+	// food adequacy. The split ladders replace it.
+	if (!forced && !(c.condition.numbers >= SPLIT_NUMBERS && foodReading(st, c).adequacy >= 1 && st.era <= 6 && r() < 0.25)) return null;
 	if (st.cultures.filter((k) => k.alive).length >= 10) return null;
 	const opts: Point[] = [];
 	for (let dy = -1; dy <= 1; dy++)
@@ -382,7 +391,7 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	const d = makeCulture(st, genName(r, 2), t.x, t.y, c.traits, false);
 	d.parent = c.id;
 	const founder = split(r, c, d, yearOf(st.era));
-	d.prosperity = 4;
+	d.condition = daughterCondition(c);
 	d.migrated = true;
 	if (c.isPlayer) d.conserv = 1.2 + r() * 0.3;
 	d.known = clone(c.traits);
@@ -390,21 +399,22 @@ function trySplit(st: GameState, c: Culture, forced: boolean): Culture | null {
 	// The daughter carries what the parent remembers: the values it lost and the lands it lived on.
 	d.lost = c.lost.map((l) => ({ ...l }));
 	d.lands = { ...c.lands };
-	c.prosperity -= 2;
 	st.cultures.push(d);
+	emit(st, 'split', c.id, `${d.id}: unspecified`);
 	st.log.push({ era: st.era, text: `A daughter band leaves the ${c.name}: the ${d.name}, on the ${st.map.tiles[t.y][t.x]}, led by ${founder.name}.` });
 	return d;
 }
 
-function prosperityStep(st: GameState, c: Culture, consolidations: number): number {
-	const t = st.map.tiles[c.y][c.x];
-	// Only food strain feeds prosperity; custom strain is pressure, which 6SL.3 will carry.
-	const fed = foodHeldCount(c);
-	let d = 1.1 - 5.0 * (fed ? foodStrainCount(st, c) / fed : 0) + RICHNESS[t as Terrain] + 1.5 * (consolidations || 0);
-	if (c.migrated) d -= 1;
-	d = Math.max(-2, Math.min(2.5, d));
-	c.prosperity = Math.max(0, Math.min(10, c.prosperity + d));
-	return d;
+// A band ends: it is dead, and what it kept is lost. `reason` names the route that ended it.
+function endBand(st: GameState, c: Culture, reason: string): void {
+	c.alive = false;
+	c.diedEra = st.era;
+	st.log.push({
+		era: st.era,
+		text: `The ${c.name} are no more; what they kept is lost.${c.isPlayer ? ' Your testimony ends here.' : ''}`
+	});
+	emit(st, 'death', c.id, reason);
+	if (c.isPlayer) st.playerDead = true;
 }
 
 export function defaultStep(): StepInput {
@@ -456,15 +466,15 @@ export function endEra(st: GameState, step: StepInput): GameState {
 	st.cultures
 		.filter((c) => c.alive)
 		.forEach((c) => {
-			prosperityStep(st, c, 0);
-			if (c.prosperity <= 0) {
-				c.alive = false;
-				c.diedEra = st.era;
-				st.log.push({
-					era: st.era,
-					text: `The ${c.name} are no more; what they kept is lost.${c.isPlayer ? ' Your testimony ends here.' : ''}`
-				});
-				if (c.isPlayer) st.playerDead = true;
+			conditionStep(st, c);
+			const forced = ladderStep(st, c);
+			record(st, c);
+			// INTERIM (deleted by 6SL.19): a band with no heads left is gone. The death ladders replace it.
+			if (c.condition.numbers <= 0) endBand(st, c, 'no one left');
+			else {
+				// Split routes' forced outcomes belong to 6SL.10; the stud carries out deaths only.
+				const ending = forced.find((r) => 'death' in r.forced);
+				if (ending) endBand(st, c, ending.id);
 			}
 		});
 	if (p.alive)

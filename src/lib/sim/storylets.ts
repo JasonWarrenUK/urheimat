@@ -1,4 +1,5 @@
-import type { Condition, Consequence, Culture, GameState, Situation, StepInput, Storylet } from '$lib/types';
+import type { BandRef, Condition, Consequence, Culture, GameState, Situation, StepInput, Storylet } from '$lib/types';
+import { liveTier, readStrand, trendOf, writeStrand } from './condition';
 import { ageOf, leaderOf, successor, yearOf } from './family';
 import { contact } from './engine';
 import { change, resolve } from './pressures';
@@ -49,7 +50,12 @@ export function holds(st: GameState, c: Culture, cond: Condition): boolean {
 	const year = yearOf(st.era);
 	if ('year' in cond) return year >= cond.year[0] && year <= cond.year[1];
 	if ('seat' in cond) return (cond.seat as string[]).includes(st.map.tiles[c.y][c.x]);
-	if ('prosperity' in cond) return (cond.prosperity.below === undefined || c.prosperity < cond.prosperity.below) && (cond.prosperity.above === undefined || c.prosperity > cond.prosperity.above);
+	if ('strand' in cond) {
+		const want = cond.strand,
+			now = readStrand(st, c, want.id);
+		return (want.below === undefined || now < want.below) && (want.above === undefined || now > want.above) && (want.trend === undefined || trendOf(st, c, want.id) === want.trend);
+	}
+	if ('ladder' in cond) return liveTier(c, cond.ladder.route) === cond.ladder.tier;
 	if ('leader' in cond) {
 		const l = leaderOf(c),
 			age = ageOf(l, year);
@@ -98,8 +104,19 @@ const lastFired = (st: GameState, id: string): number | undefined => st.story.fi
 // replaces the flat cap with weather.
 export const SITUATIONS_PER_STEP = 2;
 
+// The ladder routes a storylet names in its conditions. A storylet that names a route is that
+// route's situation at that tier, and one that names several is their combination (6SL.6).
+const namedRoutes = (s: Storylet): string[] => s.when.flatMap((w) => ('ladder' in w ? [w.ladder.route] : []));
+
+// Of the ladder storylets that hold, the most specific wins and consumes the routes it names: a
+// storylet whose routes another holding storylet names too, and more, is dropped.
+function mostSpecific(pool: Storylet[]): Storylet[] {
+	return pool.filter((s) => !pool.some((o) => o !== s && namedRoutes(o).length > namedRoutes(s).length && namedRoutes(s).every((r) => namedRoutes(o).includes(r))));
+}
+
 // Which storylets fire now: everything raised by a consequence, plus storylets whose conditions
-// hold and that are not spent (once) or cooling down, drawn to the cap.
+// hold and that are not spent (once) or cooling down, drawn to the cap. Ladder storylets sit outside
+// the cap: every live route surfaces each step, and 6SL.8 takes over all caps later.
 export function fire(st: GameState, c: Culture, corpus: readonly Storylet[] = STORYLETS): Situation[] {
 	const raised = new Set(st.raised);
 	st.raised = [];
@@ -113,9 +130,10 @@ export function fire(st: GameState, c: Culture, corpus: readonly Storylet[] = ST
 		return s.chance === undefined || st.rng() < s.chance;
 	});
 	const due = pool.filter((s) => raised.has(s.id));
-	const rest = pool.filter((s) => !raised.has(s.id));
+	const ladders = mostSpecific(pool.filter((s) => !raised.has(s.id) && namedRoutes(s).length));
+	const rest = pool.filter((s) => !raised.has(s.id) && !namedRoutes(s).length);
 	while (due.length < SITUATIONS_PER_STEP && rest.length) due.push(rest.splice(Math.floor(st.rng() * rest.length), 1)[0]);
-	return due.map((s) => ({
+	return [...due, ...ladders].map((s) => ({
 		id: `${st.era}:${s.id}`,
 		storylet: s.id,
 		text: s.text.replace(/\{leader\}/g, leaderOf(c).name),
@@ -123,10 +141,23 @@ export function fire(st: GameState, c: Culture, corpus: readonly Storylet[] = ST
 	}));
 }
 
+// The bands a consequence's `of` names, as they stand when it is applied. A reference nobody meets
+// (no parent, no daughters, no one in contact) names no band, and the write does nothing.
+function bandsFor(st: GameState, c: Culture, refs: readonly BandRef[]): Culture[] {
+	const found = refs.flatMap((ref) => {
+		if (ref === 'self') return [c];
+		if (ref === 'parent') return c.parent === null ? [] : [st.cultures[c.parent]];
+		if (ref === 'daughters') return st.cultures.filter((k) => k.alive && k.parent === c.id);
+		return neighbours(st, c);
+	});
+	return found.filter((k, i) => found.indexOf(k) === i);
+}
+
 export function apply(st: GameState, c: Culture, cons: Consequence[]): void {
 	cons.forEach((k) => {
 		if ('log' in k) st.log.push({ era: st.era, text: k.log.replace(/\{leader\}/g, leaderOf(c).name) });
-		else if ('prosperity' in k) c.prosperity = Math.max(0, Math.min(10, c.prosperity + k.prosperity));
+		else if ('strand' in k) bandsFor(st, c, k.of ?? ['self']).forEach((target) => writeStrand(target, c, k.strand, k.by));
+		else if ('prosperity' in k) writeStrand(c, c, 'morale', k.prosperity); // STUD: legacy shim until the remap table is approved
 		else if ('set' in k) {
 			const si = slotIndex(k.set.custom),
 				fi = si < 0 ? -1 : partIndex(si, k.set.part);
@@ -167,6 +198,16 @@ export function answer(st: GameState, c: Culture, step: StepInput, corpus: reado
 
 // The first storylets: enough to prove each mechanism. The corpus is 6SL.12's.
 export const STORYLETS: readonly Storylet[] = [
+	// STUD: the famine ladder's first tier, the one example route, replaced by 6SL.19's storylets.
+	{
+		id: 'famine-1',
+		text: 'The stores are gone and the herds and fields do not feed everyone. The elders ask what is to be done.',
+		when: [{ ladder: { route: 'famine', tier: 1 } }],
+		answers: [
+			{ id: 'ration', text: 'Ration what there is', then: [{ strand: 'health', by: -1 }, { strand: 'buffer', by: 1 }] },
+			{ id: 'feast', text: 'Hold a feast and trust in the gods', then: [{ strand: 'morale', by: 1 }, { strand: 'health', by: -1 }] }
+		]
+	},
 	{
 		id: 'new-leader-doubts',
 		text: '{leader} is young, and the elders mutter that the old ways are theirs to keep.',

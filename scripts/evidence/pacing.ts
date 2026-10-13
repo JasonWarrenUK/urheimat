@@ -27,7 +27,7 @@ for (let seed = 1; seed <= SEEDS; seed++) {
 			changes[era] += after.filter((v, i) => v !== before[i]).length;
 			kept[era] += after.filter((v, i) => v === truth[i]).length;
 			strain[era] += strainCount(st, p);
-			prosp[era] += p.prosperity;
+			prosp[era] += p.condition.numbers;
 			keptN[era]++;
 		}
 	}
@@ -39,7 +39,7 @@ for (let era = 1; era <= ERAS; era++)
 		'parts changed in player band': (changes[era] / keptN[era]).toFixed(1),
 		'original parts still kept': `${(kept[era] / keptN[era]).toFixed(1)} of ${FEATURE_COUNT}`,
 		'parts straining': (strain[era] / keptN[era]).toFixed(1),
-		prosperity: (prosp[era] / keptN[era]).toFixed(1),
+		'headcount (stud)': (prosp[era] / keptN[era]).toFixed(0),
 		'bands alive': (alive[era] / SEEDS).toFixed(1),
 		'splits': (splits[era] / SEEDS).toFixed(2),
 		'deaths': (deaths[era] / SEEDS).toFixed(2)

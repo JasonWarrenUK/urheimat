@@ -43,7 +43,8 @@ describe('conditions', () => {
 		expect(holds(st, c, { year: [0, 0] })).toBe(true);
 		expect(holds(st, c, { year: [25, 50] })).toBe(false);
 		expect(holds(st, c, { seat: [st.map.tiles[c.y][c.x] as never] })).toBe(true);
-		expect(holds(st, c, { prosperity: { above: 5, below: 7 } })).toBe(true);
+		expect(holds(st, c, { strand: { id: 'morale', above: 5, below: 8 } })).toBe(true);
+		expect(holds(st, c, { ladder: { route: 'famine', tier: 0 } })).toBe(true);
 		expect(holds(st, c, { leader: { generation: [1, 1], age: [18, 45] } })).toBe(true);
 		expect(holds(st, c, { contact: 'some' }) || holds(st, c, { contact: 'none' })).toBe(true);
 	});
@@ -93,7 +94,7 @@ describe('conditions', () => {
 	});
 });
 
-const always: Storylet = { id: 'always', text: 'Hello {leader}', when: [], answers: [{ id: 'a', text: 'A', then: [{ prosperity: 1 }] }], lie: [{ log: 'lay' }] };
+const always: Storylet = { id: 'always', text: 'Hello {leader}', when: [], answers: [{ id: 'a', text: 'A', then: [{ strand: 'morale', by: 1 }] }], lie: [{ log: 'lay' }] };
 const spent: Storylet = { ...always, id: 'spent', once: true };
 const cooling: Storylet = { ...always, id: 'cooling', cooldown: 3 };
 const never: Storylet = { ...always, id: 'never', when: [], raisedOnly: true };
@@ -137,9 +138,9 @@ describe('answers and consequences', () => {
 		const st = fresh(),
 			c = player(st);
 		st.situations = fire(st, c, [always, cooling]);
-		const before = c.prosperity;
+		const before = c.condition.morale;
 		answer(st, c, { move: null, answers: { [st.situations[0].id]: 'a' } }, [always, cooling]);
-		expect(c.prosperity).toBe(before + 1);
+		expect(c.condition.morale).toBe(before + 1);
 		expect(st.log.at(-1)?.text).toBe('lay');
 		expect(st.story.map((r) => [r.storylet, r.answer])).toEqual([
 			['always', 'a'],

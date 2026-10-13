@@ -1129,7 +1129,7 @@ export const SLOTS: SlotDef[] = [
 		name: 'How they are fed',
 		// Contract: for a band that has this custom, every value assumes the band draws its food from
 		// the land by a rule; it assumes nothing about which sources, how many, or who does the work.
-		// Up to three sources, each with its own labour. Strain here is hunger: it hits prosperity.
+		// Up to three sources, each with its own labour. Strain here is hunger: it lowers the band's food yield.
 		strain: 'food',
 		features: each(3, [
 			{

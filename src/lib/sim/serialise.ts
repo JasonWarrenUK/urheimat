@@ -9,7 +9,9 @@ import { rngFrom } from './engine';
 // 5: Storylets: a culture may lack customs (absent), and the state carries events, story and raised.
 // 6: Pressures: a culture carries its pulls, the values it lost and the lands it has lived on; a
 //    situation may surface a pressure instead of a storylet.
-export const SCHEMA_VERSION = 6;
+// 7: Condition strands: a culture carries its condition (headcount, buffer, health, morale, standing,
+//    seat counter, ladders, history) instead of prosperity, and the state carries band events.
+export const SCHEMA_VERSION = 7;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, ...rest } = st;
