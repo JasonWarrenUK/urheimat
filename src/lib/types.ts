@@ -37,6 +37,9 @@ export interface TraitValue extends ValueTags {
 	id?: string;
 	name: string;
 	aff?: Affinity;
+	// How well what this livelihood value yields keeps, which caps the surplus buffer (6SL.6). Only
+	// livelihood sources say. Unset until the values are written; the stud reads none of it.
+	keeps?: 'high' | 'low' | 'none';
 }
 
 export type Terrain = 'coast' | 'marsh' | 'river' | 'forest' | 'steppe' | 'desert' | 'mountain';
@@ -91,8 +94,8 @@ export interface SlotDef {
 	name: string;
 	features: FeatureDef[];
 	shadows?: ShadowRule[];
-	// What straining against the land costs. Food strain is hunger and hits prosperity directly;
-	// custom strain (the default) is pressure, which the situation system will carry.
+	// What straining against the land costs. Food strain is hunger and lowers the band's food yield
+	// (6SL.6); custom strain (the default) is pressure, which the situation system carries.
 	strain?: 'food' | 'custom';
 	render: (values: string[]) => string;
 }
@@ -130,7 +133,7 @@ export interface Culture {
 	traits: CultureTraits;
 	alive: boolean;
 	isPlayer: boolean;
-	prosperity: number;
+	condition: BandCondition;
 	conserv: number;
 	drive: Drive;
 	known: CultureTraits;
@@ -187,6 +190,84 @@ export interface CustomPull {
 	strength: number;
 }
 
+// ---------- condition strands (6SL.6) ----------
+// Condition is felt through situations and never shown as numbers (spike 5f). Food is derived each
+// step from the land, the livelihood customs and the numbers, so it is read and recorded but never
+// stored or written: a consequence acts on the factors food derives from.
+export type StrandId = 'food' | 'numbers' | 'buffer' | 'health' | 'morale' | 'standing';
+export type WritableStrandId = Exclude<StrandId, 'food'>;
+
+// Which bands a consequence acts on, resolved when it is applied. Open: the set of references.
+export type BandRef = 'self' | 'parent' | 'daughters' | 'contacts';
+
+// The derived food of one step: what the land and the customs yield, what the numbers need, and how
+// the two stand. Adequacy below 1 is hunger.
+export interface FoodReading {
+	yield: number;
+	need: number;
+	adequacy: number;
+}
+
+// One route's state on one band: the pull it has built, the tier that pull has reached and how many
+// times its situations were refused (a ladder, 6SL.19 and 6SL.10 write the routes).
+export interface LadderState {
+	strength: number;
+	tier: number;
+	refusals: number;
+}
+
+// Every strand of one band at the end of one step, with food as derived then. The notebook reads
+// condition over time from these (2DS.3: "Hard times and good").
+export interface StrandSnapshot {
+	step: number;
+	numbers: number;
+	buffer: number;
+	health: number;
+	morale: number;
+	standing: Record<number, number>;
+	food: FoodReading;
+}
+
+export interface BandCondition {
+	numbers: number; // the hidden headcount; conditions read its size tier
+	buffer: number; // surplus carried between steps, capped by how well the food keeps and how settled the band is
+	health: number;
+	morale: number;
+	standing: Record<number, number>; // each other band's regard for this one, by band id
+	seatSteps: number; // steps in a row on the current seat; stands in for settledness until 4SD.11
+	ladders: Record<string, LadderState>;
+	history: StrandSnapshot[];
+}
+
+// A dated, structured event beside the chronicle text, for the notebook's turning points.
+export type BandEventKind = 'death' | 'split' | 'move' | 'ladder';
+export interface BandEvent {
+	kind: BandEventKind;
+	band: number;
+	step: number;
+	reason: string;
+}
+
+// What a ladder does when its last tier is reached.
+export type ForcedOutcome = { death: true } | { split: string };
+
+// A route is data: what feeds its pull, where each tier starts and what the last tier forces. The
+// situations at each tier are storylets that hold a `{ ladder }` condition, so a combination of
+// routes is a storylet that holds several (the most specific storylet wins).
+export interface LadderFeed {
+	when: Condition[]; // all must hold for the band this step
+	by: number; // strength added to the pull
+}
+
+export interface LadderRoute {
+	id: string;
+	kind: 'death' | 'split';
+	feeds: LadderFeed[];
+	tiers: number[]; // the strength at which each tier is reached, ascending; the last tier is the forced outcome
+	fade: number; // what the pull keeps each step nothing feeds it
+	forced: ForcedOutcome;
+}
+
 export interface GameMap {
 	tiles: MapTerrain[][];
 	cx: number;
@@ -219,6 +300,7 @@ export interface GameState {
 	ancestral: CultureTraits;
 	situations: Situation[]; // put to the player this step
 	events: StepEvent[]; // what happened to the player's band in the last step
+	bandEvents: BandEvent[]; // structured events for every band, kept for the notebook
 	story: StoryRecord[]; // every storylet that fired, in order
 	raised: string[]; // storylets to fire next step whatever their conditions
 }
@@ -261,7 +343,10 @@ export type Condition =
 	| { custom: string; present: boolean } // the band holds, or lacks, the custom
 	| { year: [from: number, to: number] }
 	| { seat: Terrain[] }
-	| { prosperity: { below?: number; above?: number } }
+	// A strand stands at a level now (food reads as adequacy, standing as the mean regard) or moves
+	// against the last step's snapshot. A ladder route is live at a tier.
+	| { strand: { id: StrandId; below?: number; above?: number; trend?: 'rising' | 'falling' } }
+	| { ladder: { route: string; tier: number } }
 	| { leader: { age?: [lo: number, hi: number]; generation?: [lo: number, hi: number]; line?: 'tracked' | 'kinsman' } }
 	| { contact: 'some' | 'none' }
 	// A neighbour in contact practises something: `known` reads the band's dated knowledge of its kin
@@ -281,7 +366,11 @@ export type StepEvent = 'succession' | 'move' | 'split' | 'death';
 // What an answer does. 6SL.4 extends this.
 export type Consequence =
 	| { log: string }
-	| { prosperity: number }
+	// A strand moves by `by`, on the bands named in `of` (the band itself when absent). Food is not
+	// writable, and standing always names the bands whose regard changes: naming none is an error.
+	| { strand: Exclude<WritableStrandId, 'standing'>; by: number; of?: BandRef[] }
+	| { strand: 'standing'; by: number; of: [BandRef, ...BandRef[]] }
+	| { prosperity: number } // STUD: legacy, mapped to morale until the remap table is approved, then deleted
 	| { set: { custom: string; part: string; value: string | string[] } } // by value id
 	| { lose: string }
 	| { gain: string }
