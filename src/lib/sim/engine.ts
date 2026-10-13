@@ -12,7 +12,8 @@ import type {
 	StepInput,
 	Terrain
 } from '$lib/types';
-import { conditionStep, daughterCondition, SPLIT_NUMBERS, startingCondition } from './condition';
+import { conditionStep, daughterCondition, startingCondition } from './condition';
+import { SPLIT_NUMBERS } from './figures';
 import { foodReading } from './food';
 import { emit, record } from './history';
 import { ladderStep } from './ladder';

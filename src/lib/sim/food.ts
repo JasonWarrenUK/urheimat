@@ -1,5 +1,6 @@
 import type { Culture, FoodReading, GameState } from '$lib/types';
 import { foodHeldCount, foodStrainCount } from './engine';
+import { SETTLED_STEPS } from './figures';
 
 // Food (6SL.6): a yield worked out each step from the land and the livelihood customs, set against
 // what the numbers need. It is derived and never stored; each step's reading is recorded in the
@@ -9,11 +10,8 @@ import { foodHeldCount, foodStrainCount } from './engine';
 // ceiling per source, a labour floor, overuse depletion and the labour custom, all against the
 // headcount; the keeps field on each livelihood value and the seat counter cap the buffer.
 
-// TUNING STUB: how much surplus a settled band can hold, and how many steps on one seat count as settled.
+// TUNING STUB until step 3 replaces the buffer with the reserve: how much surplus a settled band can hold.
 const BUFFER_CAP = 20;
-const SETTLED_STEPS = 4;
-// TUNING STUB: what a whole-band move leaves of the buffer (stores do not travel).
-export const MOVE_BUFFER_KEPT = 0.25;
 
 // TUNING STUB: yield counts held food sources less those the land resists; need is one per source and
 // ignores the headcount, so adequacy is the share of sources the land lets work.

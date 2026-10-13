@@ -1,28 +1,13 @@
 import type { BandCondition, Culture, GameState, StrandId, WritableStrandId } from '$lib/types';
-import { foodReading, MOVE_BUFFER_KEPT, stepBuffer } from './food';
+import { MAX_STRAND, MOVE_RESERVE_KEPT, NUMBERS_TIERS, START_HEALTH, START_MORALE, START_NUMBERS } from './figures';
+import { foodReading, stepBuffer } from './food';
 import { meanStanding, strandIn } from './history';
 
 // Condition (6SL.6): the strands a band is made of, how they move each step and how a condition or a
 // consequence reads and writes them. Numbers are a hidden headcount and the player meets only its
 // size tier, as prose (spike 5f).
 //
-// STUD: every constant marked TUNING STUB is a placeholder. Scales, ranges, starting values and tier
-// names are open decisions.
-
-// TUNING STUB: the starting headcount, and the size tiers over it (names and boundaries are open).
-export const START_NUMBERS = 60;
-export const NUMBERS_TIERS: readonly { name: string; from: number }[] = [
-	{ name: 'few', from: 0 },
-	{ name: 'small', from: 20 },
-	{ name: 'middling', from: 50 },
-	{ name: 'large', from: 100 },
-	{ name: 'great', from: 200 }
-];
-// TUNING STUB: the headcount from which an AI band may split, under the interim rule until 6SL.10.
-export const SPLIT_NUMBERS = 90;
-const START_HEALTH = 7;
-const START_MORALE = 7;
-const MAX_STRAND = 10;
+// Every figure is in figures.ts.
 
 export const numbersTier = (numbers: number): number => NUMBERS_TIERS.reduce((tier, t, i) => (numbers >= t.from ? i : tier), 0);
 
@@ -91,6 +76,6 @@ export function conditionStep(st: GameState, c: Culture): void {
 	k.numbers = Math.max(0, Math.round(k.numbers * (fed.unmet > 0 ? 0.8 : 1.1)));
 	k.health = clamp(k.health + (fed.unmet > 0 ? -1 : 0.5));
 	k.buffer = fed.buffer;
-	if (c.migrated && c.bornEra < st.era) k.buffer *= MOVE_BUFFER_KEPT;
+	if (c.migrated && c.bornEra < st.era) k.buffer *= MOVE_RESERVE_KEPT;
 	k.seatSteps = c.migrated ? 0 : k.seatSteps + 1;
 }

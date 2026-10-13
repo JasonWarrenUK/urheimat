@@ -195,6 +195,12 @@ export interface CustomPull {
 // step from the land, the livelihood customs and the numbers, so it is read and recorded but never
 // stored or written: a consequence acts on the factors food derives from.
 export type StrandId = 'food' | 'numbers' | 'buffer' | 'health' | 'morale' | 'standing';
+
+// The seven livelihood sources, by the ids of the values of the livelihood custom's source part, and
+// the five resource pools on a tile that they draw on (6SL.6): several sources share one pool, so
+// the hoe and the plough share the soil and large and small herds share the pasture.
+export type SourceId = 'herds/large' | 'herds/small' | 'crop/hoe' | 'crop/plough' | 'catch' | 'hunt' | 'gather';
+export type PoolId = 'soil' | 'pasture' | 'game' | 'fish' | 'plants';
 export type WritableStrandId = Exclude<StrandId, 'food'>;
 
 // Which bands a consequence acts on, resolved when it is applied. Open: the set of references.
