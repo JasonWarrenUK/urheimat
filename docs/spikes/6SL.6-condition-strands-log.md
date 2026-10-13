@@ -62,6 +62,21 @@ Decisions made with Jason while turning the single prosperity number into condit
 ## Scope
 
 - The decisions above exceed one task. 6SL.6 splits into five tasks: the strands core, death ladders, split ladders, standing and surplus storylets. The dependencies between them are analysed against the roadmap graph and the code before any task is written, because under-wired links between tasks cause large refactors later.
+- The generic ladder machinery (a pull per route builds, surfaces as a situation at a tier, a refusal raises the tier, live pulls combine into one situation, the top tier is the forced outcome) is built once, in the core. Death and split tasks add routes as data (conditions and storylets per tier) and touch no engine code. Chosen over building it in the first ladder task and over a sixth task for it.
+- 6SL.10 (daughter band as an outcome of pressure or opportunity, with the player choosing the branch) becomes the split-ladders task: it keeps its id and its dependencies on 6SL.6 and 6SL.8, and its notes are extended with the avenues and reason-specific shares. The five tasks are therefore 6SL.6 (core), 6SL.10 (splits) and three new tasks (death ladders, standing, surplus storylets).
+- Wiring found so far, to be settled before any task is written: 6SL.4 (condition gained) is subsumed by the generic strand vocabulary; 6SL.11 (moves) supplies the reasons that move costs depend on; 6SL.7 (AI scripts) must answer the ladder situations; 4SD.5 (prestige) reads standing, not the core; 2DS.2 (UI spike) designs the strand display; 6SL.17 (cross-band relations) feeds standing; 4SD.9 (absorption, trade) is the outcome of the small-and-shunned route; 4SD.11 replaces the seat counter; 2DS.3's notebook needs condition over time, which the core must record.
+
+## Interim rules and history
+
+- Until the ladder tasks land, the core ships interim rules that translate today's behaviour: a band dies when its headcount reaches zero, and an AI band splits by the existing roll (era 6 or earlier, under 10 live bands) when its numbers tier is high and its food adequacy good; the player's band never splits on its own, as now. Each interim rule is labelled in code and in the task notes for deletion by the ladder task that replaces it. Chosen over shipping no death and no splits, which would break the game and the pacing evidence script, and over final rules with the ladder beside them.
+- The core records, for every band, a per-step snapshot of every strand, and the ladder, split and surplus tasks emit structured events (kind, band, step, reason) beside the chronicle text. The notebook (2DS.3: "Hard times and good", "Turning points") reads both, and the core makes one schema bump for the new state, with older saves discarded per the saved-run policy (3PL.3, 7SC.1). Chosen over snapshots alone and over recording nothing now.
+
+## Wiring
+
+- 6SL.4 (answer effects) is narrowed: "condition gained" leaves its description, since the core supplies the generic strand consequence, and 6SL.4 gains a dependency on 6SL.6 so its reform answers can carry real strand costs.
+- 4SD.11 (territory) soft-depends on 6SL.6: it records the link without blocking 4SD.12 (writing) and 6SL.13 (run ending) behind the core. If 4SD.11 lands first, the core reads real settledness and builds no seat counter.
+- Surplus storylets (6SL.21) may offer gift and beg answers before real trade exists (4SD.9): each is a storylet consequence that acts on a named neighbour in contact, moving the band's buffer, standing and the neighbour's own buffer. The strand consequence therefore takes a target, the band itself or named bands, and the core exposes a neighbour's buffer as writable. 4SD.9's note says it replaces these stand-ins with real trade. Chosen over leaving neighbour answers out and over waiting for 4SD.9.
+- Ladder situations have their own cap of one per step, combined across routes as decided under split pressure, so one ladder situation never crowds out the pressure and storylet caps. A top-tier forced outcome always fires. 6SL.8 (weather) takes over all caps later; 6SL.19 and 6SL.10 soft-depend on it. Chosen over counting ladders against the storylet cap and over leaving them outside every cap.
 
 ## Felt
 
