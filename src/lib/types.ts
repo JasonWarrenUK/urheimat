@@ -278,6 +278,9 @@ export interface GameMap {
 	tiles: MapTerrain[][];
 	cx: number;
 	cy: number;
+	// What each tile's resource pools hold as a fraction of full (6SL.6). Sparse: a tile no band has
+	// worked is absent and a pool absent from a tile is full. Keyed "x,y".
+	stocks: Record<string, Partial<Record<PoolId, number>>>;
 }
 
 export interface LogEntry {

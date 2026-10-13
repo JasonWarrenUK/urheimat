@@ -162,7 +162,7 @@ function genMap(r: () => number): GameMap {
 			});
 			if (sea) tiles[y][x] = 'coast';
 		}
-	return { tiles, cx, cy };
+	return { tiles, cx, cy, stocks: {} };
 }
 
 const inb = (x: number, y: number): boolean => x >= 0 && x < W && y >= 0 && y < H;

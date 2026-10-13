@@ -11,7 +11,8 @@ import { rngFrom } from './engine';
 //    situation may surface a pressure instead of a storylet.
 // 7: Condition strands: a culture carries its condition (headcount, buffer, health, morale, standing,
 //    seat counter, ladders, history) instead of prosperity, and the state carries band events.
-export const SCHEMA_VERSION = 7;
+// 8: Resource pools: the map carries each tile's stocks of soil, pasture, game, fish and wild plants.
+export const SCHEMA_VERSION = 8;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, ...rest } = st;
