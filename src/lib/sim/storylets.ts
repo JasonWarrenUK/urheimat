@@ -204,7 +204,7 @@ export const STORYLETS: readonly Storylet[] = [
 		text: 'The stores are gone and the herds and fields do not feed everyone. The elders ask what is to be done.',
 		when: [{ ladder: { route: 'famine', tier: 1 } }],
 		answers: [
-			{ id: 'ration', text: 'Ration what there is', then: [{ strand: 'health', by: -1 }, { strand: 'buffer', by: 1 }] },
+			{ id: 'ration', text: 'Ration what there is', then: [{ strand: 'health', by: -1 }, { strand: 'buffer', by: 0.05 }] },
 			{ id: 'feast', text: 'Hold a feast and trust in the gods', then: [{ strand: 'morale', by: 1 }, { strand: 'health', by: -1 }] }
 		]
 	},

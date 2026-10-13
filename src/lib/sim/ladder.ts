@@ -20,7 +20,7 @@ export const famine: LadderRoute = {
 	id: 'famine',
 	kind: 'death',
 	// TUNING STUB: hungry with the buffer spent.
-	feeds: [{ when: [{ strand: { id: 'food', below: 1 } }, { strand: { id: 'buffer', below: 1 } }], by: 1 }],
+	feeds: [{ when: [{ strand: { id: 'food', below: 1 } }, { strand: { id: 'buffer', below: 0.01 } }], by: 1 }],
 	tiers: [1, 2, 3],
 	fade: 0.5,
 	forced: { death: true }

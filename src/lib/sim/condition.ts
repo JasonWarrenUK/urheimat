@@ -1,7 +1,8 @@
-import type { BandCondition, Culture, GameState, StrandId, WritableStrandId } from '$lib/types';
+import type { BandCondition, Culture, FoodReading, GameState, StrandId, WritableStrandId } from '$lib/types';
 import { MAX_STRAND, MOVE_RESERVE_KEPT, NUMBERS_TIERS, START_HEALTH, START_MORALE, START_NUMBERS } from './figures';
-import { foodReading, stepBuffer } from './food';
+import { foodReading, stepReserve, workReading } from './food';
 import { meanStanding, strandIn } from './history';
+import { workTile } from './pools';
 
 // Condition (6SL.6): the strands a band is made of, how they move each step and how a condition or a
 // consequence reads and writes them. Numbers are a hidden headcount and the player meets only its
@@ -66,16 +67,19 @@ export function writeStrand(target: Culture, source: Culture, id: WritableStrand
 	else k[id] = clamp(k[id] + by);
 }
 
-// One step of every strand but the ladders. TUNING STUB: numbers grow when fed and fall when not,
-// health follows what the buffer could not cover, and a whole-band move cuts the buffer and starts the
-// seat counter again.
-export function conditionStep(st: GameState, c: Culture): void {
+// One step of every strand but the ladders; returns the food the step ran on, for the snapshot. The
+// band works its tile (drawing its pools down), the reserve banks or spends, a whole-band move cuts
+// the reserve and starts the seat counter again. STUB until the demography step: numbers and health
+// move by fixed rates on the adequacy the band felt.
+export function conditionStep(st: GameState, c: Culture): FoodReading {
 	const k = c.condition,
-		food = foodReading(st, c),
-		fed = stepBuffer(c, food);
-	k.numbers = Math.max(0, Math.round(k.numbers * (fed.unmet > 0 ? 0.8 : 1.1)));
-	k.health = clamp(k.health + (fed.unmet > 0 ? -1 : 0.5));
-	k.buffer = fed.buffer;
+		work = workReading(st, c),
+		kept = stepReserve(c, work);
+	workTile(st, c.x, c.y, work.use);
+	k.numbers = Math.max(0, Math.round(k.numbers * (kept.fed < 1 ? 0.8 : 1.1)));
+	k.health = clamp(k.health + (kept.fed < 1 ? -1 : 0.5));
+	k.buffer = kept.reserve;
 	if (c.migrated && c.bornEra < st.era) k.buffer *= MOVE_RESERVE_KEPT;
 	k.seatSteps = c.migrated ? 0 : k.seatSteps + 1;
+	return work.food;
 }

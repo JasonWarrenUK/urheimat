@@ -17,6 +17,7 @@ import { SPLIT_NUMBERS } from './figures';
 import { foodReading } from './food';
 import { emit, record } from './history';
 import { ladderStep } from './ladder';
+import { idleTiles, tileKey } from './pools';
 import { activeParts, isActive, isActiveIn, isAvailableIn } from './predicates';
 import { advance, ageOf, found, split, yearOf } from './family';
 import { pressureStep } from './pressures';
@@ -464,12 +465,14 @@ export function endEra(st: GameState, step: StepInput): GameState {
 	// The pulls on every band build; an AI band's surfaced pulls resolve now, the player's become the
 	// coming step's situations, read before the storylets fire so a storylet can see them.
 	const pressures = st.cultures.filter((c) => c.alive).flatMap((c) => pressureStep(st, c));
+	// Every band works its tile; a tile no live band worked this step regrows with nothing drawn.
+	const worked = new Set(st.cultures.filter((c) => c.alive).map((c) => tileKey(c.x, c.y)));
 	st.cultures
 		.filter((c) => c.alive)
 		.forEach((c) => {
-			conditionStep(st, c);
+			const food = conditionStep(st, c);
 			const forced = ladderStep(st, c);
-			record(st, c);
+			record(st, c, food);
 			// INTERIM (deleted by 6SL.19): a band with no heads left is gone. The death ladders replace it.
 			if (c.condition.numbers <= 0) endBand(st, c, 'no one left');
 			else {
@@ -478,6 +481,7 @@ export function endEra(st: GameState, step: StepInput): GameState {
 				if (ending) endBand(st, c, ending.id);
 			}
 		});
+	idleTiles(st, worked);
 	if (p.alive)
 		st.cultures.forEach((c) => {
 			if (c.alive && !c.isPlayer && contact(st, p, c) >= 0.5) {

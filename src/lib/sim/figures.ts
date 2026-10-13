@@ -1,4 +1,4 @@
-import type { PoolId, SourceId } from '$lib/types';
+import type { PoolId, SourceId, TraitValue } from '$lib/types';
 
 // Every tuning figure of the condition model (6SL.6) lives here and nowhere else. Each is a
 // TUNING figure: a placeholder with the reasoning for its ratio, set by Claude against the evidence
@@ -39,10 +39,9 @@ export interface SourceFigures {
 	// anything at all: a plough needs a team, a herd a herder.
 	hands: number;
 	minCrew: number;
-	// How hard working it draws its pool down, per unit of load.
+	// How hard working it draws its pool down, per unit of load. How well what it yields keeps is not
+	// here: it is the `keeps` field on the livelihood value in the corpus, so a new value must say.
 	draw: number;
-	// How well what it yields keeps, which caps the reserve.
-	keeps: 'high' | 'low' | 'none';
 }
 
 // TUNING. Ratios and why: the plough's ceiling exceeds the hoe's because ox-ploughing cut tillage
@@ -51,13 +50,13 @@ export interface SourceFigures {
 // for the heads they feed. The hunt is the lowest ceiling: wild game feeds few people per tile.
 // Grain and herds keep; fish and nuts keep a little (dried or smoked); fresh game does not.
 export const SOURCES: Record<SourceId, SourceFigures> = {
-	'herds/large': { pool: 'pasture', ceiling: 70, hands: 12, minCrew: 0.25, draw: 0.5, keeps: 'high' },
-	'herds/small': { pool: 'pasture', ceiling: 60, hands: 10, minCrew: 0.2, draw: 0.6, keeps: 'high' },
-	'crop/hoe': { pool: 'soil', ceiling: 80, hands: 30, minCrew: 0.3, draw: 0.3, keeps: 'high' },
-	'crop/plough': { pool: 'soil', ceiling: 140, hands: 24, minCrew: 0.4, draw: 0.7, keeps: 'high' },
-	catch: { pool: 'fish', ceiling: 50, hands: 18, minCrew: 0.25, draw: 0.4, keeps: 'low' },
-	hunt: { pool: 'game', ceiling: 30, hands: 16, minCrew: 0.3, draw: 0.5, keeps: 'none' },
-	gather: { pool: 'plants', ceiling: 25, hands: 14, minCrew: 0.2, draw: 0.3, keeps: 'low' }
+	'herds/large': { pool: 'pasture', ceiling: 70, hands: 12, minCrew: 0.25, draw: 0.5 },
+	'herds/small': { pool: 'pasture', ceiling: 60, hands: 10, minCrew: 0.2, draw: 0.6 },
+	'crop/hoe': { pool: 'soil', ceiling: 80, hands: 30, minCrew: 0.3, draw: 0.3 },
+	'crop/plough': { pool: 'soil', ceiling: 140, hands: 24, minCrew: 0.4, draw: 0.7 },
+	catch: { pool: 'fish', ceiling: 50, hands: 18, minCrew: 0.25, draw: 0.4 },
+	hunt: { pool: 'game', ceiling: 30, hands: 16, minCrew: 0.3, draw: 0.5 },
+	gather: { pool: 'plants', ceiling: 25, hands: 14, minCrew: 0.2, draw: 0.3 }
 };
 
 // TUNING: the share of numbers that works (children and the old do not).
@@ -96,7 +95,7 @@ export const POOL_FLOOR = 0.02;
 
 // TUNING: what each keeps factor holds, as a fraction of a step's need (0.12 is three years of
 // food in twenty-five). Grain and herds keep; dried fish and nuts keep a little; fresh game not at all.
-export const KEEPS: Record<SourceFigures['keeps'], number> = { high: 0.12, low: 0.03, none: 0 };
+export const KEEPS: Record<NonNullable<TraitValue['keeps']>, number> = { high: 0.12, low: 0.03, none: 0 };
 // TUNING: what a wandering band can still hold (it can keep a herd), and the steps on a seat from
 // which a band counts as settled.
 export const SETTLED_FLOOR = 0.2;

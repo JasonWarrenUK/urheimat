@@ -7,7 +7,7 @@ export const AFF_WEIGHT: Record<AffLevel, number> = { strong: 3, favours: 1.5, a
 
 // A value with an id naming its concept, named affinity levels and tags. The name is provisional
 // display text; rendering transforms it downstream.
-const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags): TraitValue => ({ id, name, aff, ...tags });
+const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags & Pick<TraitValue, 'keeps'>): TraitValue => ({ id, name, aff, ...tags });
 
 // One row of a value's reading grid: a verb and object, with each target it can be aimed at
 // (null = no target). Every value carries its full grid; cells left out were struck deliberately.
@@ -1137,13 +1137,13 @@ export const SLOTS: SlotDef[] = [
 				label: 'fed by',
 				size: [1, 1],
 				values: [
-					N('herds/large', 'cattle and horses', { steppe: 'strong', desert: 'favours', mountain: 'favours', forest: 'resists', marsh: 'resists' }, { about: ['herds', 'wealth', 'hierarchy', 'male'], readings: [...R('provide', 'living', 'plenty'), ...R('guard', 'herds', null)] }),
-					N('herds/small', 'sheep and goats', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'resists' }, { about: ['herds', 'thrift', 'patience'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'herds', null)] }),
-					N('crop/hoe', 'hoe crops', { forest: 'strong', marsh: 'favours', river: 'favours', desert: 'resists', steppe: 'resists' }, { about: ['grain', 'growth', 'labour', 'female'], readings: [...R('provide', 'living', 'nourishment'), ...R('create', 'grain', null)] }),
-					N('crop/plough', 'plough crops', { river: 'strong', coast: 'favours', forest: 'resists', mountain: 'resists', marsh: 'resists', desert: 'resists' }, { about: ['grain', 'plenty', 'labour', 'permanence'], readings: [...R('provide', 'living', 'plenty'), ...R('create', 'grain', null)] }),
-					N('catch', 'the catch', { coast: 'strong', river: 'strong', marsh: 'strong', steppe: 'resists', desert: 'excludes' }, { about: ['water', 'wild', 'plenty'], readings: R('provide', 'living', 'nourishment') }),
-					N('hunt', 'the hunt', { forest: 'strong', mountain: 'favours', steppe: 'favours' }, { about: ['wild', 'chase', 'strength'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'wild', null)] }),
-					N('gather', 'gathering', { forest: 'favours', marsh: 'favours', coast: 'favours' }, { about: ['plants', 'patience', 'thrift'], readings: R('provide', 'living', 'nourishment') })
+					N('herds/large', 'cattle and horses', { steppe: 'strong', desert: 'favours', mountain: 'favours', forest: 'resists', marsh: 'resists' }, { keeps: 'high', about: ['herds', 'wealth', 'hierarchy', 'male'], readings: [...R('provide', 'living', 'plenty'), ...R('guard', 'herds', null)] }),
+					N('herds/small', 'sheep and goats', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'resists' }, { keeps: 'high', about: ['herds', 'thrift', 'patience'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'herds', null)] }),
+					N('crop/hoe', 'hoe crops', { forest: 'strong', marsh: 'favours', river: 'favours', desert: 'resists', steppe: 'resists' }, { keeps: 'high', about: ['grain', 'growth', 'labour', 'female'], readings: [...R('provide', 'living', 'nourishment'), ...R('create', 'grain', null)] }),
+					N('crop/plough', 'plough crops', { river: 'strong', coast: 'favours', forest: 'resists', mountain: 'resists', marsh: 'resists', desert: 'resists' }, { keeps: 'high', about: ['grain', 'plenty', 'labour', 'permanence'], readings: [...R('provide', 'living', 'plenty'), ...R('create', 'grain', null)] }),
+					N('catch', 'the catch', { coast: 'strong', river: 'strong', marsh: 'strong', steppe: 'resists', desert: 'excludes' }, { keeps: 'low', about: ['water', 'wild', 'plenty'], readings: R('provide', 'living', 'nourishment') }),
+					N('hunt', 'the hunt', { forest: 'strong', mountain: 'favours', steppe: 'favours' }, { keeps: 'none', about: ['wild', 'chase', 'strength'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'wild', null)] }),
+					N('gather', 'gathering', { forest: 'favours', marsh: 'favours', coast: 'favours' }, { keeps: 'low', about: ['plants', 'patience', 'thrift'], readings: R('provide', 'living', 'nourishment') })
 				]
 			},
 			{
