@@ -95,6 +95,8 @@ Decisions made with Jason while turning the single prosperity number into condit
 - Labour is divided by the kinds a band recognises, not by an arbitrary two-gender split, and the current labour values (the men, the women, all together) hard-code two. The fix at source is a change to the livelihood custom: each source's worked-by becomes a set of recognised kinds, all-together meaning every kind. It reaches the labour tags that pull descent and residence, the cross-custom constraint on sex nouns (6SL.5), how gender is assigned (4SD.10) and the `unrecognised` condition, so it is its own task, depending on 6SL.6.
 - Until that task lands the core's food uses a labelled interim rule: the men and the women each draw on their own kind when the band recognises it, all-together sources draw on every recognised kind, and the other kinds work only all-together sources. With no gender custom the band falls back to men and women. The interim rule is deleted by the labour task.
 
+- One history store: 4SD.15 (record history) depends on 6SL.6 and extends the core's per-step strand snapshots and structured events with custom changes and positions, with its description narrowed to match. Chosen over two stores joined by band and step, and over folding the task into the core.
+
 ## Felt
 
 - The numeric prosperity bar goes. A strand is shown only when it stands out, as a line of prose (for example "The herds are thin" when food is low); in ordinary times the panel stays quiet. Chosen over a word per strand always shown (a ladder the player learns as a number) and over nothing on screen.
