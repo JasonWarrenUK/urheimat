@@ -4,6 +4,7 @@ import type { Culture, GameState, MapTerrain } from '$lib/types';
 import { begin, newGame, startTiles } from './engine';
 import { handsFor, heldSources, recognisedKinds, reserveCap, stepReserve, workReading } from './food';
 import { SOURCES, WORKING_SHARE } from './figures';
+import { contributions } from './pressures';
 import { SLOTS } from './slots';
 
 const si = SLOTS.findIndex((s) => s.id === fixtures.livelihood.custom);
@@ -112,16 +113,29 @@ describe('yield', () => {
 		const forest = workReading(st, c).sources.find((s) => s.id === 'crop/plough')!.yield;
 		expect(river).toBeGreaterThan(forest * 2);
 	});
-	it('cuts a plough without large herds to a hand-hauled fraction', () => {
+	it('draws a plough fully with large herds, partly with small herds and by hand with neither', () => {
 		const { st, c } = fresh();
 		terrain(st, c, 'river');
 		c.condition.numbers = 400;
-		hold(c, [['crop/plough', 'shared'], ['herds/small', 'shared']]);
-		const hauled = workReading(st, c).sources.find((s) => s.id === 'crop/plough')!.yield;
-		hold(c, [['crop/plough', 'shared'], ['herds/large', 'shared']]);
-		const drawn = workReading(st, c).sources.find((s) => s.id === 'crop/plough')!.yield;
+		const plough = (other: string) => {
+			hold(c, [['crop/plough', 'shared'], [other, 'shared']]);
+			return workReading(st, c).sources.find((s) => s.id === 'crop/plough')!.yield;
+		};
+		const hauled = plough('gather'),
+			partly = plough('herds/small'),
+			fully = plough('herds/large');
 		expect(hauled).toBeGreaterThan(0);
-		expect(drawn).toBeGreaterThan(hauled * 2);
+		expect(partly).toBeGreaterThan(hauled);
+		expect(fully).toBeGreaterThan(partly);
+	});
+	it('pulls a plough band to add large herds in a free stage, and not a band that holds them', () => {
+		const { st, c } = fresh();
+		hold(c, [['crop/plough', 'shared']]);
+		const herds = SLOTS[si].features[fi('s2.source')].values.findIndex((v) => v.id === 'herds/large');
+		const draws = (band: Culture) => contributions(st, band).filter((k) => k.source.kind === 'custom' && k.part === fi('s2.source') && k.value === herds);
+		expect(draws(c).length).toBe(1);
+		hold(c, [['crop/plough', 'shared'], ['herds/large', 'shared']]);
+		expect(draws(c).length).toBe(0);
 	});
 	it('scales with a depleted pool and sets adequacy against the headcount', () => {
 		const { st, c } = fresh();

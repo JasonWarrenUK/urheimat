@@ -1,7 +1,7 @@
 import type { Culture, CultureTraits, FoodReading, GameState, PoolId, SourceId, Terrain, TraitValue } from '$lib/types';
 import { startingCondition } from './condition';
 import { aff } from './engine';
-import { HAND_HAULED, HAND_HAULED_CREW, KEEPS, SETTLED_FLOOR, SETTLED_STEPS, SOURCES, WORKING_SHARE } from './figures';
+import { HAND_HAULED, HAND_HAULED_CREW, KEEPS, SMALL_DRAUGHT, SMALL_DRAUGHT_CREW, SETTLED_FLOOR, SETTLED_STEPS, SOURCES, WORKING_SHARE } from './figures';
 import { isActive } from './predicates';
 import { stockOf, type PoolUse } from './pools';
 import { RICHNESS, SLOTS } from './slots';
@@ -50,12 +50,20 @@ function heldSourcesOf(traits: CultureTraits, absent: readonly string[]): HeldSo
 // A band's livelihood sources.
 export const heldSources = (c: Culture): HeldSource[] => heldSourcesOf(c.traits, c.absent);
 
+// How well a plough is drawn: full with large herds held as a source, partly with small herds only,
+// and a hand-hauled fraction of its ceiling with neither (and a bigger minimum crew). Every other
+// source needs no draught.
+function draught(held: readonly HeldSource[], s: HeldSource): { ceiling: number; crew: number } {
+	if (s.id !== 'crop/plough') return { ceiling: 1, crew: 1 };
+	if (held.some((o) => o.id === 'herds/large')) return { ceiling: 1, crew: 1 };
+	if (held.some((o) => o.id === 'herds/small')) return { ceiling: SMALL_DRAUGHT, crew: SMALL_DRAUGHT_CREW };
+	return { ceiling: HAND_HAULED, crew: HAND_HAULED_CREW };
+}
+
 // A source's full ceiling on a terrain, before its pool's stock: base times the terrain affinity weight
-// times one plus richness. A plough needs draught animals: without large herds held as a source it
-// falls to a hand-hauled fraction of its ceiling (and needs a bigger crew, in workReading).
+// times one plus richness, times how well a plough is drawn.
 function fullCeiling(held: readonly HeldSource[], s: HeldSource, terrain: Terrain): number {
-	const haul = s.id === 'crop/plough' && !held.some((o) => o.id === 'herds/large');
-	return SOURCES[s.id].ceiling * aff(LIVELIHOOD, s.fi, s.vi, terrain) * (1 + (RICHNESS[terrain] ?? 0)) * (haul ? HAND_HAULED : 1);
+	return SOURCES[s.id].ceiling * aff(LIVELIHOOD, s.fi, s.vi, terrain) * (1 + (RICHNESS[terrain] ?? 0)) * draught(held, s).ceiling;
 }
 
 // The most people the ancestral customs could feed on the home tile, with full pools: the largest
@@ -128,13 +136,11 @@ export function workReading(st: GameState, c: Culture): Work {
 	const terrain = st.map.tiles[c.y][c.x] as Terrain;
 	const held = heldSources(c);
 	const hands = handsFor(c, held);
-	const drawn = held.some((s) => s.id === 'herds/large');
 	const sources = held.map((s, i): SourceWork => {
 		const fig = SOURCES[s.id];
-		const haul = s.id === 'crop/plough' && !drawn;
 		const full = fullCeiling(held, s, terrain);
 		const crew = hands[i] / fig.hands;
-		const yielded = crew < Math.min(1, fig.minCrew * (haul ? HAND_HAULED_CREW : 1)) ? 0 : full * stockOf(st, c.x, c.y, fig.pool) * Math.min(1, crew);
+		const yielded = crew < Math.min(1, fig.minCrew * draught(held, s).crew) ? 0 : full * stockOf(st, c.x, c.y, fig.pool) * Math.min(1, crew);
 		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, load: full > 0 ? yielded / full : 0, full };
 	});
 	const capacity = sources.reduce((n, s) => n + s.full, 0);

@@ -70,6 +70,10 @@ export const WORKING_SHARE = 0.5;
 export const HAND_HAULED = 0.25;
 // TUNING: the extra minimum crew a hand-hauled plough needs, as a multiple.
 export const HAND_HAULED_CREW = 2;
+// TUNING: draught from small herds only (sheep and goats are poor draught animals) sits between the
+// two: a plough with them keeps this share of its ceiling and needs this multiple of its minimum crew.
+export const SMALL_DRAUGHT = 0.6;
+export const SMALL_DRAUGHT_CREW = 1.5;
 
 // ---------- food: pools ----------
 

@@ -117,6 +117,9 @@ Decisions made with Jason while turning the single prosperity number into condit
 - Target 1 (survival): about three of the six starting bands are still alive after 15 passive steps, on average. Passive runs let every situation lie for every band, so a guided player band should do better. Before tuning, about one in five survived.
 - Target 2 (the start): the pre-scattering band already has customs suited to its home tile (`genAncestral` weights each part by affinity squared and never draws a value the home terrain excludes), so the start is built from that and not from a fixed headcount. Total people before the scattering are a share of the home tile's capacity (the ancestral customs on the home terrain, full pools, full crews), divided evenly among the six bands. Each band's adequacy then depends on how well its new tile suits those customs, so the scattering is the first test. Chosen over a share of each band's own capacity and over a depleted home tile.
 - The cause of the scattering is out of this task. It belongs to the split ladders (6SL.10, as a first split resolved by consent) or the intro rewrite (6SL.14).
+## Open core items
+
+- Plough and herds: the plough and large herds pull each other into a band, as two rows in the cross-custom pull table (a band that holds plough crops is pulled to add large herds in a free livelihood stage), and the draught cliff is gradual: a plough is drawn fully with large herds, partly (0.6 of its ceiling, a crew 1.5 times the minimum) with small herds only and by hand with neither (0.25, twice the crew). Evidence: with customs pinned, a river plough band with large herds does well; unpinned, 6SL.3's land pulls replaced its herds with another plough, which made the plough hand-hauled and killed 24 of 30 such bands. The pull reverses the loss and does not prevent it. Chosen over no row and over rows alone.
 
 ## Felt
 

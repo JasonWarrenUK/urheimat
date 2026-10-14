@@ -1614,7 +1614,13 @@ export const FEATURE_COUNT = SLOTS.reduce((a, s) => a + s.features.length, 0);
 // husband's kin and the eldest, since ploughland cannot be split; hoe crops with the mother's line
 // and the wife's kin (Aberle 1961; Ember and Ember 1971; Holden and Mace 2003; Boserup 1970).
 const pull = (about: Noun, part: string, value: string, strength = 0.6): CustomPull => ({ when: { custom: 'livelihood', about }, to: { custom: 'descent', part, value }, strength });
+// A plough needs draught animals (6SL.6): a band that holds plough crops, which the corpus tags as
+// permanence, is pulled to add large herds in whichever livelihood stage is free. Land pulls can take
+// a band's herds away, and this is what draws them back. The target is a stage's part id.
+const draught = (part: string): CustomPull => ({ when: { custom: 'livelihood', about: 'permanence' }, to: { custom: 'livelihood', part, value: 'herds/large' }, strength: 0.6 });
 export const PULLS: readonly CustomPull[] = [
+	draught('s2.source'),
+	draught('s3.source'),
 	pull('herds', 'line', 'father'),
 	pull('herds', 'residence', 'husband'),
 	pull('herds', 'share', 'youngest', 0.4),
