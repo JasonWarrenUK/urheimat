@@ -550,7 +550,7 @@
 							"6SL.6",
 							"6SL.8"
 						],
-						"notes": "The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g) and the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md). Routes are data on 6SL.6's ladder engine: hunger, quarrel and open land, with the numbers tier as one more input; a standing avenue waits for the leaders' internal reputation strand. A split arrives as a situation whose acceptance and refusal both carry pros and cons; refusing while the pressure remains climbs to higher-stakes storylets, live split pulls combine into one situation, and a forced split at the top tier is rare. Heads are shared by reason: hunger sends out those the land cannot feed, a quarrel a faction, open land a small party; the daughter starts with that reason's health and morale. Deletes 6SL.6's interim AI split roll.",
+						"notes": "The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g) and the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md). Routes are data on 6SL.6's ladder engine: hunger, quarrel and open land, with the numbers tier as one more input; a standing avenue waits for the leaders' internal reputation strand. A split arrives as a situation whose acceptance and refusal both carry pros and cons; refusing while the pressure remains climbs to higher-stakes storylets, live split pulls combine into one situation, and a forced split at the top tier is rare. Heads are shared by reason: hunger sends out those the land cannot feed, a quarrel a faction, open land a small party; the daughter starts with that reason's health and morale. Deletes 6SL.6's interim AI split roll. The cause of the original scattering is either this task's first split resolved by consent at era 0 or 6SL.14's intro; 6SL.6 starts the bands from a share of the home tile's capacity and names no cause.",
 						"assignee": "Jason"
 					},
 					{
@@ -594,7 +594,7 @@
 						"dependsOn": [
 							"6SL.2"
 						],
-						"notes": "The player sees no reference to the notebook during play, so the chronicle line \"Your testimony ends here\" (engine.ts:483) goes too. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r).",
+						"notes": "The player sees no reference to the notebook during play, so the chronicle line \"Your testimony ends here\" (engine.ts:483) goes too. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1c, 1h, 2r). From 6SL.6: the cause of the scattering (the pressure that drove the original band apart) is settled here or in 6SL.10, as the first split resolved by consent; the condition core starts the six bands from a share of the home tile's capacity and names no cause.",
 						"assignee": "Jason"
 					},
 					{
