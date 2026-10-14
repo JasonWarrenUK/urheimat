@@ -9,8 +9,12 @@ import type { PoolId, SourceId, TraitValue } from '$lib/types';
 
 // ---------- numbers ----------
 
-// TUNING: a band begins at sixty, a small band by the figures below: one decent source at its
-// ceiling feeds it with room to grow, so the first steps are not a famine.
+// TUNING: the people before the scattering are a share of the most their home tile could feed with
+// the ancestral customs (food.ts homePopulation), divided evenly among the six bands. A band never
+// starts below the floor, so a poor home still sends out viable bands. START_NUMBERS is the headcount
+// of a band made outside a scattering (the default before begin sets the real one).
+export const HOME_SHARE = 0.9;
+export const MIN_START = 12;
 export const START_NUMBERS = 60;
 // TUNING: the size tiers over the headcount. Boundaries are headcounts so later features that need
 // them (conflict, splits) have concrete numbers; the names are placeholders until 2DS.2 designs the
@@ -50,13 +54,13 @@ export interface SourceFigures {
 // for the heads they feed. The hunt is the lowest ceiling: wild game feeds few people per tile.
 // Grain and herds keep; fish and nuts keep a little (dried or smoked); fresh game does not.
 export const SOURCES: Record<SourceId, SourceFigures> = {
-	'herds/large': { pool: 'pasture', ceiling: 70, hands: 12, minCrew: 0.25, draw: 0.5 },
-	'herds/small': { pool: 'pasture', ceiling: 60, hands: 10, minCrew: 0.2, draw: 0.6 },
-	'crop/hoe': { pool: 'soil', ceiling: 80, hands: 30, minCrew: 0.3, draw: 0.3 },
-	'crop/plough': { pool: 'soil', ceiling: 140, hands: 24, minCrew: 0.4, draw: 0.7 },
-	catch: { pool: 'fish', ceiling: 50, hands: 18, minCrew: 0.25, draw: 0.4 },
-	hunt: { pool: 'game', ceiling: 30, hands: 16, minCrew: 0.3, draw: 0.5 },
-	gather: { pool: 'plants', ceiling: 25, hands: 14, minCrew: 0.2, draw: 0.3 }
+	'herds/large': { pool: 'pasture', ceiling: 70, hands: 8, minCrew: 0.2, draw: 0.25 },
+	'herds/small': { pool: 'pasture', ceiling: 60, hands: 6, minCrew: 0.2, draw: 0.3 },
+	'crop/hoe': { pool: 'soil', ceiling: 80, hands: 16, minCrew: 0.25, draw: 0.15 },
+	'crop/plough': { pool: 'soil', ceiling: 140, hands: 14, minCrew: 0.3, draw: 0.35 },
+	catch: { pool: 'fish', ceiling: 50, hands: 10, minCrew: 0.2, draw: 0.2 },
+	hunt: { pool: 'game', ceiling: 30, hands: 9, minCrew: 0.25, draw: 0.25 },
+	gather: { pool: 'plants', ceiling: 25, hands: 8, minCrew: 0.2, draw: 0.15 }
 };
 
 // TUNING: the share of numbers that works (children and the old do not).
@@ -80,11 +84,13 @@ export interface PoolFigures {
 // only when lightly worked (the (1 - load) factor is the fallow rule); game and fish breed, and
 // depensation (recovery stalling at low abundance) is common in the record though not universal.
 export const POOLS: Record<PoolId, PoolFigures> = {
-	soil: { regrow: 0.5, breeds: false },
-	pasture: { regrow: 0.7, breeds: false },
-	plants: { regrow: 0.6, breeds: false },
-	game: { regrow: 0.6, breeds: true },
-	fish: { regrow: 0.8, breeds: true }
+	soil: { regrow: 0.6, breeds: false },
+	pasture: { regrow: 0.9, breeds: false },
+	plants: { regrow: 0.9, breeds: false },
+	// Breeding pools regrow in proportion to what remains, so their rate is an intrinsic growth rate
+	// and the most they regain in a step is a quarter of it.
+	game: { regrow: 1.6, breeds: true },
+	fish: { regrow: 2.4, breeds: true }
 };
 // TUNING: how much herds on a tile add to the soil's regrowth, per unit of herd load (manure).
 export const MANURE = 0.15;
@@ -110,7 +116,7 @@ export const MOVE_RESERVE_KEPT = 0.25;
 // the base sits at the healthy end and is scaled down by health and morale, so a band at the start
 // (health 7, morale 7) nets about even and one in good health grows. Deaths are the mirror.
 export const BIRTHS = {
-	base: 1.3,
+	base: 1.1,
 	// Adequacy above one helps up to this much more; below one it falls in proportion.
 	adequacyCap: 1.2,
 	// Health and morale scale births between these bounds (at 0 the low bound, at 10 the high).

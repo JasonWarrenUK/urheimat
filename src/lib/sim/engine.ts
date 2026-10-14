@@ -13,8 +13,8 @@ import type {
 	Terrain
 } from '$lib/types';
 import { conditionStep, daughterCondition, startingCondition } from './condition';
-import { SPLIT_NUMBERS } from './figures';
-import { foodReading } from './food';
+import { HOME_SHARE, MIN_START, SPLIT_NUMBERS } from './figures';
+import { foodReading, homePopulation } from './food';
 import { emit, record } from './history';
 import { ladderStep } from './ladder';
 import { idleTiles, tileKey } from './pools';
@@ -316,6 +316,11 @@ export function begin(st: GameState, px: number, py: number): GameState {
 		st.cultures.push(makeCulture(st, genName(r, 2), t.x, t.y, st.ancestral, false));
 	}
 	st.era = 1;
+	// The people before the scattering are a share of what their home tile could feed with the customs
+	// they carry, and the bands that set out share them evenly. How well each band's new tile suits
+	// those customs then decides how it starts.
+	const heads = Math.max(MIN_START, Math.round((HOME_SHARE * homePopulation(st)) / st.cultures.length));
+	st.cultures.forEach((c) => (c.condition.numbers = heads));
 	// Every band sets out under a leader of its own, with the family they already have.
 	st.cultures.forEach((c) => found(r, c, 0));
 	st.log.push({

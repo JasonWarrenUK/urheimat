@@ -1,4 +1,5 @@
-import type { Culture, FoodReading, GameState, PoolId, SourceId, Terrain, TraitValue } from '$lib/types';
+import type { Culture, CultureTraits, FoodReading, GameState, PoolId, SourceId, Terrain, TraitValue } from '$lib/types';
+import { startingCondition } from './condition';
 import { aff } from './engine';
 import { HAND_HAULED, HAND_HAULED_CREW, KEEPS, SETTLED_FLOOR, SETTLED_STEPS, SOURCES, WORKING_SHARE } from './figures';
 import { isActive } from './predicates';
@@ -28,22 +29,54 @@ export interface HeldSource {
 	vi: number;
 }
 
-// A band's livelihood sources, in stage order. An absent livelihood custom holds none.
-export function heldSources(c: Culture): HeldSource[] {
-	if (LIVELIHOOD < 0 || c.absent.includes('livelihood')) return [];
+// The livelihood sources a set of customs holds, in stage order. An absent livelihood custom holds none.
+function heldSourcesOf(traits: CultureTraits, absent: readonly string[]): HeldSource[] {
+	if (LIVELIHOOD < 0 || absent.includes('livelihood')) return [];
 	const features = SLOTS[LIVELIHOOD].features;
 	const out: HeldSource[] = [];
 	for (let stage = 1; stage <= 3; stage++) {
 		const fi = features.findIndex((f) => f.id === `s${stage}.source`);
-		if (fi < 0 || !isActive(c.traits, LIVELIHOOD, fi)) continue;
-		const vi = c.traits[LIVELIHOOD][fi][0];
+		if (fi < 0 || !isActive(traits, LIVELIHOOD, fi)) continue;
+		const vi = traits[LIVELIHOOD][fi][0];
 		if (vi === undefined) continue;
 		const lf = features.findIndex((f) => f.id === `s${stage}.labour`);
-		const lv = lf >= 0 && isActive(c.traits, LIVELIHOOD, lf) ? c.traits[LIVELIHOOD][lf][0] : undefined;
+		const lv = lf >= 0 && isActive(traits, LIVELIHOOD, lf) ? traits[LIVELIHOOD][lf][0] : undefined;
 		const value = features[fi].values[vi];
 		out.push({ id: value.id as SourceId, keeps: value.keeps ?? 'none', labour: lv === undefined ? 'shared' : (features[lf].values[lv].id as Labour), fi, vi });
 	}
 	return out;
+}
+
+// A band's livelihood sources.
+export const heldSources = (c: Culture): HeldSource[] => heldSourcesOf(c.traits, c.absent);
+
+// A source's full ceiling on a terrain, before its pool's stock: base times the terrain affinity weight
+// times one plus richness. A plough needs draught animals: without large herds held as a source it
+// falls to a hand-hauled fraction of its ceiling (and needs a bigger crew, in workReading).
+function fullCeiling(held: readonly HeldSource[], s: HeldSource, terrain: Terrain): number {
+	const haul = s.id === 'crop/plough' && !held.some((o) => o.id === 'herds/large');
+	return SOURCES[s.id].ceiling * aff(LIVELIHOOD, s.fi, s.vi, terrain) * (1 + (RICHNESS[terrain] ?? 0)) * (haul ? HAND_HAULED : 1);
+}
+
+// The most people the ancestral customs could feed on the home tile, with full pools: the largest
+// headcount whose yield still feeds it. Crews matter (a source nobody can work yields nothing), so a
+// people whose customs idle most of its workers is small. The scattering starts from a share of it
+// (begin in engine.ts). A people that could feed no one at all counts as one that could feed MIN_START.
+export function homePopulation(st: GameState): number {
+	const home = {
+		traits: st.ancestral,
+		absent: [] as string[],
+		x: st.map.cx,
+		y: st.map.cy,
+		condition: startingCondition()
+	} as Culture;
+	const ceiling = Math.ceil(workReading(st, home).capacity * 1.2);
+	let best = 0;
+	for (let n = 1; n <= ceiling; n++) {
+		home.condition.numbers = n;
+		if (workReading(st, home).food.adequacy >= 1) best = n;
+	}
+	return best;
 }
 
 // The kinds of people a band recognises. A band with no gender custom falls back to men and women.
@@ -95,13 +128,11 @@ export function workReading(st: GameState, c: Culture): Work {
 	const terrain = st.map.tiles[c.y][c.x] as Terrain;
 	const held = heldSources(c);
 	const hands = handsFor(c, held);
-	// A plough needs draught animals: without large herds held as a source it falls to a hand-hauled
-	// fraction of its ceiling and needs a bigger crew.
 	const drawn = held.some((s) => s.id === 'herds/large');
 	const sources = held.map((s, i): SourceWork => {
 		const fig = SOURCES[s.id];
 		const haul = s.id === 'crop/plough' && !drawn;
-		const full = fig.ceiling * aff(LIVELIHOOD, s.fi, s.vi, terrain) * (1 + (RICHNESS[terrain] ?? 0)) * (haul ? HAND_HAULED : 1);
+		const full = fullCeiling(held, s, terrain);
 		const crew = hands[i] / fig.hands;
 		const yielded = crew < Math.min(1, fig.minCrew * (haul ? HAND_HAULED_CREW : 1)) ? 0 : full * stockOf(st, c.x, c.y, fig.pool) * Math.min(1, crew);
 		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, load: full > 0 ? yielded / full : 0, full };
