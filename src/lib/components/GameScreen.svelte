@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
+	import { conditionLines } from '$lib/sim/condition';
 	import { endEra, foodHeldCount, foodStrainCount, freeLand, strainCount } from '$lib/sim/engine';
 	import { ageOf, leaderOf, yearOf, YEARS_PER_STEP } from '$lib/sim/family';
 	import { game, type Tab as TabType } from '$lib/game-store.svelte';
@@ -36,7 +37,7 @@
 	const stepSummary = $derived.by(() => {
 		if (!player.alive) return 'Your people are gone. The kin go on without you.';
 		if (game.step.move) return `This step you lead the ${player.name} to the ${gameState.map.tiles[game.step.move.y][game.step.move.x]}.`;
-		if (game.choosingMove) return 'Tap a neighbouring tile on the map. Moving costs a point of prosperity and loosens every custom for a step.';
+		if (game.choosingMove) return 'Tap a neighbouring tile on the map. Moving leaves the stores behind and loosens every custom for a step.';
 		return gameState.situations.length ? 'Answer what has arisen, or let it lie.' : 'Nothing presses on your people this step.';
 	});
 
@@ -81,9 +82,11 @@
 
 <div class="status">
 	<div>
-		<b>{player.alive ? player.prosperity.toFixed(1) : '—'}</b>
-		<span>prosperity</span>
-		<div class="bar"><i class:low={player.prosperity < 3} style:width="{player.prosperity * 10}%"></i></div>
+		{#each (player.alive ? conditionLines(gameState, player) : []) as line (line)}
+			<span>{line}</span>
+		{:else}
+			<span class="muted">{player.alive ? 'Your people are well enough.' : '—'}</span>
+		{/each}
 	</div>
 	<div>
 		<b>{player.alive ? foodStrainCount(gameState, player) : '—'}</b>

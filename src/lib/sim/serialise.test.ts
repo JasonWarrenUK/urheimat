@@ -43,5 +43,8 @@ describe('serialise', () => {
 		const state = play(fixtures.seed, fixtures.splitEra);
 
 		expect(deserialiseState(serialiseState(state), SCHEMA_VERSION + 1)).toBeNull();
+		// A save from before the condition strands (version 6) is discarded, not migrated (3PL.3).
+		expect(deserialiseState(serialiseState(state), 6)).toBeNull();
+		expect(deserialiseState(serialiseState(state), SCHEMA_VERSION - 1)).toBeNull();
 	});
 });

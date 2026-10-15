@@ -60,3 +60,71 @@ describe('engine', () => {
 		expect((render(funeral, entry.recFv).match(/…/g) ?? []).length).toBe(lost);
 	});
 });
+
+describe('the step and condition', () => {
+	const fresh = () => {
+		const st = newGame(fixtures.seed);
+		const t = startTiles(st);
+		begin(st, t[0].x, t[0].y);
+		return { st, c: st.cultures[st.playerId as number] };
+	};
+
+	it('ends the player band when no one is left, and says so', () => {
+		const { st, c } = fresh();
+		c.condition.numbers = 0;
+		endEra(st, defaultStep());
+		expect(c.alive).toBe(false);
+		expect(c.diedEra).toBe(1);
+		expect(st.playerDead).toBe(true);
+		expect(st.bandEvents.some((e) => e.kind === 'death' && e.band === c.id && e.reason === 'no one left')).toBe(true);
+	});
+
+	it('ends a band whose ladder has refused its last tier', () => {
+		const { st, c } = fresh();
+		c.condition.numbers = 100;
+		// The famine route has three tiers; a fourth refusal forces its outcome.
+		c.condition.ladders.famine = { strength: 5, refusals: 3, surfaced: true, resolved: false };
+		endEra(st, defaultStep());
+		expect(c.alive).toBe(false);
+		expect(st.playerDead).toBe(true);
+		expect(st.bandEvents.some((e) => e.kind === 'death' && e.band === c.id && e.reason === 'famine')).toBe(true);
+	});
+
+	it('keeps one snapshot of every live band every step, with consecutive steps', () => {
+		const { st } = fresh();
+		for (let i = 0; i < 3; i++) endEra(st, defaultStep());
+		st.cultures
+			.filter((c) => c.bornEra === 0)
+			.forEach((c) => {
+				const steps = c.condition.history.map((h) => h.step);
+				expect(steps).toEqual([1, 2, 3].slice(0, c.alive ? 3 : (c.diedEra as number)));
+			});
+	});
+
+	it('sums two bands working one tile, so neighbours wear the same land faster than a lone band', () => {
+		const wear = (neighbour: boolean): number => {
+			const { st, c } = fresh();
+			const others = st.cultures.filter((k) => !k.isPlayer);
+			others.forEach((k) => (k.alive = false));
+			const other = others[0];
+			other.alive = neighbour;
+			other.x = c.x + 2;
+			other.y = c.y;
+			st.map.tiles.forEach((row, y) => row.forEach((_, x) => (st.map.tiles[y][x] = 'steppe')));
+			[c, other].forEach((band) => {
+				band.absent = band.absent.filter((id) => id !== 'livelihood');
+				const si = SLOTS.findIndex((s) => s.id === 'livelihood');
+				const feature = (id: string) => SLOTS[si].features.findIndex((f) => f.id === id);
+				const value = (part: string, id: string) => SLOTS[si].features[feature(part)].values.findIndex((v) => v.id === id);
+				[1, 2, 3].forEach((stage, i) => {
+					band.traits[si][feature(`s${stage}.source`)] = i === 0 ? [value('s1.source', 'hunt')] : [];
+					band.traits[si][feature(`s${stage}.labour`)] = [value(`s${stage}.labour`, 'shared')];
+				});
+				band.condition.numbers = 4000;
+			});
+			endEra(st, defaultStep());
+			return st.map.stocks[`${c.x + 1},${c.y}`]?.game ?? 1;
+		};
+		expect(wear(true)).toBeLessThan(wear(false));
+	});
+});

@@ -39,7 +39,7 @@
 	</div>
 	<div class="small faint">
 		{#if kin.parent !== null}daughter of the {gameState.cultures[kin.parent].name}; {/if}
-		as last known (era {kin.knownEra}), keeps {keptParts} of {ancestralParts.length} ancestral parts{#if kin.alive}; prosperity {w >= 0.5 ? kin.prosperity.toFixed(0) : 'unknown'}{/if}
+		as last known (era {kin.knownEra}), keeps {keptParts} of {ancestralParts.length} ancestral parts
 	</div>
 	<div class="diff">
 		{#if diffs.length}

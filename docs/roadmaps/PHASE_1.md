@@ -2,7 +2,7 @@
 
 Urheimat is playable but private and shallow in places, and the gameplay-loop spike has now replaced the loop it was built on. This phase does three things at once: gets it onto a public URL, answers the open design questions before building further on them, and rebuilds the loop and deepens the simulation and reconstruction models that the game's whole argument rests on.
 
-**Critical path:** `2DS.1 → 6SL.2 → 6SL.3 → 6SL.6 → 2DS.2`; the gameplay-loop spike reported on 2026-09-30 and its decisions live in `docs/spikes/2DS.1-gameplay-loop.md`. The situation loop (Milestone 6) now gates the simulation, reconstruction and UI work, and the UI spike cannot start until condition is derived. The launch and persistence work runs parallel to all of it.
+**Critical path:** `2DS.1 → 6SL.2 → 6SL.3 → 6SL.6 → 6SL.20 → 6SL.19 → 2DS.2`; the gameplay-loop spike reported on 2026-09-30 and its decisions live in `docs/spikes/2DS.1-gameplay-loop.md`. The situation loop (Milestone 6) now gates the simulation, reconstruction and UI work, and the UI spike cannot start until condition is derived. The launch and persistence work runs parallel to all of it.
 
 ---
 
@@ -23,8 +23,8 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
 
 - [x] **2DS.1**: Gameplay-loop spike: interrogate the core premise, victory conditions, action economy and pacing, evaluate the six existing mechanics (Hold, Reform, Teach, Consolidate, Daughter band, Migrate), and define how condition, strain and action-budget states are derived
   - Note: Everything is open, including whether eight eras of three actions ending in a reconstruction is the right shape at all. Output is a design decision plus new tasks for whatever it finds wanting.
-- [ ] **2DS.2**: UI spike: information architecture first, then visual design; defines how the derived states are displayed, and produces concrete mobile and accessibility tasks rather than principles _(blocked: depends on 2DS.1, 4SD.2, 6SL.6)_
-  - Note: Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a).
+- [ ] **2DS.2**: UI spike: information architecture first, then visual design; defines how the derived states are displayed, and produces concrete mobile and accessibility tasks rather than principles _(blocked: depends on 2DS.1, 4SD.2, 6SL.6, 6SL.19, 6SL.20)_
+  - Note: Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. From 6SL.6: also designs how a strand that stands out is shown in prose (the panel is quiet in ordinary times), the warnings each ladder gives and the health and morale lines. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a). From 6SL.6: bands now work as many tiles as their numbers need, so the map is large (4SD.19) and this spike designs how it is shown.
 - [x] **2DS.3**: Notebook design spike: the structure, toggle behaviour, prose and wireframe-level layout of the scholars' notebook
   - Note: Prose only, no totals. Works from the subjects table in the spike log, combined or spread as the design finds best; settles how the believed/true toggle works and how a band that died early reads. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2b, 2c, 2e, 2g, 2j).
 
@@ -55,30 +55,37 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b).
 - [x] **4SD.4**: Semantic drift: place feature values on a similarity graph so drift favours near neighbours
   - Note: Sky to Storm should be likelier than Sky to Sea. This also lets the scholars reconstruct a plausible intermediate rather than only a right or wrong value.
-- [ ] **4SD.5**: Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight _(blocked: depends on 6SL.6)_
-  - Note: Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.6). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).
+- [ ] **4SD.5**: Prestige asymmetry: borrowing flows down the prestige gradient rather than symmetrically by contact weight _(blocked: depends on 6SL.20)_
+  - Note: Creates the areal-feature trap: unrelated neighbours converging because they all copied the same prosperous culture. Prestige reads the standing strand of condition (6SL.20). Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5e).
 - [ ] **4SD.6**: Second founding stock: seed two unrelated ancestral cultures at game start _(depends on 2DS.1)_
   - Note: The player's line still descends from one stock; the second exists to contaminate the record and to make a mistaken origin possible (spike decision 2i).
 - [ ] **4SD.7**: Substrate inheritance: dying and displaced cultures leave traces in whoever succeeds them _(blocked: depends on 4SD.6)_
   - Note: Needs a second lineage to inherit from, so it follows the second founding stock. Traces may be unrelated traditions or mutated sibling ones.
 - [ ] **4SD.8**: Taboo and deliberate archaism: sanctify a custom against drift, or revive one already lost _(blocked: depends on 6SL.9)_
   - Note: Decides whether sanctifying exists and how it costs; the spike log holds a think-through of its impact under a loop with no random drift. Revival draws on the spirit's complete memory against the band's fading one. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4f, 1g).
-- [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11)_
-  - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l).
+- [ ] **4SD.9**: Inter-culture relations: raids, conquest and absorption, and peaceful relations (trade, alliance, marriage), some player-started _(blocked: depends on 4SD.11, 6SL.19)_
+  - Note: Possible actions are defined by both parties' custom and development, and evolve with them. Absorption ends the player's run when the lineage no longer holds authority; the rule for which band absorbs which must be transparent, and an equal merger needs a ruling. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2t, 4j, 4l). From 6SL.6: real trade replaces the gift and beg stand-ins in 6SL.21's surplus storylets, and absorption becomes the outcome of 6SL.19's small-and-shunned route, which ends in extinction until it exists.
 - [ ] **4SD.10**: Expand the corpus: more customs, more parts per custom, more values per part _(depends on 2DS.1, 4SD.16)_
-  - Note: Content work. Soft-linked to semantic drift because new values are best authored once the similarity graph exists to place them on.
-- [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(depends on 6SL.5)_
-  - Note: The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j).
+  - Note: Content work. Depends on the tagging task because new values are written with their ids, tags, readings, material and affinities as they are added; the funeral pilot set the shape (atomic parts, stages, rule-values). From 4SD.16: how gender is assigned (birth, rite, choice); the hero's passage as a reading family; a grain kind for substance so a harvest feast can shadow it. From 6SL.6: dividing livelihood labour by the kinds a band recognises is 4SD.18's, which assumes recognised kinds as the vocabulary gender assignment settles.
+- [ ] **4SD.11**: Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land _(blocked: depends on 6SL.5, 4SD.20)_
+  - Note: A band's seat is the tile it holds. Food now comes from the tiles its range works (6SL.6: itinerant sources afresh each step, fields held, tiles a shared commons), so spike decision 3k's single seat no longer holds for food; claims, ownership and crowding between bands are decided here, after 4SD.20's design spike on how bands share tiles. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here. From 6SL.6: the food buffer's cap depends on lifestyle, since a granary implies a settled band; 6SL.6 stands in a counter of steps spent on the current seat (a move resets it), so replace that counter with the real settledness custom here and revisit the cap curve.
 - [ ] **4SD.12**: Writing as a gated custom in grades, from tallies to full record _(blocked: depends on 6SL.5, 4SD.11)_
   - Note: A settled band reaches it sooner. Each grade fixes more of what the band knows into the record; early writing does not mean a full record. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2n, 3j).
 - [ ] **4SD.13**: Dated knowledge between every pair of bands, with recognition by graded resemblance _(depends on 6SL.1)_
   - Note: What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).
 - [ ] **4SD.14**: Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
-- [ ] **4SD.15**: Record history: each band's custom changes, positions and structured events, step by step _(depends on 6SL.1)_
+- [ ] **4SD.15**: Record history: each band's custom changes and positions, step by step, in the history 6SL.6 starts _(blocked: depends on 6SL.1, 6SL.6)_
+  - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f). From 6SL.6: one history store. 6SL.6 keeps the per-step strand snapshots on each band and the structured events (kind, band, step, reason) on the game state; this task extends both with custom changes and positions rather than building a second structure.
 - [x] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops
 - [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(depends on 4SD.16)_
   - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f).
+- [ ] **4SD.18**: Labour by recognised kinds: each livelihood source's worked-by becomes a set of the kinds the band recognises, replacing the men, the women and all together _(blocked: depends on 6SL.6)_
+  - Note: The current values hard-code two genders. The change reaches the labour tags that pull descent and residence (PULLS in slots.ts), the cross-custom constraint on sex nouns (6SL.5), how gender is assigned (4SD.10) and the unrecognised condition. Replaces and deletes the interim labour rule in 6SL.6's food model. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).
+- [ ] **4SD.19**: Larger map: a map large enough for bands to need many tiles _(blocked: depends on 6SL.6)_
+  - Note: With realistic densities a forager band of 150 works about five tiles of 100 square kilometres, so the 9 by 7 map cannot hold the ten bands the cap allows. Touches genMap (its seeded draws, so every seeded result and the baselines move), startTiles, contact (the distance bands), the cap on live bands, the world map display and the evidence scripts. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md, Range).
+- [ ] **4SD.20**: Tile range: how range interacts with moves, splits, crowding, standing, conflict and territory, including a design spike on how bands share tiles _(blocked: depends on 4SD.19, 6SL.10, 6SL.11, 6SL.20)_
+  - Note: 6SL.6 builds range scoped to food and livelihood: tiles are a shared commons and nothing is claimed. This task explores how range meets the other mechanisms: where a move or a daughter band can go and why, the open-land and hunger split avenues, crowding as a death route (6SL.19), neighbours' regard for a band that wears shared land (6SL.20), raids and absorption (6SL.17, 4SD.9) and territory (4SD.11). It opens with a design spike on how bands share tiles (commons, exclusive claims, persistent claims), which 4SD.11 follows. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md, Range).
 
 ---
 
@@ -113,22 +120,22 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 3o).
 - [x] **6SL.3**: Layer 1 pressures: surface the land's and neighbours' pull on a custom as a situation with written answers, replacing random drift for all bands
   - Note: "Let it lie" resolves to the pull's own outcome. A value the band once held and lost is weighted down unless a neighbour practises it or the land favours it. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3m, 3w, 4a, 4e, 4m).
-- [ ] **6SL.4**: Answer effects: the one-turn keep, reform from any source, condition gained; a reform can bite back with a follow-up situation _(depends on 6SL.3)_
-  - Note: Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d).
+- [ ] **6SL.4**: Answer effects: the one-turn keep and reform from any source; a reform can bite back with a follow-up situation _(blocked: depends on 6SL.3, 6SL.6)_
+  - Note: Answers are derived from many sources: the storylet, combinations of existing customs, ancestral customs, things learnt from neighbours, things provoked by the environment. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3l, 4a, 4b, 4d). From 4SD.16: an answer may add, drop or swap a member of a set-valued part. From 6SL.6: condition gained is the generic strand consequence that 6SL.6 supplies; a cautious answer names the strand it improves, and a reform answer can name the strands it costs.
 - [x] **6SL.5**: Prerequisite structure and storylet engine: conditions on world and band state, firing, answers and consequences
   - Note: One structure gates storylets, writing and territory alike. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 3r).
-- [ ] **6SL.6**: Condition as strands (food, numbers, standing) felt through situations, with death and split thresholds _(depends on 6SL.3)_
-  - Note: No numbers shown, open to reconsideration. New strands arise by circumstance. King of Dragon Pass is the example, analysed in the spike log. Replaces the former 4SD.1. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f).
-- [ ] **6SL.7**: Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle _(depends on 6SL.3)_
-  - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k).
+- [ ] **6SL.6**: Condition core: a hidden headcount with size tiers, food as yield against numbers with a surplus buffer, health and morale as strands, the generic strand vocabulary and the ladder engine; replaces prosperity _(depends on 6SL.3)_
+  - Note: Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as heads fed against numbers (a density per square kilometre and heads fed per worker for each source, a minimum team, the land's affinity and richness, tile pools drawn down and regrown), with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (strength gates surfacing, refusals set the tier, a forced top tier, combined situations as authored storylets outside the cap) with one example route, famine, that 6SL.19 replaces; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; schema bumps with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter. Range: a band works as many tiles as its numbers need (densities per square kilometre, a tile of 100): itinerant sources pick tiles afresh each step within reach 2, the hoe and the plough hold fields within reach 1, and tiles are a shared commons with nothing claimed. Figures cite research or are marked assumptions. A much bigger map (4SD.19) and how range meets the other mechanisms (4SD.20) follow this task.
+- [ ] **6SL.7**: Scripted answers for AI bands, shaped by conservatism and drive, reported in the chronicle _(blocked: depends on 6SL.3, 6SL.10, 6SL.19)_
+  - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 4k). From 6SL.6: the scripts also answer the death, split and surplus ladder situations; until then an AI band resolves each by its let-it-lie outcome.
 - [ ] **6SL.8**: Weather and lulls: situation count by pressure, fine-weather opportunities, watched steps with chronicle lines _(depends on 6SL.3, 6SL.5)_
   - Note: Pressure behaves like weather, with peaks and lulls and no climb towards the end. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3i, 3p, 3t).
 - [ ] **6SL.9**: Band memory: what the people remember of each custom's past fades by generation and breaks at a split, while the spirit's view stays complete _(depends on 6SL.1)_
   - Note: Ancestral answers draw on what the band remembers. The spirit is a frame only, never named in the game. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 1d, 1e, 1g, 1h).
-- [ ] **6SL.10**: Daughter band as an outcome of pressure or opportunity, with the player choosing which branch to follow _(blocked: depends on 6SL.6, 6SL.8)_
-  - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g).
-- [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(depends on 6SL.3)_
-  - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i).
+- [ ] **6SL.10**: Split ladders: a daughter band as an outcome of pressure (hunger, quarrel) or opportunity (open land), with the player choosing which branch to follow _(blocked: depends on 6SL.6, 6SL.8)_
+  - Note: The daughter's condition is derived from the parent's condition, the narrative reason for the split and the land it spawns on. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2d, 4g) and the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md). Routes are data on 6SL.6's ladder engine: hunger, quarrel and open land, with the numbers tier as one more input; a standing avenue waits for the leaders' internal reputation strand. A split arrives as a situation whose acceptance and refusal both carry pros and cons; refusing while the pressure remains climbs to higher-stakes storylets, live split pulls combine into one situation, and a forced split at the top tier is rare. Heads are shared by reason: hunger sends out those the land cannot feed, a quarrel a faction, open land a small party; the daughter starts with that reason's health and morale. Deletes 6SL.6's interim AI split roll.
+- [ ] **6SL.11**: Moves: forced by events, or player-started with diegetic justification or a consequence _(blocked: depends on 6SL.3, 6SL.6)_
+  - Note: In the early game a move is the only act the player can start unprompted. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3s, 4i). From 6SL.6: this task supplies the reason for a move (forced or chosen), which the morale and head costs of a move read; 6SL.6 already cuts the food buffer and resets the seat counter on every whole-band move.
 - [x] **6SL.12**: Storylet corpus, first batch: pressure-agnostic storylets on state the engine already exposes (leaders, succession, the land, contact, the customs a band holds, events, history), enough for a medium run
   - Note: Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3a, 2n).
 - [ ] **6SL.13**: Run ending: history arrives once written record begins, a sky-clock fallback with a power from beyond when writing has stalled, the player may stop, and a timelapse of the world to the notebook _(blocked: depends on 4SD.12)_
@@ -139,10 +146,17 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Hidden custom categories are invisible until active. Display itself belongs to 2DS.2. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5d).
 - [ ] **6SL.16**: Family opinion as a storylet trigger _(depends on 6SL.12)_
 
-- [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(depends on 6SL.1, 4SD.16)_
+- [ ] **6SL.17**: Cross-band relationships: warfare (internal versus external) as band state, raids and feuds between bands, and killings between bands _(blocked: depends on 6SL.1, 4SD.16, 6SL.20)_
+  - Note: From 6SL.6: feuds, raids and killings between bands move standing (6SL.20) and numbers.
 
 - [ ] **6SL.18**: Storylet corpus, second batch: storylets that answer layer 1 pressures, and reform bite-back (a reform provoking its own situation next step) _(blocked: depends on 6SL.3, 6SL.4, 6SL.12)_
   - Note: The family is voiceless at first. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5g).
+- [ ] **6SL.19**: Death ladders: famine, attrition, starved and shunned, and small and shunned, each a ladder of situations ending in the band's end _(blocked: depends on 6SL.6, 6SL.20)_
+  - Note: Four routes written as data on 6SL.6's ladder engine: famine (adequacy below need once the buffer is spent), attrition (numbers below what keeps a band going), starved and shunned (food with standing) and small and shunned (numbers with standing). Every answer carries pros and cons; refusing while the strands stay low climbs the tiers, the top tier ends the band, and live pulls combine into one situation. Deletes 6SL.6's interim death rule and emits structured events for the notebook. Sudden deaths (raid, plague, massacre) are a later task. Small and shunned ends in extinction until 4SD.9 gives it absorption. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).
+- [ ] **6SL.20**: Standing: each band's regard for another, stored per band and moved by storylet answers, relative size, parentage and shared customs _(blocked: depends on 6SL.6)_
+  - Note: Stored per band as each other band's regard, read from its dated knowledge (2k, 2s); the aggregate that prestige needs is derived on read. A storylet answer that moves standing always names the bands concerned, and naming none is an error. Size reads the headcount tiers from 6SL.6, parentage the band tree and shared customs bandSimilarity (src/lib/sim/similarity.ts). The leaders' reputation within a band is not standing and is a later strand. 4SD.5 reads this task; 6SL.17's feuds, raids and killings move it. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).
+- [ ] **6SL.21**: Surplus storylets: a surplus building, drawing on the buffer, the buffer nearly spent and the cap reached, with rationing acting on health and morale _(blocked: depends on 6SL.6, 6SL.20)_
+  - Note: Storylets reading 6SL.6's buffer against its cap and against numbers. Rationing costs health and saves stores; a feast lifts morale and spends them. Gift and beg answers act on a named neighbour in contact (the band's buffer, standing and the neighbour's own buffer) as stand-ins until 4SD.9 gives real trade. Loss of the buffer (stores rot, raids, a sick herd) is a sudden event for a later task. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).
 
 ---
 
@@ -190,49 +204,55 @@ graph LR
 		5RC.5["5RC.5: Notebook shell: two books (the scholars'…"]
 		6SL.1["6SL.1: World step and leaders: a fixed 25-year…"]
 		4SD.13["4SD.13: Dated knowledge between every pair of b…"]
-		4SD.15["4SD.15: Record history: each band's custom chan…"]
-		5RC.7["5RC.7: The true book: an omniscient history of…"]
 		6SL.2["6SL.2: Remove the order menu and the action bud…"]
 		6SL.5["6SL.5: Prerequisite structure and storylet engi…"]
-		4SD.11["4SD.11: Territory as a gated custom: every band…"]
+		6SL.9["6SL.9: Band memory: what the people remember of…"]
+		4SD.8["4SD.8: Taboo and deliberate archaism: sanctify…"]
+		6SL.12["6SL.12: Storylet corpus, first batch: pressure-…"]
+		6SL.14["6SL.14: Intro and framing rewrite: no scholars,…"]
+		6SL.16["6SL.16: Family opinion as a storylet trigger"]
+		M2["M2: Design spikes"]:::mile
+		M3["M3: Persistence"]:::mile
+		M4["M4: Simulation depth"]:::mile
+		M5["M5: Reconstruction"]:::mile
+		M6["M6: The situation loop"]:::mile
+		2DS.2["2DS.2: UI spike: information architecture first…"]
+		3PL.4["3PL.4: Archive of finished runs: unranked recor…"]
+		4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
+		4SD.5["4SD.5: Prestige asymmetry: borrowing flows down…"]
 		4SD.9["4SD.9: Inter-culture relations: raids, conquest…"]
+		4SD.11["4SD.11: Territory as a gated custom: every band…"]
 		4SD.12["4SD.12: Writing as a gated custom in grades, fr…"]
+		4SD.15["4SD.15: Record history: each band's custom chan…"]
+		4SD.18["4SD.18: Labour by recognised kinds: each liveli…"]
+		4SD.19["4SD.19: Larger map: a map large enough for band…"]
+		4SD.20["4SD.20: Tile range: how range interacts with mo…"]
 		5RC.1["5RC.1: The evidence model: what the scholars ca…"]
 		5RC.2["5RC.2: Attestation derived from the evidence mo…"]
 		5RC.3["5RC.3: Deeper scholar model: weighted evidence,…"]
 		5RC.4["5RC.4: The notebook accounts for the second sto…"]
 		5RC.6["5RC.6: The scholars' book: one named scholar's…"]
-		3PL.4["3PL.4: Archive of finished runs: unranked recor…"]
-		M3["M3: Persistence"]:::mile
+		5RC.7["5RC.7: The true book: an omniscient history of…"]
 		5RC.8["5RC.8: Partial credit in reconstruction: a near…"]
-		M5["M5: Reconstruction"]:::mile
-		6SL.9["6SL.9: Band memory: what the people remember of…"]
-		4SD.8["4SD.8: Taboo and deliberate archaism: sanctify…"]
-		6SL.12["6SL.12: Storylet corpus, first batch: pressure-…"]
-		6SL.13["6SL.13: Run ending: history arrives once writte…"]
-		6SL.14["6SL.14: Intro and framing rewrite: no scholars,…"]
-		6SL.15["6SL.15: Derive the new displayed states: recogn…"]
-		6SL.16["6SL.16: Family opinion as a storylet trigger"]
-		6SL.17["6SL.17: Cross-band relationships: warfare (inte…"]
 		6SL.3["6SL.3: Layer 1 pressures: surface the land's an…"]
-		4SD.2["4SD.2: Remove the aggregate strain count; the p…"]
-		6SL.4["6SL.4: Answer effects: the one-turn keep, refor…"]
-		6SL.6["6SL.6: Condition as strands (food, numbers, sta…"]
-		2DS.2["2DS.2: UI spike: information architecture first…"]
-		M2["M2: Design spikes"]:::mile
-		4SD.5["4SD.5: Prestige asymmetry: borrowing flows down…"]
-		M4["M4: Simulation depth"]:::mile
+		6SL.4["6SL.4: Answer effects: the one-turn keep and re…"]
+		6SL.6["6SL.6: Condition core: a hidden headcount wit… ▸"]
 		6SL.7["6SL.7: Scripted answers for AI bands, shaped by…"]
 		6SL.8["6SL.8: Weather and lulls: situation count by pr…"]
-		6SL.10["6SL.10: Daughter band as an outcome of pressure…"]
+		6SL.10["6SL.10: Split ladders: a daughter band as an ou…"]
 		6SL.11["6SL.11: Moves: forced by events, or player-star…"]
+		6SL.13["6SL.13: Run ending: history arrives once writte…"]
+		6SL.15["6SL.15: Derive the new displayed states: recogn…"]
+		6SL.17["6SL.17: Cross-band relationships: warfare (inte…"]
 		6SL.18["6SL.18: Storylet corpus, second batch: storylet…"]
-		M6["M6: The situation loop"]:::mile
+		6SL.19["6SL.19: Death ladders: famine, attrition, starv…"]
+		6SL.20["6SL.20: Standing: each band's regard for anothe…"]
+		6SL.21["6SL.21: Surplus storylets: a surplus building,…"]
 	end
 	subgraph tier1["Secondary · deferred"]
 		G-SAVES["G-SAVES: Players hold saves worth keeping"]:::external
-		7SC.1["7SC.1: Forward migration of saved runs: each sc…"]
 		M7["M7: Saved-run continuity (Secondary)"]:::mile
+		7SC.1["7SC.1: Forward migration of saved runs: each sc…"]
 	end
 	G-SAVES --> 7SC.1
 	1FN.1 --> 1FN.2
@@ -265,60 +285,68 @@ graph LR
 	4SD.16 --> 6SL.17
 	4SD.10 -.-> 4SD.14
 	4SD.10 --> M4
-	4SD.14 --> 5RC.1
+	4SD.10 -.-> 4SD.18
 	4SD.14 --> M4
+	4SD.14 --> 5RC.1
 	4SD.17 --> M4
-	5RC.5 --> 5RC.7
-	5RC.5 --> 5RC.6
 	5RC.5 --> 3PL.4
+	5RC.5 --> 5RC.6
+	5RC.5 --> 5RC.7
 	6SL.1 --> 4SD.13
-	6SL.1 --> 4SD.15
 	6SL.1 --> 6SL.9
+	6SL.1 --> 4SD.15
 	6SL.1 --> 6SL.15
 	6SL.1 --> 6SL.17
-	4SD.13 --> 5RC.1
 	4SD.13 --> M4
-	4SD.15 --> 5RC.7
-	4SD.15 --> M4
-	5RC.7 --> 3PL.4
-	5RC.7 --> M5
+	4SD.13 --> 5RC.1
 	6SL.2 --> 6SL.5
 	6SL.2 --> 6SL.14
 	6SL.2 --> 6SL.3
+	6SL.5 --> 6SL.12
 	6SL.5 --> 4SD.11
 	6SL.5 --> 4SD.12
-	6SL.5 --> 6SL.12
 	6SL.5 --> 6SL.8
+	6SL.9 --> 4SD.8
+	6SL.9 --> M6
+	4SD.8 --> M4
+	6SL.12 --> 6SL.16
+	6SL.12 --> 6SL.18
+	6SL.14 --> M6
+	6SL.16 --> M6
+	M2 --> 7SC.1
+	M3 --> 7SC.1
+	M4 --> 7SC.1
+	M5 --> 7SC.1
+	M6 --> 7SC.1
+	2DS.2 --> M2
+	3PL.4 --> M3
+	4SD.2 --> M4
+	4SD.2 --> 2DS.2
+	4SD.5 --> M4
+	4SD.9 --> M4
 	4SD.11 --> 4SD.9
 	4SD.11 --> 4SD.12
-	4SD.9 --> M4
+	4SD.12 --> M4
 	4SD.12 --> 5RC.1
 	4SD.12 --> 6SL.13
 	4SD.12 --> 6SL.15
-	4SD.12 --> M4
+	4SD.15 --> M4
+	4SD.15 --> 5RC.7
+	4SD.18 --> M4
+	4SD.19 -.-> 2DS.2
+	4SD.19 --> 4SD.20
+	4SD.20 --> 4SD.11
 	5RC.1 --> 5RC.2
 	5RC.2 --> 5RC.3
 	5RC.3 -.-> 5RC.4
 	5RC.3 --> 5RC.6
 	5RC.3 --> 5RC.8
 	5RC.4 --> M5
-	5RC.6 --> 3PL.4
 	5RC.6 --> M5
-	3PL.4 --> M3
-	M3 --> 7SC.1
+	5RC.6 --> 3PL.4
+	5RC.7 --> M5
+	5RC.7 --> 3PL.4
 	5RC.8 --> M5
-	M5 --> 7SC.1
-	6SL.9 --> 4SD.8
-	6SL.9 --> M6
-	4SD.8 --> M4
-	6SL.12 --> 6SL.16
-	6SL.12 --> 6SL.18
-	6SL.13 --> M6
-	6SL.14 --> M6
-	6SL.15 --> M6
-	6SL.16 --> M6
-	6SL.17 -.-> 6SL.3
-	6SL.17 --> M6
 	6SL.3 --> 4SD.2
 	6SL.3 --> 6SL.4
 	6SL.3 --> 6SL.6
@@ -326,25 +354,46 @@ graph LR
 	6SL.3 --> 6SL.8
 	6SL.3 --> 6SL.11
 	6SL.3 --> 6SL.18
-	4SD.2 --> 2DS.2
-	4SD.2 --> M4
 	6SL.4 --> 6SL.18
 	6SL.6 --> 2DS.2
-	6SL.6 --> 4SD.5
+	6SL.6 -.-> 4SD.11
+	6SL.6 --> 4SD.15
+	6SL.6 --> 4SD.18
+	6SL.6 --> 4SD.19
+	6SL.6 --> 6SL.4
 	6SL.6 --> 6SL.10
-	2DS.2 --> M2
-	M2 --> 7SC.1
-	4SD.5 --> M4
-	M4 --> 7SC.1
+	6SL.6 --> 6SL.11
+	6SL.6 --> 6SL.19
+	6SL.6 --> 6SL.20
+	6SL.6 --> 6SL.21
 	6SL.7 --> M6
 	6SL.8 --> 6SL.10
-	6SL.10 --> M6
-	6SL.11 --> M6
+	6SL.8 -.-> 6SL.19
+	6SL.10 -.-> 4SD.19
+	6SL.10 --> 4SD.20
+	6SL.10 --> 6SL.7
+	6SL.11 -.-> 4SD.19
+	6SL.11 --> 4SD.20
+	6SL.13 --> M6
+	6SL.15 --> M6
+	6SL.17 --> M6
+	6SL.17 -.-> 4SD.20
+	6SL.17 -.-> 6SL.3
 	6SL.18 --> M6
-	M6 --> 7SC.1
+	6SL.19 --> 2DS.2
+	6SL.19 --> 4SD.9
+	6SL.19 --> 6SL.7
+	6SL.20 --> 2DS.2
+	6SL.20 --> 4SD.5
+	6SL.20 --> 4SD.20
+	6SL.20 --> 6SL.17
+	6SL.20 --> 6SL.19
+	6SL.20 --> 6SL.21
+	6SL.21 --> M6
 	7SC.1 --> M7
-	class 3PL.5,4SD.10,4SD.11,4SD.13,4SD.14,4SD.15,4SD.17,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.17,6SL.4,6SL.6,6SL.7,6SL.8,6SL.9 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.12,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.13,6SL.15,6SL.18 blocked
+	class 3PL.5,4SD.10,4SD.13,4SD.14,4SD.17,4SD.2,4SD.6,5RC.5,6SL.14,6SL.16,6SL.8,6SL.9 todo
+	class 6SL.6 inProgress
+	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.15,4SD.18,4SD.19,4SD.20,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.11,6SL.13,6SL.15,6SL.17,6SL.18,6SL.19,6SL.20,6SL.21,6SL.4,6SL.7 blocked
 	class 7SC.1 deferred
 	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5 done
 	class tier0 tierUnderway

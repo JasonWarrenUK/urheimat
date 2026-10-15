@@ -1,4 +1,4 @@
-import type { AffLevel, Affinity, CustomPull, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
+import type { AffLevel, Affinity, CustomPull, DemographyRow, FeatureDef, Predicate, Reading, SlotDef, TraitValue, Terrain, Transition, ValueTags } from '$lib/types';
 import type { Noun, Verb } from './vocabulary';
 
 export const LAND: Terrain[] = ['coast', 'marsh', 'river', 'forest', 'steppe', 'desert', 'mountain'];
@@ -7,7 +7,7 @@ export const AFF_WEIGHT: Record<AffLevel, number> = { strong: 3, favours: 1.5, a
 
 // A value with an id naming its concept, named affinity levels and tags. The name is provisional
 // display text; rendering transforms it downstream.
-const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags): TraitValue => ({ id, name, aff, ...tags });
+const N = (id: string, name: string, aff?: Affinity, tags?: ValueTags & Pick<TraitValue, 'keeps'>): TraitValue => ({ id, name, aff, ...tags });
 
 // One row of a value's reading grid: a verb and object, with each target it can be aimed at
 // (null = no target). Every value carries its full grid; cells left out were struck deliberately.
@@ -1129,7 +1129,7 @@ export const SLOTS: SlotDef[] = [
 		name: 'How they are fed',
 		// Contract: for a band that has this custom, every value assumes the band draws its food from
 		// the land by a rule; it assumes nothing about which sources, how many, or who does the work.
-		// Up to three sources, each with its own labour. Strain here is hunger: it hits prosperity.
+		// Up to three sources, each with its own labour. Strain here is hunger: it lowers the band's food yield.
 		strain: 'food',
 		features: each(3, [
 			{
@@ -1137,13 +1137,13 @@ export const SLOTS: SlotDef[] = [
 				label: 'fed by',
 				size: [1, 1],
 				values: [
-					N('herds/large', 'cattle and horses', { steppe: 'strong', desert: 'favours', mountain: 'favours', forest: 'resists', marsh: 'resists' }, { about: ['herds', 'wealth', 'hierarchy', 'male'], readings: [...R('provide', 'living', 'plenty'), ...R('guard', 'herds', null)] }),
-					N('herds/small', 'sheep and goats', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'resists' }, { about: ['herds', 'thrift', 'patience'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'herds', null)] }),
-					N('crop/hoe', 'hoe crops', { forest: 'strong', marsh: 'favours', river: 'favours', desert: 'resists', steppe: 'resists' }, { about: ['grain', 'growth', 'labour', 'female'], readings: [...R('provide', 'living', 'nourishment'), ...R('create', 'grain', null)] }),
-					N('crop/plough', 'plough crops', { river: 'strong', coast: 'favours', forest: 'resists', mountain: 'resists', marsh: 'resists', desert: 'resists' }, { about: ['grain', 'plenty', 'labour', 'permanence'], readings: [...R('provide', 'living', 'plenty'), ...R('create', 'grain', null)] }),
-					N('catch', 'the catch', { coast: 'strong', river: 'strong', marsh: 'strong', steppe: 'resists', desert: 'excludes' }, { about: ['water', 'wild', 'plenty'], readings: R('provide', 'living', 'nourishment') }),
-					N('hunt', 'the hunt', { forest: 'strong', mountain: 'favours', steppe: 'favours' }, { about: ['wild', 'chase', 'strength'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'wild', null)] }),
-					N('gather', 'gathering', { forest: 'favours', marsh: 'favours', coast: 'favours' }, { about: ['plants', 'patience', 'thrift'], readings: R('provide', 'living', 'nourishment') })
+					N('herds/large', 'cattle and horses', { steppe: 'strong', desert: 'favours', mountain: 'favours', forest: 'resists', marsh: 'resists' }, { keeps: 'high', about: ['herds', 'wealth', 'hierarchy', 'male'], readings: [...R('provide', 'living', 'plenty'), ...R('guard', 'herds', null)] }),
+					N('herds/small', 'sheep and goats', { mountain: 'strong', desert: 'favours', steppe: 'favours', marsh: 'resists' }, { keeps: 'high', about: ['herds', 'thrift', 'patience'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'herds', null)] }),
+					N('crop/hoe', 'hoe crops', { forest: 'strong', marsh: 'favours', river: 'favours', desert: 'resists', steppe: 'resists' }, { keeps: 'high', about: ['grain', 'growth', 'labour', 'female'], readings: [...R('provide', 'living', 'nourishment'), ...R('create', 'grain', null)] }),
+					N('crop/plough', 'plough crops', { river: 'strong', coast: 'favours', forest: 'resists', mountain: 'resists', marsh: 'resists', desert: 'resists' }, { keeps: 'high', about: ['grain', 'plenty', 'labour', 'permanence'], readings: [...R('provide', 'living', 'plenty'), ...R('create', 'grain', null)] }),
+					N('catch', 'the catch', { coast: 'strong', river: 'strong', marsh: 'strong', steppe: 'resists', desert: 'excludes' }, { keeps: 'low', about: ['water', 'wild', 'plenty'], readings: R('provide', 'living', 'nourishment') }),
+					N('hunt', 'the hunt', { forest: 'strong', mountain: 'favours', steppe: 'favours' }, { keeps: 'none', about: ['wild', 'chase', 'strength'], readings: [...R('provide', 'living', 'nourishment'), ...R('guard', 'wild', null)] }),
+					N('gather', 'gathering', { forest: 'favours', marsh: 'favours', coast: 'favours' }, { keeps: 'low', about: ['plants', 'patience', 'thrift'], readings: R('provide', 'living', 'nourishment') })
 				]
 			},
 			{
@@ -1614,7 +1614,13 @@ export const FEATURE_COUNT = SLOTS.reduce((a, s) => a + s.features.length, 0);
 // husband's kin and the eldest, since ploughland cannot be split; hoe crops with the mother's line
 // and the wife's kin (Aberle 1961; Ember and Ember 1971; Holden and Mace 2003; Boserup 1970).
 const pull = (about: Noun, part: string, value: string, strength = 0.6): CustomPull => ({ when: { custom: 'livelihood', about }, to: { custom: 'descent', part, value }, strength });
+// A plough needs draught animals (6SL.6): a band that holds plough crops, which the corpus tags as
+// permanence, is pulled to add large herds in whichever livelihood stage is free. Land pulls can take
+// a band's herds away, and this is what draws them back. The target is a stage's part id.
+const draught = (part: string): CustomPull => ({ when: { custom: 'livelihood', about: 'permanence' }, to: { custom: 'livelihood', part, value: 'herds/large' }, strength: 0.6 });
 export const PULLS: readonly CustomPull[] = [
+	draught('s2.source'),
+	draught('s3.source'),
 	pull('herds', 'line', 'father'),
 	pull('herds', 'residence', 'husband'),
 	pull('herds', 'share', 'youngest', 0.4),
@@ -1623,4 +1629,42 @@ export const PULLS: readonly CustomPull[] = [
 	pull('permanence', 'share', 'eldest', 0.4),
 	pull('growth', 'line', 'mother'),
 	pull('growth', 'residence', 'wife')
+];
+
+// How a band's customs shift its births and deaths (6SL.6), keyed by custom and tag as PULLS is: a
+// row applies once while the band holds some value about the noun in the custom. A dangerous way of
+// life costs extra heads a step (a fraction of the whole population per 25-year step); a marriage
+// rule would shift the birth rate. The base death rate already includes the average violence of the
+// populations it came from, so a row is the extra of a way of life that makes it worse than the
+// average, not the whole of it. The table is small and grows with the corpus; a row's `source` says
+// where its size comes from and how far to trust it, and a row with none is marked unverified.
+//
+// Sourcing (a research pass, mostly search excerpts; Hill, Hurtado and Walker 2007 and Winking et al.
+// 2013 were read in full): per-year rates times 25 give the share per step, every conversion derived.
+// Hiwi violence 8 per 1,000 a year at ages 10 to 39 (20% of those person-years); hunter-gatherer
+// warfare median 164 per 100,000 a year (4.1% a step), farmers 595 (14.9%), Hiwi 1,018 (25%), Hadza and
+// !Kung about 1% (Wrangham, Wilson and Muller 2006 via a secondary page; Hill et al. 2007; the African
+// rates may be lowered by pacification).
+export const DEMOGRAPHY: readonly DemographyRow[] = [
+	// Dangerous lifestyles.
+	{
+		when: { custom: 'youth', about: 'violence' },
+		deaths: 0.04,
+		source: 'Hill, Hurtado and Walker 2007 Table 5 (Hiwi violence); Bowles 2009 share of deaths (snippet): derived, an upper-middle value for a warlike people; the rite cannot be isolated from the rest of violence'
+	}, // raiding as a rite of passage
+	{
+		when: { custom: 'rule', about: 'violence' },
+		deaths: 0.03,
+		source: 'Wrangham, Wilson and Muller 2006 median 164 per 100,000 a year, so 4.1% a step (secondary snippet, consistent with Hill et al. 2007): derived; nothing separates a ruling regime from baseline warfare'
+	}, // rule won and held by war
+	{ when: { custom: 'justice', about: 'violence' }, deaths: 0.01, unverified: true }, // feud as remedy: no usable figure, and feud deaths sit inside the violence totals above, so softened
+	{
+		when: { custom: 'livelihood', about: 'chase' },
+		deaths: 0.01,
+		source: 'Hill, Hurtado and Walker 2007 Table 5 (Hiwi accidents, 1 to 4 per 1,000 a year for adult men): derived, 0.6% to 2.5% of everyone, all accidents and not hunting alone'
+	} // the hunt
+	// No row for a hero's deed as a chase (no source) and none for many partners or wives: the studies
+	// found lower fertility per woman under polygyny (74% of 92 in Josephson's list as cited by Winking
+	// et al. 2013; Tsimane odds ratio 0.82), so the placeholder rise of 5% in births is withdrawn and
+	// births take nothing from customs until a sourced effect is found.
 ];
