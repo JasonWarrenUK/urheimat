@@ -120,7 +120,7 @@
 					{
 						"id": "3PL.3",
 						"description": "Save and resume a run across sessions and devices",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"3PL.2",
 							"3PL.5"
@@ -144,13 +144,14 @@
 					{
 						"id": "3PL.5",
 						"description": "Wire integration tests for the runs access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"3PL.1"
 						],
 						"notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.",
 						"assignee": "Jason",
-						"started": "2026-10-15"
+						"started": "2026-10-15",
+						"ended": "2026-10-15"
 					}
 				]
 			},
