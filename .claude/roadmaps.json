@@ -3,6 +3,7 @@
 		"name": "PHASE_1",
 		"path": "docs/roadmaps/PHASE_1.md",
 		"project": "Urheimat",
+		"min_plugin": "2.7.0",
 		"archived": false,
 		"externalGates": [
 			{
@@ -165,7 +166,8 @@
 							"6SL.3"
 						],
 						"notes": "Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b).",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-15"
 					},
 					{
 						"id": "4SD.4",
