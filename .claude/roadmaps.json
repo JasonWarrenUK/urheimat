@@ -168,7 +168,8 @@
 						"notes": "Strain is per custom only, and pressures are simply the situations of the turn. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5b).",
 						"assignee": "Jason",
 						"started": "2026-10-15",
-						"ended": "2026-10-15"
+						"ended": "2026-10-15",
+						"pr": 14
 					},
 					{
 						"id": "4SD.4",
