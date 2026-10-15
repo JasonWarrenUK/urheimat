@@ -293,7 +293,7 @@
 					{
 						"id": "4SD.15",
 						"description": "Record history: each band's custom changes and positions, step by step, in the history 6SL.6 starts",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.1",
 							"6SL.6"
@@ -327,7 +327,7 @@
 					{
 						"id": "4SD.18",
 						"description": "Labour by recognised kinds: each livelihood source's worked-by becomes a set of the kinds the band recognises, replacing the men, the women and all together",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.6"
 						],
@@ -339,7 +339,7 @@
 					{
 						"id": "4SD.19",
 						"description": "Larger map: a map large enough for bands to need many tiles",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.6"
 						],
@@ -509,7 +509,7 @@
 					{
 						"id": "6SL.4",
 						"description": "Answer effects: the one-turn keep and reform from any source; a reform can bite back with a follow-up situation",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3",
 							"6SL.6"
@@ -533,13 +533,14 @@
 					{
 						"id": "6SL.6",
 						"description": "Condition core: a hidden headcount with size tiers, food as yield against numbers with a surplus buffer, health and morale as strands, the generic strand vocabulary and the ladder engine; replaces prosperity",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"6SL.3"
 						],
 						"notes": "Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as heads fed against numbers (a density per square kilometre and heads fed per worker for each source, a minimum team, the land's affinity and richness, tile pools drawn down and regrown), with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (strength gates surfacing, refusals set the tier, a forced top tier, combined situations as authored storylets outside the cap) with one example route, famine, that 6SL.19 replaces; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; schema bumps with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter. Food is in heads fed, set against the headcount: a ceiling per source is a base figure times the terrain affinity weight times one plus richness, hands come from the working band split by recognised kind, and labour uses an interim rule (the men and the women draw on their own kind, all-together sources on every recognised kind, other kinds on all-together sources only) that 4SD.18 replaces. Range: a band works as many tiles as its numbers need (densities per square kilometre, a tile of 100): itinerant sources pick tiles afresh each step within reach 2, the hoe and the plough hold fields within reach 1, and tiles are a shared commons with nothing claimed. Figures cite research or are marked assumptions. A much bigger map (4SD.19) and how range meets the other mechanisms (4SD.20) follow this task.",
 						"assignee": "Jason",
-						"started": "2026-10-12"
+						"started": "2026-10-12",
+						"ended": "2026-10-15"
 					},
 					{
 						"id": "6SL.7",
@@ -588,7 +589,7 @@
 					{
 						"id": "6SL.11",
 						"description": "Moves: forced by events, or player-started with diegetic justification or a consequence",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.3",
 							"6SL.6"
@@ -690,7 +691,7 @@
 					{
 						"id": "6SL.20",
 						"description": "Standing: each band's regard for another, stored per band and moved by storylet answers, relative size, parentage and shared customs",
-						"status": "blocked",
+						"status": "todo",
 						"dependsOn": [
 							"6SL.6"
 						],
