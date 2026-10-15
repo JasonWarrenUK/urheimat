@@ -82,7 +82,7 @@
 
 <div class="status">
 	<div>
-		{#each conditionLines(gameState, player) as line (line)}
+		{#each (player.alive ? conditionLines(gameState, player) : []) as line (line)}
 			<span>{line}</span>
 		{:else}
 			<span class="muted">{player.alive ? 'Your people are well enough.' : '—'}</span>
