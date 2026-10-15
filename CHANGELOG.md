@@ -4,6 +4,33 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-15
+
+### Breaking
+
+- Runs saved under the previous schema no longer load; start a new game after updating. The save schema is now version 9. Prosperity is gone: a band's condition is now several strands (headcount, stores, health, spirits and regard from other bands). A storylet reads and writes those in place of the old prosperity score.
+
+### Added
+
+- Condition strands. A band is its headcount, its stores, its health and its spirits. None is shown as a number; the screen speaks in a line of prose only when something stands out.
+- Food from the land. Each way of living feeds a different number of people per square kilometre, and a band works as many tiles as its numbers need. Foragers and herders range afresh each step; hoe and plough farmers hold fields and give them up after several unneeded steps. Neighbours share land and wear it down.
+- Tile pools. Soil, pasture, game, fish and wild plants live on each tile, are drawn down by work and regrow when left alone. Game and fish breed, so a near-empty pool recovers slowly. A band that moves leaves its tile to recover.
+- Births and deaths counted separately, with chance that matters more the smaller the band is, so small bands can die out by luck. Customs reach both through a short table of sourced effects.
+- Ladders. Hunger climbs situations towards a band's end in place of a hidden score reaching zero; famine is the first route. Each answer eases, refuses or resolves the route it names; refusing the last tier ends the band.
+- A stored surplus. A band banks what it does not eat, up to a cap set by how well its food keeps and how settled it is, and spends it first in a lean step.
+- Bands start from the people before the scattering: they share a fraction of what the home tile could feed with the ancestral customs, so the start follows from the customs.
+- An evidence script, `scripts/evidence/condition.ts`, measuring how bands feed and survive, with controlled comparisons.
+
+### Changed
+
+- The status bar no longer shows a prosperity bar; it shows a prose line only when food, health, spirits or numbers stand out. A move no longer claims to cost prosperity; it leaves the stores behind.
+- Plough crops pull a band towards large herds, since a plough needs animals to draw it.
+- Every seeded result changes, so the drift baseline is re-captured.
+
+### Fixed
+
+- A band that has ended no longer shows condition prose beside "Your people are gone."
+
 ## [0.8.0] - 2026-10-11
 
 ### Breaking
@@ -153,7 +180,8 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.5.0...v0.6.0
