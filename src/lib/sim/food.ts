@@ -15,8 +15,9 @@ import { RICHNESS, SLOTS } from './slots';
 // A source works the tiles it needs (range.ts). Each tile gives it a ceiling: density x the tile's area
 // x terrain affinity x (1 + richness) x its pool's stock. The source yields the lesser of what its
 // tiles allow and what its hands produce (hands x heads fed per worker), and nothing below its
-// minimum team. A step is 25 years, so no fallow cycle is modelled: what the step shows is how hard
-// each pool was worked.
+// minimum team. Sources of one band on one pool split the tile's ceiling by what their hands can
+// work. A step is 25 years, so no fallow cycle is modelled: what the step shows is how hard each
+// pool was worked.
 
 const LIVELIHOOD = SLOTS.findIndex((s) => s.id === 'livelihood');
 const GENDER = SLOTS.findIndex((s) => s.id === 'gender');
@@ -159,19 +160,32 @@ export function workReading(st: GameState, c: Culture, opts: WorkOptions = {}): 
 	const held = heldSources(c);
 	const hands = handsFor(c, held);
 	const terrainAt = (t: Tile): Terrain => st.map.tiles[t.y][t.x] as Terrain;
-	const shape = held.map((s, i) => {
+	const worked = held.map((s, i) => {
 		const fig = SOURCES[s.id],
 			d = draught(held, s);
 		// A hand-hauled or poorly drawn plough loses ceiling and each worker's productivity alike.
 		const workable = hands[i] >= fig.team * d.crew ? hands[i] * fig.perHand * d.ceiling : 0;
+		return { s, fig, d, workable };
+	});
+	// Sources of one band that draw on one pool (the hoe and the plough, large and small herds) split
+	// each tile's ceiling between them in proportion to what their hands can work, so together they
+	// never claim more than the tile holds. A pool whose sources can work nothing splits it evenly.
+	const poolSources = (pool: PoolId) => worked.filter((w) => w.fig.pool === pool);
+	const shareOf = (pool: PoolId, workable: number): number => {
+		const sharing = poolSources(pool),
+			total = sharing.reduce((n, w) => n + w.workable, 0);
+		return total > 0 ? workable / total : 1 / sharing.length;
+	};
+	const shape = worked.map(({ s, fig, d, workable }) => {
+		const slice = shareOf(fig.pool, workable);
 		const full = (t: Tile): number => fig.density * TILE_KM2 * aff(LIVELIHOOD, s.fi, s.vi, terrainAt(t)) * (1 + (RICHNESS[terrainAt(t)] ?? 0)) * d.ceiling;
-		const demand: Demand = { workable, itinerant: fig.pool !== 'soil', full, usable: (t) => full(t) * stockOf(st, t.x, t.y, fig.pool) };
-		return { s, fig, demand };
+		const demand: Demand = { workable, itinerant: fig.pool !== 'soil', full, usable: (t) => full(t) * stockOf(st, t.x, t.y, fig.pool) * slice };
+		return { s, fig, demand, slice };
 	});
 	const chosen = chooseTiles(st, c, shape.map((x) => x.demand), opts.ignoreSeats);
 	const uses = new Map<string, TileUse>();
 	let capacity = 0;
-	const sources = shape.map(({ s, fig, demand }, i): SourceWork => {
+	const sources = shape.map(({ s, fig, demand, slice }, i): SourceWork => {
 		const tiles = chosen.perSource[i];
 		const usable = tiles.reduce((n, t) => n + demand.usable(t), 0);
 		const yielded = Math.min(usable, demand.workable);
@@ -179,7 +193,7 @@ export function workReading(st: GameState, c: Culture, opts: WorkOptions = {}): 
 			const share = usable > 0 ? demand.usable(t) / usable : 0;
 			const full = demand.full(t);
 			const load = full > 0 ? (yielded * share) / full : 0;
-			capacity += full;
+			capacity += full * slice;
 			addUse(uses, t.key, { [fig.pool]: { load, drawn: fig.draw * load, herds: fig.pool === 'pasture' ? load : 0 } });
 		});
 		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, workable: demand.workable, tiles: tiles.length };

@@ -283,3 +283,28 @@ describe('the reserve', () => {
 		expect(stepReserve(c, work).fed).toBe(1);
 	});
 });
+
+describe('sources that share a pool', () => {
+	it('never claim more of a tile than it holds between them', () => {
+		const { st, c } = fresh();
+		paint(st, 'river');
+		c.condition.numbers = fixtures.sharedPool.soil.numbers;
+		hold(c, fixtures.sharedPool.soil.sources);
+		const { uses } = workReading(st, c);
+		expect(uses.size).toBeGreaterThan(0);
+		uses.forEach((use) => Object.values(use).forEach((pool) => expect(pool!.load).toBeLessThanOrEqual(1 + 1e-9)));
+	});
+	it('count the shared tile once toward what the range can hold', () => {
+		const { st, c } = fresh();
+		paint(st, 'steppe');
+		c.condition.numbers = fixtures.sharedPool.herds.numbers;
+		const [large, small] = fixtures.sharedPool.herds.sources;
+		const capacityOf = (sources: [string, string][]): number => {
+			hold(c, sources);
+			return workReading(st, c).capacity;
+		};
+		const alone = [capacityOf([large]), capacityOf([small])];
+		const together = capacityOf([large, small]);
+		expect(together).toBeLessThanOrEqual(Math.max(...alone));
+	});
+});
