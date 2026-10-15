@@ -1,9 +1,10 @@
 import type { Culture, CultureTraits, FoodReading, GameState, PoolId, SourceId, Terrain, TraitValue } from '$lib/types';
 import { startingCondition } from './condition';
 import { aff } from './engine';
-import { HAND_HAULED, HAND_HAULED_CREW, KEEPS, SMALL_DRAUGHT, SMALL_DRAUGHT_CREW, SETTLED_FLOOR, SETTLED_STEPS, SOURCES, WORKING_SHARE } from './figures';
+import { HAND_HAULED, HAND_HAULED_CREW, KEEPS, SMALL_DRAUGHT, SMALL_DRAUGHT_CREW, SETTLED_FLOOR, SETTLED_STEPS, SOURCES, TILE_KM2, WORKING_SHARE } from './figures';
 import { isActive } from './predicates';
-import { stockOf, type PoolUse } from './pools';
+import { addUse, stockOf, type TileUse } from './pools';
+import { chooseTiles, type Demand, type Tile } from './range';
 import { RICHNESS, SLOTS } from './slots';
 
 // Food (6SL.6): what the land and the livelihood customs yield, in heads fed, set against the
@@ -11,9 +12,11 @@ import { RICHNESS, SLOTS } from './slots';
 // (history.ts) so a transition can be read against the step before. Consequences cannot write it;
 // they act on the factors it derives from (numbers, the reserve, the customs).
 //
-// Each source has a ceiling (base x terrain affinity x (1 + richness) x its pool's stock). It yields
-// nothing below a minimum crew and rises linearly to the ceiling with the hands it has. A step is 25
-// years, so no fallow cycle is modelled: what the step shows is how hard each pool was worked.
+// A source works the tiles it needs (range.ts). Each tile gives it a ceiling: density x the tile's area
+// x terrain affinity x (1 + richness) x its pool's stock. The source yields the lesser of what its
+// tiles allow and what its hands produce (hands x heads fed per worker), and nothing below its
+// minimum team. A step is 25 years, so no fallow cycle is modelled: what the step shows is how hard
+// each pool was worked.
 
 const LIVELIHOOD = SLOTS.findIndex((s) => s.id === 'livelihood');
 const GENDER = SLOTS.findIndex((s) => s.id === 'gender');
@@ -60,16 +63,12 @@ function draught(held: readonly HeldSource[], s: HeldSource): { ceiling: number;
 	return { ceiling: HAND_HAULED, crew: HAND_HAULED_CREW };
 }
 
-// A source's full ceiling on a terrain, before its pool's stock: base times the terrain affinity weight
-// times one plus richness, times how well a plough is drawn.
-function fullCeiling(held: readonly HeldSource[], s: HeldSource, terrain: Terrain): number {
-	return SOURCES[s.id].ceiling * aff(LIVELIHOOD, s.fi, s.vi, terrain) * (1 + (RICHNESS[terrain] ?? 0)) * draught(held, s).ceiling;
-}
-
-// The most people the ancestral customs could feed on the home tile, with full pools: the largest
-// headcount whose yield still feeds it. Crews matter (a source nobody can work yields nothing), so a
-// people whose customs idle most of its workers is small. The scattering starts from a share of it
-// (begin in engine.ts). A people that could feed no one at all counts as one that could feed MIN_START.
+// The most people the ancestral customs could feed around the home tile, with full pools: the
+// largest headcount whose yield still feeds it. Crews matter (a source nobody can work yields nothing),
+// so a people whose customs idle most of its workers is small, and range matters (a forager people
+// needs many tiles). The scattering starts from a share of it (begin in engine.ts). The scan steps
+// geometrically, since the answer can run from tens to thousands.
+const HOME_SCAN_MAX = 50000;
 export function homePopulation(st: GameState): number {
 	const home = {
 		traits: st.ancestral,
@@ -78,13 +77,26 @@ export function homePopulation(st: GameState): number {
 		y: st.map.cy,
 		condition: startingCondition()
 	} as Culture;
-	const ceiling = Math.ceil(workReading(st, home).capacity * 1.2);
 	let best = 0;
-	for (let n = 1; n <= ceiling; n++) {
+	for (let n = 1; n <= HOME_SCAN_MAX; n += Math.max(1, Math.floor(n / 40))) {
 		home.condition.numbers = n;
-		if (workReading(st, home).food.adequacy >= 1) best = n;
+		if (workReading(st, home, { ignoreSeats: true }).food.adequacy >= 1) best = n;
 	}
 	return best;
+}
+
+// A people that could not feed anyone could not have existed, and the corpus does not yet keep a
+// source's labour and the kinds a band recognises consistent (4SD.18 divides labour by recognised
+// kinds at source). So when the ancestral customs cannot feed even one person under the labour rule,
+// their livelihood is worked by all together. INTERIM (deleted by 4SD.18). Draws nothing from the rng.
+export function makeViable(st: GameState): void {
+	if (LIVELIHOOD < 0 || homePopulation(st) > 0) return;
+	const features = SLOTS[LIVELIHOOD].features;
+	[1, 2, 3].forEach((stage) => {
+		const lf = features.findIndex((f) => f.id === `s${stage}.labour`);
+		const shared = lf < 0 ? -1 : features[lf].values.findIndex((v) => v.id === 'shared');
+		if (shared >= 0) st.ancestral[LIVELIHOOD][lf] = [shared];
+	});
 }
 
 // The kinds of people a band recognises. A band with no gender custom falls back to men and women.
@@ -118,42 +130,63 @@ export interface SourceWork {
 	pool: PoolId;
 	keeps: NonNullable<TraitValue['keeps']>;
 	yield: number; // heads fed
-	load: number; // the share of the source's full ceiling used
-	full: number; // the source's full ceiling on this land, before its pool's stock
+	workable: number; // the heads its hands could produce, before the land limits it
+	tiles: number; // how many tiles it works
 }
 
 export interface Work {
 	food: FoodReading;
-	// The heads the sources would feed with full pools and full crews: what the land can hold.
+	// The heads the tiles the sources work would feed with full pools and full crews: what the band's
+	// range can hold. Numbers beyond it crowd the land.
 	capacity: number;
 	sources: SourceWork[];
-	use: Partial<Record<PoolId, PoolUse>>;
+	// How hard each tile was worked this step, by "x,y" key; the engine sums every band's and steps
+	// each pool once (tiles are a shared commons).
+	uses: Map<string, TileUse>;
+	// The fields the band holds after this step, for conditionStep to store.
+	fields: string[];
+	fieldIdle: number;
 }
 
-// What a band's sources yield this step, and how hard each pool was worked doing it. Pure: nothing is
-// drawn down until the step does it (conditionStep).
-export function workReading(st: GameState, c: Culture): Work {
-	const terrain = st.map.tiles[c.y][c.x] as Terrain;
+export interface WorkOptions {
+	// Measure the home people before any band has a seat.
+	ignoreSeats?: boolean;
+}
+
+// What a band's sources yield this step and how hard each tile was worked doing it. Pure: nothing is
+// drawn down or stored until the step does it (engine.ts, conditionStep).
+export function workReading(st: GameState, c: Culture, opts: WorkOptions = {}): Work {
 	const held = heldSources(c);
 	const hands = handsFor(c, held);
-	const sources = held.map((s, i): SourceWork => {
-		const fig = SOURCES[s.id];
-		const full = fullCeiling(held, s, terrain);
-		const crew = hands[i] / fig.hands;
-		const yielded = crew < Math.min(1, fig.minCrew * draught(held, s).crew) ? 0 : full * stockOf(st, c.x, c.y, fig.pool) * Math.min(1, crew);
-		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, load: full > 0 ? yielded / full : 0, full };
+	const terrainAt = (t: Tile): Terrain => st.map.tiles[t.y][t.x] as Terrain;
+	const shape = held.map((s, i) => {
+		const fig = SOURCES[s.id],
+			d = draught(held, s);
+		// A hand-hauled or poorly drawn plough loses ceiling and each worker's productivity alike.
+		const workable = hands[i] >= fig.team * d.crew ? hands[i] * fig.perHand * d.ceiling : 0;
+		const full = (t: Tile): number => fig.density * TILE_KM2 * aff(LIVELIHOOD, s.fi, s.vi, terrainAt(t)) * (1 + (RICHNESS[terrainAt(t)] ?? 0)) * d.ceiling;
+		const demand: Demand = { workable, itinerant: fig.pool !== 'soil', full, usable: (t) => full(t) * stockOf(st, t.x, t.y, fig.pool) };
+		return { s, fig, demand };
 	});
-	const capacity = sources.reduce((n, s) => n + s.full, 0);
-	const use: Partial<Record<PoolId, PoolUse>> = {};
-	sources.forEach((s) => {
-		const u = (use[s.pool] ??= { load: 0, drawn: 0, herds: 0 });
-		u.load += s.load;
-		u.drawn += SOURCES[s.id].draw * s.load;
-		if (s.pool === 'pasture') u.herds += s.load;
+	const chosen = chooseTiles(st, c, shape.map((x) => x.demand), opts.ignoreSeats);
+	const uses = new Map<string, TileUse>();
+	let capacity = 0;
+	const sources = shape.map(({ s, fig, demand }, i): SourceWork => {
+		const tiles = chosen.perSource[i];
+		const usable = tiles.reduce((n, t) => n + demand.usable(t), 0);
+		const yielded = Math.min(usable, demand.workable);
+		tiles.forEach((t) => {
+			const share = usable > 0 ? demand.usable(t) / usable : 0;
+			const full = demand.full(t);
+			const load = full > 0 ? (yielded * share) / full : 0;
+			capacity += full;
+			addUse(uses, t.key, { [fig.pool]: { load, drawn: fig.draw * load, herds: fig.pool === 'pasture' ? load : 0 } });
+		});
+		return { id: s.id, pool: fig.pool, keeps: s.keeps, yield: yielded, workable: demand.workable, tiles: tiles.length };
 	});
 	const total = sources.reduce((n, s) => n + s.yield, 0),
 		need = c.condition.numbers;
-	return { food: { yield: total, need, adequacy: need > 0 ? total / need : 1 }, capacity, sources, use };
+	return { food: { yield: total, need, adequacy: need > 0 ? total / need : 1 }, capacity, sources, uses, fields: chosen.fields, fieldIdle: chosen.fieldIdle };
 }
 
 // The food the band's customs and land would give it now.

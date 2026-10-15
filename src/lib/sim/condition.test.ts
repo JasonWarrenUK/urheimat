@@ -3,6 +3,7 @@ import * as fixtures from '../../../tests/fixtures/condition';
 import type { GameState } from '$lib/types';
 import { conditionStep, daughterCondition, numbersTier, readStrand, trendOf, writeStrand } from './condition';
 import { begin, defaultStep, endEra, newGame, startTiles } from './engine';
+import { workReading } from './food';
 import { record } from './history';
 import { apply, holds } from './storylets';
 
@@ -33,7 +34,7 @@ describe('reading and writing strands', () => {
 			other = st.cultures[1];
 		writeStrand(c, c, 'morale', 100);
 		expect(c.condition.morale).toBe(10);
-		writeStrand(c, c, 'numbers', -1000);
+		writeStrand(c, c, 'numbers', -1000000);
 		expect(c.condition.numbers).toBe(0);
 		writeStrand(other, c, 'standing', 2);
 		expect(other.condition.standing[c.id]).toBe(2);
@@ -76,12 +77,12 @@ describe('numbers and daughters', () => {
 			c = player(st);
 		st.era = 3;
 		c.condition.buffer = 8;
-		conditionStep(st, c);
+		conditionStep(st, c, workReading(st, c));
 		const settled = c.condition.seatSteps;
 		expect(settled).toBe(1);
 		c.migrated = true;
 		const held = c.condition.buffer;
-		conditionStep(st, c);
+		conditionStep(st, c, workReading(st, c));
 		expect(c.condition.seatSteps).toBe(0);
 		expect(c.condition.buffer).toBeLessThan(held);
 	});

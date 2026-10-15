@@ -255,6 +255,10 @@ export interface BandCondition {
 	morale: number;
 	standing: Record<number, number>; // each other band's regard for this one, by band id
 	seatSteps: number; // steps in a row on the current seat; stands in for settledness until 4SD.11
+	// The tiles the band cultivates, as "x,y" keys, held across steps (the hoe and the plough share
+	// them), and how many steps in a row they have gone unneeded. Itinerant sources hold no tiles.
+	fields: string[];
+	fieldIdle: number;
 	ladders: Record<string, LadderState>;
 	history: StrandSnapshot[];
 }

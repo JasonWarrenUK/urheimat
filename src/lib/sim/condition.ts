@@ -1,9 +1,8 @@
 import type { BandCondition, Culture, FoodReading, GameState, StrandId, WritableStrandId } from '$lib/types';
-import { birthRate, deathRate, stepHealth, stepNumbers } from './demography';
+import { birthRate, deathRate, demographicNoise, stepHealth, stepNumbers } from './demography';
 import { MAX_STRAND, MOVE_RESERVE_KEPT, NUMBERS_TIERS, START_HEALTH, START_MORALE, START_NUMBERS } from './figures';
-import { foodReading, stepReserve, workReading } from './food';
+import { foodReading, stepReserve, type Work } from './food';
 import { meanStanding, strandIn } from './history';
-import { workTile } from './pools';
 
 // Condition (6SL.6): the strands a band is made of, how they move each step and how a condition or a
 // consequence reads and writes them. Numbers are a hidden headcount and the player meets only its
@@ -14,7 +13,7 @@ import { workTile } from './pools';
 export const numbersTier = (numbers: number): number => NUMBERS_TIERS.reduce((tier, t, i) => (numbers >= t.from ? i : tier), 0);
 
 export function startingCondition(): BandCondition {
-	return { numbers: START_NUMBERS, buffer: 0, health: START_HEALTH, morale: START_MORALE, standing: {}, seatSteps: 0, ladders: {}, history: [] };
+	return { numbers: START_NUMBERS, buffer: 0, health: START_HEALTH, morale: START_MORALE, standing: {}, seatSteps: 0, fields: [], fieldIdle: 0, ladders: {}, history: [] };
 }
 
 // A daughter band starts from its parent (decision 4g): TUNING STUB, a third of the heads and the
@@ -72,15 +71,18 @@ export function writeStrand(target: Culture, source: Culture, id: WritableStrand
 }
 
 // One step of every strand but the ladders; returns the food the step ran on, for the snapshot. The
-// band works its tile (drawing its pools down), the reserve banks or spends, a whole-band move cuts
-// the reserve and starts the seat counter again. Numbers change by births less deaths (demography.ts)
-// on the adequacy the band felt, and health follows what it was fed.
-export function conditionStep(st: GameState, c: Culture): FoodReading {
+// engine has already summed every band's work on the tiles and stepped the pools, so this takes the
+// band's own reading: it stores the fields, the reserve banks or spends, a whole-band move cuts the
+// reserve and starts the seat counter again. Numbers change by births less deaths (demography.ts) on
+// the adequacy the band felt, and health follows what it was fed.
+export function conditionStep(st: GameState, c: Culture, work: Work): FoodReading {
 	const k = c.condition,
-		work = workReading(st, c),
 		kept = stepReserve(c, work);
-	workTile(st, c.x, c.y, work.use);
-	k.numbers = stepNumbers(k.numbers, birthRate(c, kept.fed), deathRate(st, c, kept.fed, work.capacity));
+	k.fields = work.fields;
+	k.fieldIdle = work.fieldIdle;
+	const births = birthRate(c, kept.fed),
+		deaths = deathRate(st, c, kept.fed, work.capacity);
+	k.numbers = stepNumbers(k.numbers, births, deaths, demographicNoise(st.rng, k.numbers, births, deaths));
 	k.health = stepHealth(k.health, kept.fed);
 	k.buffer = kept.reserve;
 	if (c.migrated && c.bornEra < st.era) k.buffer *= MOVE_RESERVE_KEPT;

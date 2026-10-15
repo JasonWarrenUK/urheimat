@@ -14,10 +14,10 @@ import type {
 } from '$lib/types';
 import { conditionStep, daughterCondition, startingCondition } from './condition';
 import { HOME_SHARE, MIN_START, SPLIT_NUMBERS } from './figures';
-import { foodReading, homePopulation } from './food';
+import { foodReading, homePopulation, makeViable, workReading, type Work } from './food';
 import { emit, record } from './history';
 import { ladderStep } from './ladder';
-import { idleTiles, tileKey } from './pools';
+import { addUse, idleTiles, workTiles, type TileUse } from './pools';
 import { activeParts, isActive, isActiveIn, isAvailableIn } from './predicates';
 import { advance, ageOf, found, split, yearOf } from './family';
 import { pressureStep } from './pressures';
@@ -292,6 +292,7 @@ export function newGame(seed: number): GameState {
 	st.peopleName = genName(r, 2);
 	st.homeTerrain = st.map.tiles[st.map.cy][st.map.cx];
 	st.ancestral = genAncestral(r, st.homeTerrain);
+	makeViable(st);
 	return st;
 }
 
@@ -470,23 +471,27 @@ export function endEra(st: GameState, step: StepInput): GameState {
 	// The pulls on every band build; an AI band's surfaced pulls resolve now, the player's become the
 	// coming step's situations, read before the storylets fire so a storylet can see them.
 	const pressures = st.cultures.filter((c) => c.alive).flatMap((c) => pressureStep(st, c));
-	// Every band works its tile; a tile no live band worked this step regrows with nothing drawn.
-	const worked = new Set(st.cultures.filter((c) => c.alive).map((c) => tileKey(c.x, c.y)));
-	st.cultures
-		.filter((c) => c.alive)
-		.forEach((c) => {
-			const food = conditionStep(st, c);
-			const forced = ladderStep(st, c);
-			record(st, c, food);
-			// INTERIM (deleted by 6SL.19): a band with no heads left is gone. The death ladders replace it.
-			if (c.condition.numbers <= 0) endBand(st, c, 'no one left');
-			else {
-				// Split routes' forced outcomes belong to 6SL.10; the stud carries out deaths only.
-				const ending = forced.find((r) => 'death' in r.forced);
-				if (ending) endBand(st, c, ending.id);
-			}
-		});
-	idleTiles(st, worked);
+	// Every band says how it works the land, from the pools as the step found them, then the tiles are
+	// worked once for all of them (a shared commons: loads sum), and a tile no band worked regrows with
+	// nothing drawn. Nothing depends on which band is asked first.
+	const live = st.cultures.filter((c) => c.alive);
+	const works = new Map(live.map((c) => [c.id, workReading(st, c)]));
+	const uses = new Map<string, TileUse>();
+	works.forEach((w) => w.uses.forEach((use, key) => addUse(uses, key, use)));
+	workTiles(st, uses);
+	idleTiles(st, new Set(uses.keys()));
+	live.forEach((c) => {
+		const food = conditionStep(st, c, works.get(c.id) as Work);
+		const forced = ladderStep(st, c);
+		record(st, c, food);
+		// INTERIM (deleted by 6SL.19): a band with no heads left is gone. The death ladders replace it.
+		if (c.condition.numbers <= 0) endBand(st, c, 'no one left');
+		else {
+			// Split routes' forced outcomes belong to 6SL.10; the stud carries out deaths only.
+			const ending = forced.find((r) => 'death' in r.forced);
+			if (ending) endBand(st, c, ending.id);
+		}
+	});
 	if (p.alive)
 		st.cultures.forEach((c) => {
 			if (c.alive && !c.isPlayer && contact(st, p, c) >= 0.5) {

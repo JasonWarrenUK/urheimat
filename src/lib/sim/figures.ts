@@ -14,7 +14,7 @@ import type { PoolId, SourceId, TraitValue } from '$lib/types';
 // starts below the floor, so a poor home still sends out viable bands. START_NUMBERS is the headcount
 // of a band made outside a scattering (the default before begin sets the real one).
 export const HOME_SHARE = 0.9;
-export const MIN_START = 12;
+export const MIN_START = 30;
 export const START_NUMBERS = 60;
 // TUNING: the size tiers over the headcount. Boundaries are headcounts so later features that need
 // them (conflict, splits) have concrete numbers; the names are placeholders until 2DS.2 designs the
@@ -37,41 +37,68 @@ export const MAX_STRAND = 10;
 
 export interface SourceFigures {
 	pool: PoolId;
-	// The heads the source feeds at its full ceiling on average land (affinity 'allows', richness 0).
-	ceiling: number;
-	// The hands it needs for that ceiling, and the least crew (a fraction of those hands) that yields
-	// anything at all: a plough needs a team, a herd a herder.
-	hands: number;
-	minCrew: number;
+	// The people a square kilometre of average land (affinity 'allows', richness 0) supports from this
+	// source alone. A tile's ceiling is this times the tile's area, the land's affinity and richness.
+	density: number;
+	// Heads fed per worker (a worker is a working adult), at full crew. A source yields the lesser of
+	// what its tiles allow and what its hands times this produce.
+	perHand: number;
+	// The least team, in hands, that yields anything at all: a plough needs a team, a hunt a party.
+	team: number;
 	// How hard working it draws its pool down, per unit of load. How well what it yields keeps is not
 	// here: it is the `keeps` field on the livelihood value in the corpus, so a new value must say.
 	draw: number;
 }
 
-// TUNING. Ratios and why: the plough's ceiling exceeds the hoe's because ox-ploughing cut tillage
-// labour by about four fifths in one Tanzanian before-and-after study and lets a band work more
-// ground with fewer hands; it also draws the soil harder, and needs a team. Herds need few hands
-// for the heads they feed. The hunt is the lowest ceiling: wild game feeds few people per tile.
-// Grain and herds keep; fish and nuts keep a little (dried or smoked); fresh game does not.
+// The area of one map tile, in square kilometres: ten by ten. TUNING (assumption): the research gives
+// densities per km2, and the tile is the unit the sim counts in.
+export const TILE_KM2 = 100;
+// How many tiles out from its seat a band can reach, by way of life: itinerant sources range wide,
+// fields stay close. TUNING (assumptions).
+export const REACH_ITINERANT = 2;
+export const REACH_FIELDS = 1;
+// A band takes tiles until their capacity covers what it can work times this margin. TUNING (assumption).
+export const RANGE_MARGIN = 1.2;
+// Steps in a row a band's fields go unneeded before the farthest is given up. TUNING (assumption).
+export const FIELD_IDLE_STEPS = 3;
+
+// Research-based where a source is named, an assumption where it says so; all TUNING.
+// - perHand: foragers 2.4 (Kelly 2013, from !Kung returns: 2,355 kcal brought in against 1,975 needed,
+//   about 1.2 per head, with about half the people working); English farm workers fed 1.3 (1520) to 2.8
+//   (1801) (Wrigley, derived from secondary sources). Hoe 2.2 and plough 2.8 follow that range, herds 3
+//   (assumption), fishing 2.4 (assumption, as foragers).
+// - density, people per km2: foragers 0.1 to 0.4 in all, split here between the hunt and gathering
+//   (Kelly 2013 Table 7-3); Jomon fisher-foragers 0.89 on average and 3 on the best land, the
+//   Northwest Coast 0.1 to 2 (Kelly Table 7-3, Koyama 1978); forest-fallow hoe farming 5 to 10
+//   (Boserup 1965); herds 2, the low end of mobile pastoralists' 1.4 to 17 (Lake Chad, a Somaliland
+//   model: snippets); plough 15 (assumption: no clean figure found).
+// - team: hunting groups of 3 to 8 (Kelly); fishing crews 3 to 4 (assumption; large canoe or whale
+//   crews are 8 to 12, Kelly); a plough team of a few; a herd and a field need a couple of people
+//   (assumptions).
+// The plough draws the soil harder than the hoe and the hoe regrows it faster in fallow; the hunt and
+// the catch draw their pools harder than gathering. Grain and herds keep, fish and nuts a little.
 export const SOURCES: Record<SourceId, SourceFigures> = {
-	'herds/large': { pool: 'pasture', ceiling: 70, hands: 8, minCrew: 0.2, draw: 0.25 },
-	'herds/small': { pool: 'pasture', ceiling: 60, hands: 6, minCrew: 0.2, draw: 0.3 },
-	'crop/hoe': { pool: 'soil', ceiling: 80, hands: 16, minCrew: 0.25, draw: 0.15 },
-	'crop/plough': { pool: 'soil', ceiling: 140, hands: 14, minCrew: 0.3, draw: 0.35 },
-	catch: { pool: 'fish', ceiling: 50, hands: 10, minCrew: 0.2, draw: 0.2 },
-	hunt: { pool: 'game', ceiling: 30, hands: 9, minCrew: 0.25, draw: 0.25 },
-	gather: { pool: 'plants', ceiling: 25, hands: 8, minCrew: 0.2, draw: 0.15 }
+	'herds/large': { pool: 'pasture', density: 2, perHand: 3, team: 2, draw: 0.25 },
+	'herds/small': { pool: 'pasture', density: 2, perHand: 3, team: 2, draw: 0.3 },
+	'crop/hoe': { pool: 'soil', density: 6, perHand: 2.2, team: 2, draw: 0.15 },
+	'crop/plough': { pool: 'soil', density: 15, perHand: 2.8, team: 3, draw: 0.35 },
+	catch: { pool: 'fish', density: 0.8, perHand: 2.4, team: 4, draw: 0.2 },
+	hunt: { pool: 'game', density: 0.15, perHand: 2.4, team: 3, draw: 0.25 },
+	gather: { pool: 'plants', density: 0.15, perHand: 2.4, team: 2, draw: 0.15 }
 };
 
 // TUNING: the share of numbers that works (children and the old do not).
 export const WORKING_SHARE = 0.5;
-// TUNING: what a plough with no large herds to draw it keeps of its ceiling. A plough pulled by
-// people is a hoe with extra work, so this sits below the hoe's ceiling over the plough's.
+// TUNING (assumptions; the research says ox-ploughing cut tillage labour by about four fifths in one
+// Tanzanian before-and-after study, not what a plough without animals loses): what a plough with no
+// large herds to draw it keeps of its ceiling and of each worker's productivity. A plough pulled by
+// people is a hoe with extra work.
 export const HAND_HAULED = 0.25;
-// TUNING: the extra minimum crew a hand-hauled plough needs, as a multiple.
+// TUNING: the extra minimum team a hand-hauled plough needs, as a multiple.
 export const HAND_HAULED_CREW = 2;
 // TUNING: draught from small herds only (sheep and goats are poor draught animals) sits between the
-// two: a plough with them keeps this share of its ceiling and needs this multiple of its minimum crew.
+// two: a plough with them keeps this share of its ceiling and productivity and needs this multiple of
+// its minimum team.
 export const SMALL_DRAUGHT = 0.6;
 export const SMALL_DRAUGHT_CREW = 1.5;
 

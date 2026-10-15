@@ -40,12 +40,35 @@ export function stepPool(pool: PoolId, stock: number, use: PoolUse, soilManure =
 	return Math.max(POOL_FLOOR, Math.min(1, left + regrowth + manure));
 }
 
-// The tile's pools after a band worked them this step. A pool the band did not use still regrows.
+// The tile's pools after it was worked this step. A pool nobody used still regrows.
 export function workTile(st: GameState, x: number, y: number, use: Partial<Record<PoolId, PoolUse>>): void {
 	const herds = use.pasture?.herds ?? 0;
 	(Object.keys(POOLS) as PoolId[]).forEach((pool) => {
 		const next = stepPool(pool, stockOf(st, x, y, pool), use[pool] ?? { load: 0, drawn: 0, herds: 0 }, herds);
 		setStock(st, x, y, pool, next);
+	});
+}
+
+export type TileUse = Partial<Record<PoolId, PoolUse>>;
+
+// Adds one band's use of a tile to the others': tiles are a shared commons, so loads, draws and herd
+// load sum, and the pool is stepped once for all of them.
+export function addUse(into: Map<string, TileUse>, key: string, use: TileUse): void {
+	const total = into.get(key) ?? {};
+	(Object.keys(use) as PoolId[]).forEach((pool) => {
+		const u = (total[pool] ??= { load: 0, drawn: 0, herds: 0 });
+		u.load += use[pool]!.load;
+		u.drawn += use[pool]!.drawn;
+		u.herds += use[pool]!.herds;
+	});
+	into.set(key, total);
+}
+
+// Every worked tile, once, after all the bands have said how hard they worked it.
+export function workTiles(st: GameState, uses: ReadonlyMap<string, TileUse>): void {
+	uses.forEach((use, key) => {
+		const [x, y] = key.split(',').map(Number);
+		workTile(st, x, y, use);
 	});
 }
 

@@ -3,7 +3,7 @@ import * as fixtures from '../../../tests/fixtures/pools';
 import type { GameState } from '$lib/types';
 import { POOL_FLOOR } from './figures';
 import { begin, newGame, startTiles } from './engine';
-import { deserialiseState, serialiseState } from './serialise';
+import { SCHEMA_VERSION, deserialiseState, serialiseState } from './serialise';
 import { idleTiles, stepPool, stockOf, tileKey, workTile } from './pools';
 
 function fresh(): GameState {
@@ -65,7 +65,7 @@ describe('tiles on the map', () => {
 	it('survives a save', () => {
 		const st = fresh();
 		workTile(st, 2, 5, { fish: fixtures.heavy });
-		const back = deserialiseState(JSON.parse(JSON.stringify(serialiseState(st))), 8);
+		const back = deserialiseState(JSON.parse(JSON.stringify(serialiseState(st))), SCHEMA_VERSION);
 		expect(back?.map.stocks).toEqual(st.map.stocks);
 	});
 });
