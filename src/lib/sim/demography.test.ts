@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import * as fixtures from '../../../tests/fixtures/demography';
 import type { Culture, GameState } from '$lib/types';
-import { birthRate, deathRate, stepHealth, stepNumbers, violenceDeaths } from './demography';
-import { begin, newGame, startTiles } from './engine';
+import { birthRate, deathRate, demographicNoise, stepHealth, stepNumbers, violenceDeaths } from './demography';
+import { begin, newGame, rngFrom, startTiles } from './engine';
 import { DEATHS } from './figures';
 import { DEMOGRAPHY, SLOTS } from './slots';
 
@@ -10,7 +10,10 @@ function fresh(): { st: GameState; c: Culture } {
 	const st = newGame(fixtures.seed);
 	const t = startTiles(st);
 	begin(st, t[0].x, t[0].y);
-	return { st, c: st.cultures[st.playerId as number] };
+	const c = st.cultures[st.playerId as number];
+	// A small band, so crowding and the cap on deaths do not hide the effects under test.
+	c.condition.numbers = 50;
+	return { st, c };
 }
 
 // Make the band hold a value, whichever stage of the part it is in.
@@ -95,6 +98,27 @@ describe('numbers and health', () => {
 		expect(healthy).toBeLessThan(10);
 		expect(stepHealth(7, 0.3)).toBeLessThan(7);
 		expect(stepHealth(10, 1)).toBe(10);
+	});
+});
+
+describe('chance', () => {
+	const spread = (numbers: number, draws = 400): number => {
+		const rng = rngFrom(7);
+		const noise = Array.from({ length: draws }, () => demographicNoise(rng, numbers, 1.1, 0.9));
+		const mean = noise.reduce((a, b) => a + b, 0) / draws;
+		return Math.sqrt(noise.reduce((a, b) => a + (b - mean) ** 2, 0) / draws);
+	};
+	it('swings a small band far more than a large one, by about the square root of its size', () => {
+		const small = spread(25),
+			large = spread(2500);
+		expect(small).toBeGreaterThan(large * 5);
+		expect(large).toBeCloseTo(Math.sqrt(2 / 2500), 1);
+	});
+	it('is repeatable from the seed, and never kills more than everyone', () => {
+		expect(spread(40)).toBe(spread(40));
+		const rng = rngFrom(1);
+		for (let i = 0; i < 200; i++) expect(demographicNoise(rng, 3, 1.1, 0.9)).toBeGreaterThanOrEqual(-1);
+		expect(stepNumbers(10, 1, 2, -1)).toBe(0);
 	});
 });
 

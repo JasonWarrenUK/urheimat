@@ -55,4 +55,19 @@ export function deathRate(st: GameState, c: Culture, fed: number, capacity: numb
 // band before it thins it and a good year does not cure a bad decade.
 export const stepHealth = (health: number, fed: number): number => health + HEALTH_STEP * (MAX_STRAND * Math.max(0, Math.min(1, fed)) - health);
 
-export const stepNumbers = (numbers: number, births: number, deaths: number): number => Math.max(0, Math.round(numbers * (1 + births - deaths)));
+// The net change a step's births and deaths make, as a fraction of numbers, with `noise` added to it.
+export const stepNumbers = (numbers: number, births: number, deaths: number, noise = 0): number => Math.max(0, Math.round(numbers * (1 + births - deaths + noise)));
+
+// Chance in a step's births and deaths. Births and deaths are counts, so their spread as a fraction of
+// numbers is about the square root of (births + deaths) over the headcount: small bands swing and
+// large ones barely move (the variance of growth, sigma_d squared over N, of Lande, Engen and Saether
+// 2003; the Poisson rule is derived here, not sourced). Two draws from the seeded rng a band a step,
+// so a run stays repeatable. The swing is held to a band's own numbers, so noise cannot kill more than
+// everyone or add more than they were.
+export function demographicNoise(rng: () => number, numbers: number, births: number, deaths: number): number {
+	const u = Math.max(rng(), 1e-12),
+		v = rng();
+	const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+	const spread = Math.sqrt((births + deaths) / Math.max(numbers, 1));
+	return Math.max(-1, Math.min(1, z * spread));
+}
