@@ -3,6 +3,11 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"config": {
+		"mongodbMemoryServer": {
+			"version": "8.2.6"
+		}
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",

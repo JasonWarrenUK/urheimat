@@ -35,10 +35,11 @@ beforeAll(async () => {
 	held.env.MONGODB_URI = server.getUri();
 }, 60000);
 
+// Guarded so a failed start-up reports its own error rather than the client's missing URI.
 afterAll(async () => {
-	await getClient().close();
+	if (held.env.MONGODB_URI) await getClient().close();
 	delete (globalThis as { __mongoClient?: unknown }).__mongoClient;
-	await server.stop();
+	if (server) await server.stop();
 });
 
 beforeEach(async () => {
