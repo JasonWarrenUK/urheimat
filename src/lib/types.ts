@@ -236,8 +236,9 @@ export interface LadderState {
 	resolved: boolean;
 }
 
-// Every strand of one band at the end of one step, with food as derived then. The notebook reads
-// condition over time from these (2DS.3: "Hard times and good").
+// Every strand of one band at the end of one step, with food as derived then, and where the band
+// stood and what it practised (4SD.15). The notebook reads condition over time from these (2DS.3:
+// "Hard times and good") and customs and routes over time from the seat and the traits.
 export interface StrandSnapshot {
 	step: number;
 	numbers: number;
@@ -246,6 +247,10 @@ export interface StrandSnapshot {
 	morale: number;
 	standing: Record<number, number>;
 	food: FoodReading;
+	x: number;
+	y: number;
+	traits: CultureTraits; // a copy: later changes never reach it
+	absent: string[];
 }
 
 export interface BandCondition {
@@ -263,13 +268,21 @@ export interface BandCondition {
 	history: StrandSnapshot[];
 }
 
-// A dated, structured event beside the chronicle text, for the notebook's turning points.
-export type BandEventKind = 'death' | 'split' | 'move' | 'ladder';
+// A dated, structured event beside the chronicle text, for the notebook's turning points. A custom
+// event (4SD.15) carries the change itself: which part moved and what it held before and after.
+export type BandEventKind = 'death' | 'split' | 'move' | 'ladder' | 'custom';
+export interface CustomChange {
+	custom: number;
+	part: number;
+	from: number[];
+	to: number[];
+}
 export interface BandEvent {
 	kind: BandEventKind;
 	band: number;
 	step: number;
 	reason: string;
+	change?: CustomChange; // present on a custom event only
 }
 
 // What a ladder does when its last tier is reached.
