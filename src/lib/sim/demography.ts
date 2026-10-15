@@ -5,7 +5,7 @@ import { DEMOGRAPHY, SLOTS } from './slots';
 
 // Births and deaths (6SL.6), calculated separately as net rates per 25-year step, so a high-birth
 // high-death band differs from a low-birth normal-death band at the same growth. Rates are fractions
-// of the headcount. Nothing here is random: a band's numbers follow from its condition and customs.
+// of the headcount. These rates follow from condition and customs; demographicNoise adds the chance.
 //
 // Births read adequacy (as the band felt it, after the reserve), health, morale, how settled the band
 // is and its marriage customs. Deaths read hunger, health, crowding, the dangerous ways of life its
