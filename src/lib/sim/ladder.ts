@@ -1,5 +1,5 @@
 import type { Culture, GameState, LadderMove, LadderRoute, LadderState } from '$lib/types';
-import { FAMINE } from './figures';
+import { FAMINE, LADDER_GONE, LADDER_REFUSED } from './figures';
 import { emit } from './history';
 import { holds } from './storylets';
 
@@ -12,11 +12,6 @@ import { holds } from './storylets';
 //
 // Two variables per route. Strength gates surfacing, on 6SL.3's pattern (pressures.ts: a pull builds
 // while its source holds, halves when it does not, surfaces at a hold). Refusals set the tier.
-
-// A pull below this is nothing.
-const GONE = 0.1;
-// What a refusal leaves of the pull, as 6SL.3's refused pulls go back at half strength.
-const REFUSED = 0.5;
 
 // STUD: one example route, famine, replaced by 6SL.19's routes. Strengths are TUNING figures
 // (figures.ts).
@@ -41,7 +36,7 @@ export function moveRoute(c: Culture, route: string, move: LadderMove, by = 1): 
 	const state = stateOf(c, route);
 	if (move === 'refuse') {
 		state.refusals++;
-		state.strength *= REFUSED;
+		state.strength *= LADDER_REFUSED;
 	} else if (move === 'ease') state.strength = Math.max(0, state.strength - by);
 	else state.resolved = true;
 	state.surfaced = false;
@@ -62,7 +57,7 @@ export function ladderStep(st: GameState, c: Culture, routes: readonly LadderRou
 		}
 		const fed = route.feeds.filter((f) => f.when.every((w) => holds(st, c, w))).reduce((n, f) => n + f.by, 0);
 		state.strength = fed > 0 ? state.strength + fed : state.strength * route.fade;
-		if (state.strength < GONE) {
+		if (state.strength < LADDER_GONE) {
 			state.strength = 0;
 			if (state.refusals > 0) state.refusals--;
 		}

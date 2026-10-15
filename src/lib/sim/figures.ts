@@ -2,10 +2,11 @@ import type { PoolId, SourceId, TraitValue } from '$lib/types';
 
 // Every tuning figure of the condition model (6SL.6) lives here and nowhere else. Each is a
 // TUNING figure: a placeholder with the reasoning for its ratio, set by Claude against the evidence
-// script (scripts/evidence/condition.ts) and reviewed by Jason before it is committed. None is a
-// sourced number. The research behind the shapes (Boserup's fallow typology, the plough and
-// draught animals, dung and soil, depensation in game and fish) is in the 6SL.6 log and gave
-// typologies and directions, not figures.
+// script (scripts/evidence/condition.ts) and reviewed by Jason before it is committed. Where the
+// research gave a number (Kelly, Boserup and Wrigley, cited in the comment above SOURCES), the figure
+// cites it; where it gave only a typology or a direction (Boserup's fallow typology, the plough and
+// draught animals, dung and soil, depensation in game and fish), the figure is marked an assumption.
+// The research is in the 6SL.6 log.
 
 // ---------- numbers ----------
 
@@ -28,6 +29,8 @@ export const NUMBERS_TIERS: readonly { name: string; from: number }[] = [
 ];
 // TUNING: the headcount from which an AI band may split, under the interim rule until 6SL.10.
 export const SPLIT_NUMBERS = 90;
+// TUNING (stub until 6SL.10): a parent's heads divide by this and one part goes with a daughter band.
+export const DAUGHTER_DIVISOR = 3;
 // TUNING: health and morale run from 0 to 10 and start well; the scale is an engine convention, never shown.
 export const START_HEALTH = 7;
 export const START_MORALE = 7;
@@ -178,3 +181,7 @@ export interface RouteFigures {
 }
 // TUNING: the famine route, the stud's example, replaced by 6SL.19's routes.
 export const FAMINE: RouteFigures = { hold: 1, tiers: 3, fade: 0.5, feed: 1 };
+// TUNING: a pull below this is nothing and its refusals count down; a refusal leaves a pull this share
+// of its strength, as 6SL.3's refused pulls go back at half.
+export const LADDER_GONE = 0.1;
+export const LADDER_REFUSED = 0.5;

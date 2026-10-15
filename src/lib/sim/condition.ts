@@ -1,6 +1,6 @@
 import type { BandCondition, Culture, FoodReading, GameState, StrandId, WritableStrandId } from '$lib/types';
 import { birthRate, deathRate, demographicNoise, stepHealth, stepNumbers } from './demography';
-import { MAX_STRAND, MOVE_RESERVE_KEPT, NUMBERS_TIERS, START_HEALTH, START_MORALE, START_NUMBERS } from './figures';
+import { DAUGHTER_DIVISOR, MAX_STRAND, MOVE_RESERVE_KEPT, NUMBERS_TIERS, START_HEALTH, START_MORALE, START_NUMBERS } from './figures';
 import { foodReading, stepReserve, type Work } from './food';
 import { meanStanding, strandIn } from './history';
 
@@ -19,7 +19,7 @@ export function startingCondition(): BandCondition {
 // A daughter band starts from its parent (decision 4g): TUNING STUB, a third of the heads and the
 // parent's health and morale. The real share depends on why the band split.
 export function daughterCondition(parent: Culture): BandCondition {
-	const heads = Math.floor(parent.condition.numbers / 3);
+	const heads = Math.floor(parent.condition.numbers / DAUGHTER_DIVISOR);
 	parent.condition.numbers -= heads;
 	return { ...startingCondition(), numbers: heads, health: parent.condition.health, morale: parent.condition.morale };
 }
