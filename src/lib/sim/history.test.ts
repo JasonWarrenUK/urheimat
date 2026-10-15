@@ -5,6 +5,7 @@ import { begin, defaultStep, endEra, freeLand, newGame, startTiles } from './eng
 import { foodReading } from './food';
 import { customTurningPoints, record, seatAt, snapshot } from './history';
 import { change } from './pressures';
+import { SLOTS } from './slots';
 import { apply } from './storylets';
 
 // 4SD.15: the history 6SL.6 started also tells where each band stood and what it practised at every
@@ -26,8 +27,8 @@ function changeable(st: GameState): [number, number, number] {
 	for (let si = 0; si < c.traits.length; si++)
 		for (let fi = 0; fi < c.traits[si].length; fi++) {
 			const held = c.traits[si][fi];
-			if (held.length === 1 && held[0] !== 0) return [si, fi, 0];
-			if (held.length === 1) return [si, fi, 1];
+			if (held.length !== 1 || SLOTS[si].features[fi].values.length < 2) continue;
+			return [si, fi, held[0] === 0 ? 1 : 0];
 		}
 	throw new Error('no ordinary part to change');
 }
@@ -103,11 +104,13 @@ describe('turning points', () => {
 		}
 		expect(customTurningPoints(c)).toEqual([3, 4]);
 	});
-	it('is empty across a run in which nothing changed', () => {
+	it('never names a step without a custom event for the band', () => {
 		const st = fresh();
 		for (let i = 0; i < 3; i++) endEra(st, defaultStep());
 		const c = player(st);
 		expect(c.condition.history.length).toBe(3);
-		if (customEvents(st).every((e) => e.band !== c.id)) expect(customTurningPoints(c)).toEqual([]);
+		// A revert within one step leaves an event but no turning point, so only this direction holds.
+		const eventSteps = new Set(customEvents(st).filter((e) => e.band === c.id).map((e) => e.step));
+		customTurningPoints(c).forEach((step) => expect(eventSteps).toContain(step));
 	});
 });

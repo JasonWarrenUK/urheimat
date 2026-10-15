@@ -282,7 +282,7 @@ export interface BandEvent {
 	band: number;
 	step: number;
 	reason: string;
-	change?: CustomChange; // present on a custom event only
+	change?: CustomChange; // on a custom event for a changed part; a custom lost or regained carries its reason only
 }
 
 // What a ladder does when its last tier is reached.
