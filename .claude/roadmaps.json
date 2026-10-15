@@ -151,7 +151,8 @@
 						"notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.",
 						"assignee": "Jason",
 						"started": "2026-10-15",
-						"ended": "2026-10-15"
+						"ended": "2026-10-15",
+						"pr": 13
 					}
 				]
 			},
