@@ -48,6 +48,25 @@ describe('reading and writing strands', () => {
 		apply(st, c, [{ strand: 'standing', by: 1, of: ['parent'] }]);
 		expect(Object.keys(c.condition.standing)).toEqual([]);
 	});
+	it('applies the legacy prosperity consequence to morale until the corpus is remapped', () => {
+		const st = fresh(),
+			c = player(st);
+		const before = c.condition.morale;
+		apply(st, c, [{ prosperity: -2 }]);
+		expect(c.condition.morale).toBe(before - 2);
+	});
+	it('names daughters and the parent as the bands a consequence acts on', () => {
+		const st = fresh(),
+			c = player(st);
+		const daughter = st.cultures.find((k) => k.id !== c.id)!;
+		daughter.parent = c.id;
+		apply(st, c, [{ strand: 'standing', by: 2, of: ['daughters'] }]);
+		expect(daughter.condition.standing[c.id]).toBe(2);
+		c.parent = daughter.id;
+		const before = daughter.condition.buffer;
+		apply(st, c, [{ strand: 'buffer', by: 0.1, of: ['parent'] }]);
+		expect(daughter.condition.buffer).toBeCloseTo(before + 0.1);
+	});
 	it('reads a trend against the last snapshot, steady when there is none', () => {
 		const st = fresh(),
 			c = player(st);

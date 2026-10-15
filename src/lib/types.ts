@@ -405,7 +405,7 @@ export type Consequence =
 	// What the answer does to a ladder route in play. Every answer to a ladder situation states one
 	// for each route it names (a corpus test enforces it); letting a situation lie is always a refusal.
 	| { ladder: { route: string; do: LadderMove; by?: number } }
-	| { prosperity: number } // STUD: legacy, mapped to morale until the remap table is approved, then deleted
+	| { prosperity: number } // STUD: legacy, mapped to morale until the corpus pass remaps every answer (docs/spikes/6SL.6-remap-table.md), then deleted
 	| { set: { custom: string; part: string; value: string | string[] } } // by value id
 	| { lose: string }
 	| { gain: string }

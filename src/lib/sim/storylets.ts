@@ -159,7 +159,7 @@ export function apply(st: GameState, c: Culture, cons: Consequence[]): void {
 		if ('log' in k) st.log.push({ era: st.era, text: k.log.replace(/\{leader\}/g, leaderOf(c).name) });
 		else if ('ladder' in k) moveRoute(c, k.ladder.route, k.ladder.do, k.ladder.by);
 		else if ('strand' in k) bandsFor(st, c, k.of ?? ['self']).forEach((target) => writeStrand(target, c, k.strand, k.by));
-		else if ('prosperity' in k) writeStrand(c, c, 'morale', k.prosperity); // STUD: legacy shim until the remap table is approved
+		else if ('prosperity' in k) writeStrand(c, c, 'morale', k.prosperity); // STUD: legacy shim until the corpus pass remaps the answers
 		else if ('set' in k) {
 			const si = slotIndex(k.set.custom),
 				fi = si < 0 ? -1 : partIndex(si, k.set.part);
