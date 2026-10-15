@@ -1633,16 +1633,38 @@ export const PULLS: readonly CustomPull[] = [
 
 // How a band's customs shift its births and deaths (6SL.6), keyed by custom and tag as PULLS is: a
 // row applies once while the band holds some value about the noun in the custom. A dangerous way of
-// life costs extra heads a step; a marriage rule shifts the birth rate. The table starts small and
-// grows with the corpus. NO row is sourced yet: every row is a placeholder in direction and size,
-// marked unverified, and a row stays until a source confirms, corrects or removes it.
+// life costs extra heads a step (a fraction of the whole population per 25-year step); a marriage
+// rule would shift the birth rate. The base death rate already includes the average violence of the
+// populations it came from, so a row is the extra of a way of life that makes it worse than the
+// average, not the whole of it. The table is small and grows with the corpus; a row's `source` says
+// where its size comes from and how far to trust it, and a row with none is marked unverified.
+//
+// Sourcing (a research pass, mostly search excerpts; Hill, Hurtado and Walker 2007 and Winking et al.
+// 2013 were read in full): per-year rates times 25 give the share per step, every conversion derived.
+// Hiwi violence 8 per 1,000 a year at ages 10 to 39 (20% of those person-years); hunter-gatherer
+// warfare median 164 per 100,000 a year (4.1% a step), farmers 595 (14.9%), Hiwi 1,018 (25%), Hadza and
+// !Kung about 1% (Wrangham, Wilson and Muller 2006 via a secondary page; Hill et al. 2007; the African
+// rates may be lowered by pacification).
 export const DEMOGRAPHY: readonly DemographyRow[] = [
 	// Dangerous lifestyles.
-	{ when: { custom: 'youth', about: 'violence' }, deaths: 0.04, unverified: true }, // raiding as a rite of passage
-	{ when: { custom: 'rule', about: 'violence' }, deaths: 0.03, unverified: true }, // rule won and held by war
-	{ when: { custom: 'justice', about: 'violence' }, deaths: 0.03, unverified: true }, // feud as remedy
-	{ when: { custom: 'livelihood', about: 'chase' }, deaths: 0.02, unverified: true }, // the hunt
-	{ when: { custom: 'hero', about: 'chase' }, deaths: 0.01, unverified: true }, // the hero's deed is a chase
-	// Marriage: many partners or wives (marriage values about hierarchy).
-	{ when: { custom: 'marriage', about: 'hierarchy' }, births: 0.05, unverified: true }
+	{
+		when: { custom: 'youth', about: 'violence' },
+		deaths: 0.04,
+		source: 'Hill, Hurtado and Walker 2007 Table 5 (Hiwi violence); Bowles 2009 share of deaths (snippet): derived, an upper-middle value for a warlike people; the rite cannot be isolated from the rest of violence'
+	}, // raiding as a rite of passage
+	{
+		when: { custom: 'rule', about: 'violence' },
+		deaths: 0.03,
+		source: 'Wrangham, Wilson and Muller 2006 median 164 per 100,000 a year, so 4.1% a step (secondary snippet, consistent with Hill et al. 2007): derived; nothing separates a ruling regime from baseline warfare'
+	}, // rule won and held by war
+	{ when: { custom: 'justice', about: 'violence' }, deaths: 0.01, unverified: true }, // feud as remedy: no usable figure, and feud deaths sit inside the violence totals above, so softened
+	{
+		when: { custom: 'livelihood', about: 'chase' },
+		deaths: 0.01,
+		source: 'Hill, Hurtado and Walker 2007 Table 5 (Hiwi accidents, 1 to 4 per 1,000 a year for adult men): derived, 0.6% to 2.5% of everyone, all accidents and not hunting alone'
+	} // the hunt
+	// No row for a hero's deed as a chase (no source) and none for many partners or wives: the studies
+	// found lower fertility per woman under polygyny (74% of 92 in Josephson's list as cited by Winking
+	// et al. 2013; Tsimane odds ratio 0.82), so the placeholder rise of 5% in births is withdrawn and
+	// births take nothing from customs until a sourced effect is found.
 ];
