@@ -70,8 +70,11 @@
 							"6SL.19",
 							"6SL.20"
 						],
-						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. From 6SL.6: also designs how a strand that stands out is shown in prose (the panel is quiet in ordinary times), the warnings each ladder gives and the health and morale lines. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a).",
-						"assignee": "Jason"
+						"notes": "Absorbs the former standalone mobile and accessibility objectives. Gated on state derivation because it cannot design the display of states whose derivation is unsettled. The canvas map currently has no keyboard or screen-reader path; that gap must leave this spike as real tasks. After 2DS.1: also designs the display of the new derived states (recognition; settledness and writing as hidden custom categories; leader and generation), the timelapse after band death and what a watched lull shows. After 2DS.3: also designs the notebook's visual design (look, typography, mobile) over 2DS.3's wireframes; the toggle's granularity is settled there. From 6SL.6: also designs how a strand that stands out is shown in prose (the panel is quiet in ordinary times), the warnings each ladder gives and the health and morale lines. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2u, 3t, 5d) and the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decision 2a). From 6SL.6: bands now work as many tiles as their numbers need, so the map is large (4SD.19) and this spike designs how it is shown.",
+						"assignee": "Jason",
+						"softDependsOn": [
+							"4SD.19"
+						]
 					},
 					{
 						"id": "2DS.3",
@@ -242,11 +245,12 @@
 					{
 						"id": "4SD.11",
 						"description": "Territory as a gated custom: every band starts as a wandering point and keeps a seat; settling, expanding and abandoning land",
-						"status": "todo",
+						"status": "blocked",
 						"dependsOn": [
-							"6SL.5"
+							"6SL.5",
+							"4SD.20"
 						],
-						"notes": "The seat tile sets fit and strain exactly as now; claimed tiles affect only contact, ownership and crowding. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here. From 6SL.6: the food buffer's cap depends on lifestyle, since a granary implies a settled band; 6SL.6 stands in a counter of steps spent on the current seat (a move resets it), so replace that counter with the real settledness custom here and revisit the cap curve.",
+						"notes": "A band's seat is the tile it holds. Food now comes from the tiles its range works (6SL.6: itinerant sources afresh each step, fields held, tiles a shared commons), so spike decision 3k's single seat no longer holds for food; claims, ownership and crowding between bands are decided here, after 4SD.20's design spike on how bands share tiles. Settle and expand can be player-started; abandoning land arises from situations (environment, raids by non-settled bands). Move costs by settledness are tuned here. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 3k, 3v, 4h, 4j). From the 4SD.4 pilot: custom-level absence (a band without a given custom) shares this gated mechanism. From 6SL.3: settledness as a pull on custom, read from band history, is defined here. From 6SL.6: the food buffer's cap depends on lifestyle, since a granary implies a settled band; 6SL.6 stands in a counter of steps spent on the current seat (a move resets it), so replace that counter with the real settledness custom here and revisit the cap curve.",
 						"assignee": "Jason",
 						"softDependsOn": [
 							"6SL.6"
@@ -330,6 +334,34 @@
 						"notes": "The current values hard-code two genders. The change reaches the labour tags that pull descent and residence (PULLS in slots.ts), the cross-custom constraint on sex nouns (6SL.5), how gender is assigned (4SD.10) and the unrecognised condition. Replaces and deletes the interim labour rule in 6SL.6's food model. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md).",
 						"softDependsOn": [
 							"4SD.10"
+						]
+					},
+					{
+						"id": "4SD.19",
+						"description": "Larger map: a map large enough for bands to need many tiles",
+						"status": "blocked",
+						"dependsOn": [
+							"6SL.6"
+						],
+						"notes": "With realistic densities a forager band of 150 works about five tiles of 100 square kilometres, so the 9 by 7 map cannot hold the ten bands the cap allows. Touches genMap (its seeded draws, so every seeded result and the baselines move), startTiles, contact (the distance bands), the cap on live bands, the world map display and the evidence scripts. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md, Range).",
+						"softDependsOn": [
+							"6SL.10",
+							"6SL.11"
+						]
+					},
+					{
+						"id": "4SD.20",
+						"description": "Tile range: how range interacts with moves, splits, crowding, standing, conflict and territory, including a design spike on how bands share tiles",
+						"status": "blocked",
+						"dependsOn": [
+							"4SD.19",
+							"6SL.10",
+							"6SL.11",
+							"6SL.20"
+						],
+						"notes": "6SL.6 builds range scoped to food and livelihood: tiles are a shared commons and nothing is claimed. This task explores how range meets the other mechanisms: where a move or a daughter band can go and why, the open-land and hunger split avenues, crowding as a death route (6SL.19), neighbours' regard for a band that wears shared land (6SL.20), raids and absorption (6SL.17, 4SD.9) and territory (4SD.11). It opens with a design spike on how bands share tiles (commons, exclusive claims, persistent claims), which 4SD.11 follows. Decided in the 6SL.6 log (docs/spikes/6SL.6-condition-strands-log.md, Range).",
+						"softDependsOn": [
+							"6SL.17"
 						]
 					}
 				]
@@ -505,7 +537,7 @@
 						"dependsOn": [
 							"6SL.3"
 						],
-						"notes": "Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as yield (land, terrain richness, fit of the livelihood customs, a ceiling per source, a labour floor, overuse depletion, the labour custom) against numbers, with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (a pull per route, tiers, a refusal count, combined pressures, a forced top tier, one ladder situation a step) with no routes; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; one schema bump with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter. Food is in heads fed, set against the headcount: a ceiling per source is a base figure times the terrain affinity weight times one plus richness, hands come from the working band split by recognised kind, and labour uses an interim rule (the men and the women draw on their own kind, all-together sources on every recognised kind, other kinds on all-together sources only) that 4SD.18 replaces.",
+						"notes": "Split into five tasks (6SL.6, 6SL.10, 6SL.19, 6SL.20, 6SL.21); the reasoning behind each item below is in docs/spikes/6SL.6-condition-strands-log.md. Replaces the former 4SD.1. No numbers shown, open to reconsideration. King of Dragon Pass is the example, analysed in the 2DS.1 spike log. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 5a, 5e, 5f). Scope: numbers as a hidden headcount with named size tiers; food as yield (land, terrain richness, fit of the livelihood customs, a ceiling per source, a labour floor, overuse depletion, the labour custom) against numbers, with a surplus buffer capped by a keeps field on each livelihood value and by a counter of steps on the current seat that stands in for settledness; health and morale, always present; the generic strand consequence and condition with named targets, replacing the prosperity forms, with every existing answer remapped to a strand for review; the generic ladder engine (a pull per route, tiers, a refusal count, combined pressures, a forced top tier, one ladder situation a step) with no routes; whole-band move costs (buffer cut, seat counter reset); per-step strand snapshots for every band and structured events beside the chronicle; a prose line when a strand stands out; interim rules for death (headcount zero) and AI splits, each labelled for deletion by 6SL.19 and 6SL.10; one schema bump with older saves discarded (3PL.3). From 6SL.3: with only food strain feeding prosperity the base game drifts upward (near the cap by era 6); tune the food strand here. 4SD.11 soft-depends on this task: if it lands first, read real settledness and build no seat counter. Food is in heads fed, set against the headcount: a ceiling per source is a base figure times the terrain affinity weight times one plus richness, hands come from the working band split by recognised kind, and labour uses an interim rule (the men and the women draw on their own kind, all-together sources on every recognised kind, other kinds on all-together sources only) that 4SD.18 replaces. Range: a band works as many tiles as its numbers need (densities per square kilometre, a tile of 100): itinerant sources pick tiles afresh each step within reach 2, the hoe and the plough hold fields within reach 1, and tiles are a shared commons with nothing claimed. Figures cite research or are marked assumptions. A much bigger map (4SD.19) and how range meets the other mechanisms (4SD.20) follow this task.",
 						"assignee": "Jason",
 						"started": "2026-10-12"
 					},
