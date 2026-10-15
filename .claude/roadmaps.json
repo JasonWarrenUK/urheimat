@@ -3,6 +3,7 @@
 		"name": "PHASE_1",
 		"path": "docs/roadmaps/PHASE_1.md",
 		"project": "Urheimat",
+		"min_plugin": "2.7.0",
 		"archived": false,
 		"externalGates": [
 			{
@@ -148,7 +149,8 @@
 							"3PL.1"
 						],
 						"notes": "The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-15"
 					}
 				]
 			},
