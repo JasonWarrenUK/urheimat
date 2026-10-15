@@ -18,7 +18,7 @@ import { foodReading, homePopulation, makeViable, workReading, type Work } from 
 import { emit, record } from './history';
 import { ladderStep } from './ladder';
 import { addUse, idleTiles, workTiles, type TileUse } from './pools';
-import { activeParts, isActive, isActiveIn, isAvailableIn } from './predicates';
+import { isActive, isActiveIn, isAvailableIn } from './predicates';
 import { advance, ageOf, found, split, yearOf } from './family';
 import { pressureStep } from './pressures';
 import { answer, fire } from './storylets';
@@ -332,22 +332,8 @@ export function begin(st: GameState, px: number, py: number): GameState {
 }
 
 // ---------- the era ----------
-// One entry per strained member, so a set with two strained members appears twice.
-export function strainedFeatures(st: GameState, c: Culture): [number, number][] {
-	const t = st.map.tiles[c.y][c.x];
-	const out: [number, number][] = [];
-	c.traits.forEach((fv, si) =>
-		fv.forEach((v, fi) => {
-			if (!c.absent.includes(SLOTS[si].id) && isActive(c.traits, si, fi)) v.forEach((vi) => strains(si, fi, vi, t) && out.push([si, fi]));
-		})
-	);
-	return out;
-}
-export const strainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).length;
-// Strain in the customs that feed the band: a resisted herd is hunger, not discomfort.
-const isFood = (si: number): boolean => SLOTS[si].strain === 'food';
-export const foodStrainCount = (st: GameState, c: Culture): number => strainedFeatures(st, c).filter(([si]) => isFood(si)).length;
-export const foodHeldCount = (c: Culture): number => activeParts(c.traits).reduce((n, [si, fi]) => n + (isFood(si) && !c.absent.includes(SLOTS[si].id) ? c.traits[si][fi].length : 0), 0);
+// Strain is per custom only (spike 5b): each part's fit against the land is read where it is shown
+// (strains, in TraitRow) and pressures are the situations of the turn. There is no aggregate count.
 
 function tryMove(st: GameState, c: Culture, x: number, y: number): boolean {
 	if (!freeLand(st, x, y) || dist(c, { x, y }) !== 1) return false;
