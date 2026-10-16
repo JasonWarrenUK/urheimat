@@ -13,7 +13,9 @@ import { rngFrom } from './engine';
 //    seat counter, ladders, history) instead of prosperity, and the state carries band events.
 // 8: Resource pools: the map carries each tile's stocks of soil, pasture, game, fish and wild plants.
 // 9: Range: a band carries the fields it cultivates and how long they have gone unneeded.
-export const SCHEMA_VERSION = 9;
+// 10: History: each snapshot carries the band's seat, traits and absent customs, and a custom change
+//     is a band event.
+export const SCHEMA_VERSION = 10;
 
 export function serialiseState(st: GameState): SerializedGameState {
 	const { rng, ...rest } = st;

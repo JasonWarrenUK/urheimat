@@ -75,7 +75,7 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: What each band knows of every other and when it learnt it. A close match to a dated record is taken for the same people, a partial match for kin, a poor match for strangers; a better match across all records corrects an earlier identification. Provenance must be robust enough for the scholars to spot paradoxes and the truth toggle to explain them. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2k, 2s, 2v, 2w).
 - [ ] **4SD.14**: Tag material traces value by value across the corpus, without presuming the corpus's customs are valid categories: a custom such as the sacred drink may describe nothing real, and the pass should say so rather than tag around it _(depends on 2DS.1)_
   - Note: Some values of a custom leave remains and others do not; the category level is too coarse. Decided in the 2DS.1 spike (docs/spikes/2DS.1-gameplay-loop.md, decisions 2l).
-- [ ] **4SD.15**: Record history: each band's custom changes and positions, step by step, in the history 6SL.6 starts _(depends on 6SL.1, 6SL.6)_
+- [x] **4SD.15**: Record history: each band's custom changes and positions, step by step, in the history 6SL.6 starts
   - Note: Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f). From 6SL.6: one history store. 6SL.6 keeps the per-step strand snapshots on each band and the structured events (kind, band, step, reason) on the game state; this task extends both with custom changes and positions rather than building a second structure.
 - [x] **4SD.16**: Tag the corpus: readings, meaning tags, material and named affinity levels for the remaining 15 customs, in recursive loops
 - [ ] **4SD.17**: Band-held belief: a band holds one reading of each practice, and belief can drift apart from practice _(depends on 4SD.16)_
@@ -391,10 +391,10 @@ graph LR
 	6SL.20 --> 6SL.21
 	6SL.21 --> M6
 	7SC.1 --> M7
-	class 3PL.5,4SD.10,4SD.13,4SD.14,4SD.15,4SD.17,4SD.18,4SD.19,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.20,6SL.4,6SL.8,6SL.9 todo
+	class 3PL.5,4SD.10,4SD.13,4SD.14,4SD.17,4SD.18,4SD.19,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.20,6SL.4,6SL.8,6SL.9 todo
 	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.20,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.13,6SL.15,6SL.17,6SL.18,6SL.19,6SL.21,6SL.7 blocked
 	class 7SC.1 deferred
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5,6SL.6 done
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.15,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5,6SL.6 done
 	class tier0 tierUnderway
 	class tier1 tierDeferred
 ```

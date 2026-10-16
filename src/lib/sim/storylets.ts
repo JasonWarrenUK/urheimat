@@ -2,6 +2,7 @@ import type { BandRef, Condition, Consequence, Culture, GameState, Situation, St
 import { liveTier, readStrand, trendOf, writeStrand } from './condition';
 import { ageOf, leaderOf, successor, yearOf } from './family';
 import { contact } from './engine';
+import { emit } from './history';
 import { moveRoute } from './ladder';
 import { change, resolve } from './pressures';
 import { SLOTS } from './slots';
@@ -168,9 +169,16 @@ export function apply(st: GameState, c: Culture, cons: Consequence[]): void {
 			const vis = ids.map((id) => SLOTS[si].features[fi].values.findIndex((v) => v.id === id)).filter((vi) => vi >= 0);
 			if (vis.length) change(st, c, si, fi, vis);
 		} else if ('lose' in k) {
-			if (!c.absent.includes(k.lose)) c.absent.push(k.lose);
-		} else if ('gain' in k) c.absent = c.absent.filter((id) => id !== k.gain);
-		else if ('raise' in k) st.raised.push(k.raise);
+			if (!c.absent.includes(k.lose)) {
+				c.absent.push(k.lose);
+				emit(st, 'custom', c.id, `${k.lose}: lost`);
+			}
+		} else if ('gain' in k) {
+			if (c.absent.includes(k.gain)) {
+				c.absent = c.absent.filter((id) => id !== k.gain);
+				emit(st, 'custom', c.id, `${k.gain}: regained`);
+			}
+		} else if ('raise' in k) st.raised.push(k.raise);
 		else if ('succession' in k) {
 			const year = yearOf(st.era),
 				next = successor(st.rng, c, year);
