@@ -1,12 +1,12 @@
 // Evidence script for the 2DS.1 gameplay-loop spike (docs/spikes/2DS.1-gameplay-loop.md).
 // Run with: bun run scripts/evidence/pacing.ts
 
-import { newGame, begin, startTiles, endEra, defaultStep, strainCount, FEATURE_COUNT } from '../../src/lib/sim/engine';
+import { newGame, begin, startTiles, endEra, defaultStep, FEATURE_COUNT } from '../../src/lib/sim/engine';
 
 // Passive play, 400 seeds: what changes era by era with no orders at all.
 const SEEDS = 400, ERAS = 8;
 const kept = Array(ERAS + 1).fill(0), keptN = Array(ERAS + 1).fill(0);
-const changes = Array(ERAS + 1).fill(0), alive = Array(ERAS + 1).fill(0), strain = Array(ERAS + 1).fill(0);
+const changes = Array(ERAS + 1).fill(0), alive = Array(ERAS + 1).fill(0);
 const deaths = Array(ERAS + 1).fill(0), splits = Array(ERAS + 1).fill(0), prosp = Array(ERAS + 1).fill(0);
 for (let seed = 1; seed <= SEEDS; seed++) {
 	const st = newGame(seed);
@@ -26,7 +26,6 @@ for (let seed = 1; seed <= SEEDS; seed++) {
 			const after = key(p.traits.flat());
 			changes[era] += after.filter((v, i) => v !== before[i]).length;
 			kept[era] += after.filter((v, i) => v === truth[i]).length;
-			strain[era] += strainCount(st, p);
 			prosp[era] += p.condition.numbers;
 			keptN[era]++;
 		}
@@ -38,7 +37,6 @@ for (let era = 1; era <= ERAS; era++)
 		era,
 		'parts changed in player band': (changes[era] / keptN[era]).toFixed(1),
 		'original parts still kept': `${(kept[era] / keptN[era]).toFixed(1)} of ${FEATURE_COUNT}`,
-		'parts straining': (strain[era] / keptN[era]).toFixed(1),
 		'headcount (stud)': (prosp[era] / keptN[era]).toFixed(0),
 		'bands alive': (alive[era] / SEEDS).toFixed(1),
 		'splits': (splits[era] / SEEDS).toFixed(2),

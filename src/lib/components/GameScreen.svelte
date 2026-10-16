@@ -2,7 +2,7 @@
 	import type { GameState } from '$lib/types';
 	import { SLOTS } from '$lib/sim/slots';
 	import { conditionLines } from '$lib/sim/condition';
-	import { endEra, foodHeldCount, foodStrainCount, freeLand, strainCount } from '$lib/sim/engine';
+	import { endEra, freeLand } from '$lib/sim/engine';
 	import { ageOf, leaderOf, yearOf, YEARS_PER_STEP } from '$lib/sim/family';
 	import { game, type Tab as TabType } from '$lib/game-store.svelte';
 	import WorldMap from './WorldMap.svelte';
@@ -87,10 +87,6 @@
 		{:else}
 			<span class="muted">{player.alive ? 'Your people are well enough.' : '—'}</span>
 		{/each}
-	</div>
-	<div>
-		<b>{player.alive ? foodStrainCount(gameState, player) : '—'}</b>
-		<span>of {foodHeldCount(player)} ways they are fed strain against the {terrain}; {player.alive ? strainCount(gameState, player) - foodStrainCount(gameState, player) : '—'} of their customs strain too, and the land presses on them</span>
 	</div>
 	<div>
 		<b>{aliveCount}</b>
