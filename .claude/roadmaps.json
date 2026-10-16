@@ -297,13 +297,16 @@
 					{
 						"id": "4SD.15",
 						"description": "Record history: each band's custom changes and positions, step by step, in the history 6SL.6 starts",
-						"status": "todo",
+						"status": "done",
 						"dependsOn": [
 							"6SL.1",
 							"6SL.6"
 						],
 						"notes": "Today only current state is stored, so neither book can tell customs over time, routes or turning points. Feeds the true book and, through the evidence model, the scholars' book. From the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 1e, 1f). From 6SL.6: one history store. 6SL.6 keeps the per-step strand snapshots on each band and the structured events (kind, band, step, reason) on the game state; this task extends both with custom changes and positions rather than building a second structure.",
-						"assignee": "Jason"
+						"assignee": "Jason",
+						"started": "2026-10-15",
+						"ended": "2026-10-15",
+						"pr": 12
 					},
 					{
 						"id": "4SD.16",
