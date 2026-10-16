@@ -3,6 +3,11 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"config": {
+		"mongodbMemoryServer": {
+			"version": "8.3.11"
+		}
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -20,6 +25,7 @@
 		"@sveltejs/kit": "^2.49.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@vitest/browser-playwright": "^4.0.15",
+		"mongodb-memory-server": "^11.3.0",
 		"playwright": "^1.57.0",
 		"svelte": "^5.45.6",
 		"svelte-check": "^4.3.4",

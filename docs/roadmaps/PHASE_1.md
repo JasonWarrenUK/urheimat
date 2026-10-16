@@ -38,11 +38,11 @@ Urheimat is playable but private and shallow in places, and the gameplay-loop sp
   - Note: Document shapes are already declared as RunDocument and ScoreDocument in src/lib/types.ts; the driver and adapter are installed.
 - [x] **3PL.2**: Wire Auth.js with a GitHub OAuth app and enforce document ownership in the server routes
   - Note: Depends on the deploy for the live callback URL. MongoDB has no row-level security, so ownership checks live in the SvelteKit server routes rather than the database. Also provisions the Atlas cluster the live deploy needs for the OAuth callback URL. Verified live on 2026-09-18: GitHub OAuth round trip writes user, account and session; /api/runs returns 401 anonymous and only the signed-in player's own runs otherwise, excluding another player's run and an ownerless document.
-- [ ] **3PL.3**: Save and resume a run across sessions and devices _(blocked: depends on 3PL.2, 3PL.5)_
+- [ ] **3PL.3**: Save and resume a run across sessions and devices _(depends on 3PL.2, 3PL.5)_
   - Note: Saves are version-gated and discarded this phase: deserialiseState returns null when a saved run's schemaVersion differs from SCHEMA_VERSION (src/lib/sim/serialise.ts), so save/resume does not wait on the tasks that change GameState's shape. Forward migration of saved runs lives in a secondary tier, released once players hold saves worth keeping. Scope line set when 3PL.2 landed: that task shipped the auth mechanism, the requirePlayerId ownership guard and GET /api/runs. The save POST, the delete route and the client-side resume wiring all belong here.
 - [ ] **3PL.4**: Archive of finished runs: unranked records (people, seed, how it ended), each able to rebuild its notebook on demand _(blocked: depends on 3PL.2, 5RC.5, 5RC.6, 5RC.7)_
   - Note: Replaces the leaderboard; there is no score to rank by. ScoreDocument loses total and max, a breaking change to a stored document shape. The archive keeps what is needed to rebuild the notebook, not its text. Sharing an archived notebook is out of scope for this phase. Decided in the 2DS.3 spike (docs/spikes/2DS.3-notebook-design.md, decisions 7a, 7b, 7c). Ships with integration tests for the archive helpers, which replace recordScore.
-- [ ] **3PL.5**: Wire integration tests for the runs access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI) _(depends on 3PL.1)_
+- [x] **3PL.5**: Wire integration tests for the runs access helpers in src/lib/server/, against the compose.yaml instance from 3PL.1 (or mongodb-memory-server if that proves less friction in CI)
   - Note: The data layer ships with pure-function tests only; the connection and CRUD helpers are exercised by a manual smoke test, not committed. This closes that gap before 3PL.3 builds save/resume on top of them.
 
 ---
@@ -391,10 +391,10 @@ graph LR
 	6SL.20 --> 6SL.21
 	6SL.21 --> M6
 	7SC.1 --> M7
-	class 3PL.5,4SD.10,4SD.13,4SD.14,4SD.17,4SD.18,4SD.19,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.20,6SL.4,6SL.8,6SL.9 todo
-	class 2DS.2,3PL.3,3PL.4,4SD.11,4SD.12,4SD.20,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.13,6SL.15,6SL.17,6SL.18,6SL.19,6SL.21,6SL.7 blocked
+	class 3PL.3,4SD.10,4SD.13,4SD.14,4SD.17,4SD.18,4SD.19,4SD.2,4SD.6,5RC.5,6SL.11,6SL.14,6SL.16,6SL.20,6SL.4,6SL.8,6SL.9 todo
+	class 2DS.2,3PL.4,4SD.11,4SD.12,4SD.20,4SD.5,4SD.7,4SD.8,4SD.9,5RC.1,5RC.2,5RC.3,5RC.4,5RC.6,5RC.7,5RC.8,6SL.10,6SL.13,6SL.15,6SL.17,6SL.18,6SL.19,6SL.21,6SL.7 blocked
 	class 7SC.1 deferred
-	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,4SD.15,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5,6SL.6 done
+	class 1FN.1,1FN.2,2DS.1,2DS.3,3PL.1,3PL.2,3PL.5,4SD.15,4SD.16,4SD.4,6SL.1,6SL.12,6SL.2,6SL.3,6SL.5,6SL.6 done
 	class tier0 tierUnderway
 	class tier1 tierDeferred
 ```
