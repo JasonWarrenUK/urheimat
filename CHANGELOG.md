@@ -4,6 +4,24 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-16
+
+### Breaking
+
+- Runs saved under the previous schema no longer load; start a new game after updating. The save schema is now version 10, because every band's history now carries where it stood and what it practised.
+
+### Added
+
+- Band history records places and customs. At the end of each step every band's record holds its seat, the customs it practised and the customs it lacked, beside the condition strands, so the notebook can tell a route and a custom over time rather than the final state only.
+- Every change to a custom is a dated event: which part moved, what it held before and what it holds now. A custom lost or regained is dated the same way. Setting a part to what it already holds leaves no event.
+- Two readers over the history: the seat a band held at a given step, and the steps at which its customs differed from the step before.
+- Integration tests for the save, load, list and delete helpers, run against a real MongoDB started in memory. `compose.yaml` now pins `mongo:8.3.11`, the same version the tests run on; recreate your local container once with `bun run db:up`.
+
+### Changed
+
+- The status bar no longer counts strained ways of life. Strain is shown only per custom, on each custom's own fit line.
+- `scripts/evidence/pacing.ts` no longer reports a parts-straining column.
+
 ## [0.9.0] - 2026-10-15
 
 ### Breaking
@@ -180,7 +198,8 @@ All notable changes to Urheimat are recorded here. The format follows [Keep a Ch
 - Index setup retries after a transient database failure.
 - The local Mongo container binds to loopback only.
 
-[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/JasonWarrenUK/urheimat/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/JasonWarrenUK/urheimat/compare/v0.6.0...v0.7.0
