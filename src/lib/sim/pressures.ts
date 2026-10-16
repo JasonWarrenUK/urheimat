@@ -1,5 +1,6 @@
 import type { Answer, Culture, GameState, MapTerrain, Pressure, Pull, PullSource, Situation, Terrain } from '$lib/types';
 import { aff, contact, setName, vname } from './engine';
+import { emitChange } from './history';
 import { NEAR, SCARCITY_LENS, UPHEAVAL_LENS } from './lens';
 import { heldAbout, isActive, isAvailable } from './predicates';
 import { partTable } from './similarity';
@@ -204,12 +205,15 @@ export function surface(c: Culture): Pull[] {
 }
 
 // Change one part, remembering what left it (a dormant memory the band may be pulled back to) and
-// forgetting what returned.
+// forgetting what returned, and dating the change for the notebook (4SD.15). A change to what the
+// part already holds is no change and leaves no event.
 export function change(st: GameState, c: Culture, si: number, fi: number, next: number[]): void {
 	const prev = c.traits[si][fi];
 	prev.forEach((vi) => !next.includes(vi) && c.lost.push({ custom: si, part: fi, value: vi, step: st.era }));
 	c.lost = c.lost.filter((l) => !(l.custom === si && l.part === fi && next.includes(l.value)));
 	c.traits[si][fi] = next;
+	if (prev.length === next.length && prev.every((vi) => next.includes(vi))) return;
+	emitChange(st, c, si, fi, prev, next, `${SLOTS[si].id}.${SLOTS[si].features[fi].id}: ${setName(si, fi, prev) || 'nothing'} to ${setName(si, fi, next) || 'nothing'}`);
 }
 
 // The value a pull would displace: what an ordinary part holds, or the member a full set would swap
